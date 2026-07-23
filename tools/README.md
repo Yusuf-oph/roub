@@ -18,7 +18,7 @@ python tools/build_data.py
 python tools/build_pages.py 1 2 3
 #    + télécharger les polices QCF_P###.woff2 des nouvelles pages dans app/fonts/qcf/
 
-# 4. déclarer les nouveaux rubs dans app/data/meta.js (+ étoiles), créer les
+# 4. déclarer les nouveaux roub' dans app/data/meta.js (+ étoiles), créer les
 #    placeholders notes/cartes, ajouter les <script> dans app/index.html
 
 # 5. contrôle + paquets + export
@@ -30,12 +30,12 @@ python tools/build_export.py
 ## Règles de rédaction du contenu (rappels)
 
 - JAMAIS de citation coranique tapée à la main : rédiger puis passer
-  `fix_citations.py <rub>` et relire son log (il remplace par la sous-chaîne
+  `fix_citations.py <roub'>` et relire son log (il remplace par la sous-chaîne
   exacte du texte uthmani), puis `verifie.py`.
 - Renvois : `{2:15}` (verset) ou `{2:21-22}` (plage : le clic mène au
   premier verset). Arabe inline : `[[...]]`. Gras `**`, italique `*`.
 - L'affichage transforme le soukoun U+0652 en U+06E1 (graphie de Médine) et
   peut masquer les ronds muets U+06DF : ne PAS modifier les données pour ça.
-- Fichiers par rub : `app/data/notes/<rub>.js` (difficultes/tajwid/tafsir/
-  vocab) et `app/data/cartes/<rub>.js` (mutash/sens uniquement : les cartes
+- Fichiers par rub : `app/data/notes/<roub'>.js` (difficultes/tajwid/tafsir/
+  vocab) et `app/data/cartes/<roub'>.js` (mutash/sens uniquement : les cartes
   d'enchaînement et de vocabulaire sont dérivées automatiquement).

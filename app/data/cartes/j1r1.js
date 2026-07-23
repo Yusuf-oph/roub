@@ -1,4 +1,4 @@
-/* Rub 1 : cartes rédigées (mutashabihat + sens des passages).
+/* Roub' 1 : cartes rédigées (mutashabihat + sens des passages).
    Les cartes d'enchaînement et de vocabulaire sont dérivées automatiquement
    par le moteur (et par tools/build_apkg.py) : ne pas les dupliquer ici. */
 window.CARTES = window.CARTES || {};
@@ -26,7 +26,7 @@ window.CARTES["j1r1"] = [
   {
     id: "j1r1-mt-4", type: "mutash",
     q: "« ṣoummoun boukmoun 'oumyoun fahoum lâ... » : comment finit 2:18, et comment finit son jumeau 2:171 ?",
-    a: "{2:18} : **lâ yardji'oûn** (ils ne reviennent pas) : après la parabole du feu, plus de retour vers la lumière.\n2:171 (rub 10) : *lâ ya'qiloûn* (ils ne raisonnent pas) : après la parabole du berger, absence de raison.",
+    a: "{2:18} : **lâ yardji'oûn** (ils ne reviennent pas) : après la parabole du feu, plus de retour vers la lumière.\n2:171 (roub' 10) : *lâ ya'qiloûn* (ils ne raisonnent pas) : après la parabole du berger, absence de raison.",
     refs: ["2:18"],
   },
   {
@@ -57,7 +57,7 @@ window.CARTES["j1r1"] = [
   },
   {
     id: "j1r1-sn-3", type: "sens",
-    q: "Où se trouve le portrait des hypocrites dans ce rub, et quel est son fil directeur ?",
+    q: "Où se trouve le portrait des hypocrites dans ce roub', et quel est son fil directeur ?",
     a: "{2:8-16} : treize versets (contre deux pour les mécréants : le danger intérieur est pire). Fil : ils **disent** croire → maladie du **doute** au cœur → corruption déguisée en **réforme** → mépris des croyants → moquerie retournée contre eux → bilan : ils ont **troqué la guidée contre l'égarement**.",
     refs: ["2:8", "2:16"],
   },

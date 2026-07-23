@@ -143,7 +143,7 @@ def build_rub(data, rid):
                                   data["NOTES"], data["CARTES"])
     R = QURAN[rid]
     meta = next((m for m in META["rubs"] if m["id"] == rid), {})
-    nom = f'Roub\'::Juz {R["juz"]}::Rub {R["rub"]} · {meta.get("titre", "")}'
+    nom = f'Roub\'::Juz {R["juz"]}::Roub' {R["rub"]} · {meta.get("titre", "")}'
     deck = genanki.Deck(deck_id_for(rid), nom)
     media = {FONT: "_UthmanicHafs.otf"}
     vidx = {v["k"]: v for r in QURAN.values() for v in r["verses"]}

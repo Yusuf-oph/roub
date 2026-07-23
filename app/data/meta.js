@@ -1,5 +1,5 @@
-/* Registre des 16 rubs (juz 1-2). Étoiles = difficulté de MÉMORISATION sur
-   l'échelle de tous les rubs du Qur'an (1 = facile type sourates courtes du
+/* Registre des 16 roub' (juz 1-2). Étoiles = difficulté de MÉMORISATION sur
+   l'échelle de tous les roub' du Qur'an (1 = facile type sourates courtes du
    juz 'Amma ; 5 = les passages législatifs les plus durs du Livre).
    Critères : longueur et régularité des versets, densité de mutashabihat
    (internes et avec d'autres sourates), rareté du vocabulaire, présence ou
@@ -59,7 +59,7 @@ window.META = {
       id: "j2r1", juz: 2, rub: 1, rubGlobal: 9, debut: "2:142", fin: "2:157", n: 16,
       titre: "Le changement de qibla",
       stars: 4, dispo: false,
-      starsWhy: "Le triplet {2:144} / {2:149} / {2:150} (*wa-min ḥaythou kharadjta...*) est l'un des mutashabihat les plus redoutés du Qur'an : trois versets quasi identiques aux suites différentes, dans le même rub. Le reste (épreuve, patience, 2:155-157) est plus fluide.",
+      starsWhy: "Le triplet {2:144} / {2:149} / {2:150} (*wa-min ḥaythou kharadjta...*) est l'un des mutashabihat les plus redoutés du Qur'an : trois versets quasi identiques aux suites différentes, dans le même roub'. Le reste (épreuve, patience, 2:155-157) est plus fluide.",
     },
     {
       id: "j2r2", juz: 2, rub: 2, rubGlobal: 10, debut: "2:158", fin: "2:176", n: 19,
@@ -89,7 +89,7 @@ window.META = {
       id: "j2r6", juz: 2, rub: 6, rubGlobal: 14, debut: "2:219", fin: "2:232", n: 14,
       titre: "Le mariage et le divorce",
       stars: 5, dispo: false,
-      starsWhy: "Le grand bloc législatif du divorce (2:226-232) : versets très longs ({2:228}, {2:229}, {2:231}, {2:232}), vocabulaire juridique précis ('idda, khoul', talâq), conditions et exceptions imbriquées, formulations proches à ne pas mélanger. Parmi les rubs les plus exigeants du Qur'an entier.",
+      starsWhy: "Le grand bloc législatif du divorce (2:226-232) : versets très longs ({2:228}, {2:229}, {2:231}, {2:232}), vocabulaire juridique précis ('idda, khoul', talâq), conditions et exceptions imbriquées, formulations proches à ne pas mélanger. Parmi les roub' les plus exigeants du Qur'an entier.",
     },
     {
       id: "j2r7", juz: 2, rub: 7, rubGlobal: 15, debut: "2:233", fin: "2:242", n: 10,
@@ -109,7 +109,7 @@ window.META = {
       id: "j30r1", juz: 30, rub: 1, rubGlobal: 233, debut: "78:1", fin: "79:46", n: 86,
       titre: "An-Naba' et An-Nâzi'ât",
       stars: 2, dispo: false,
-      starsWhy: "Versets très courts et rimés, récits imagés du Jour dernier : la cadence porte la mémoire. C'est le rub le plus long du juz 'Amma en nombre de versets, d'où une étoile de plus que la fin du juz.",
+      starsWhy: "Versets très courts et rimés, récits imagés du Jour dernier : la cadence porte la mémoire. C'est le roub' le plus long du juz 'Amma en nombre de versets, d'où une étoile de plus que la fin du juz.",
     },
     {
       id: "j30r2", juz: 30, rub: 2, rubGlobal: 234, debut: "80:1", fin: "81:29", n: 71,
@@ -151,7 +151,7 @@ window.META = {
       id: "j30r8", juz: 30, rub: 8, rubGlobal: 240, debut: "100:9", fin: "114:6", n: 82,
       titre: "Les 15 dernières sourates",
       stars: 1, dispo: false,
-      starsWhy: "D'Al-Qâri'a à An-Nâs : les sourates que tout le monde apprend en premier (Al-Ikhlâs, Al-Falaq, An-Nâs, Al-Kawthar...). Le rub le plus accessible du Qur'an : idéal pour commencer.",
+      starsWhy: "D'Al-Qâri'a à An-Nâs : les sourates que tout le monde apprend en premier (Al-Ikhlâs, Al-Falaq, An-Nâs, Al-Kawthar...). Le roub' le plus accessible du Qur'an : idéal pour commencer.",
     },
   ],
 };

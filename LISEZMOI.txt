@@ -1,4 +1,4 @@
-Roub' ۞ mémoriser le Qur'an rub par rub
+Roub' ۞ mémoriser le Qur'an roub' par roub'
 ========================================
 Juz 1, 2 et 'Amma · riwaya Hafs · récitation Al-Husary
 
@@ -27,10 +27,10 @@ autre appareil : Paramètres -> Synchronisation -> génère ton code secret
 
 UTILISER
 --------
-- Accueil : les rubs des juz 1, 2 et 'Amma, avec difficulté sur 5 étoiles.
-  Débutant ? Commence par les derniers rubs du juz 'Amma (les sourates
+- Accueil : les roub' des juz 1, 2 et 'Amma, avec difficulté sur 5 étoiles.
+  Débutant ? Commence par les derniers roub' du juz 'Amma (les sourates
   courtes de la prière).
-- Dans un rub : Mémoriser (3 affichages, dont les vraies pages du mushaf
+- Dans un roub' : Mémoriser (3 affichages, dont les vraies pages du mushaf
   de Médine), puis Difficultés, Tajwid, Tafsir, Vocabulaire, Cartes.
 - Révision : flashcards à répétition espacée (comme Anki).
 - Tutoriels : lire la translittération, légende des couleurs tajwid.
@@ -39,14 +39,14 @@ UTILISER
 
 DONNER TON AVIS (important !)
 -----------------------------
-En bas de chaque onglet d'un rub : étoiles + remarques, bouton Envoyer.
+En bas de chaque onglet d'un roub' : étoiles + remarques, bouton Envoyer.
 Quand tu as fini : Paramètres -> « Exporter mes avis » -> envoie le
 fichier téléchargé à Yusuf : dev.yusuf@pm.me
 
 QUI SOMMES-NOUS
 ---------------
 - Anis, docteur en mathématiques : co-fondateur, à l'origine de la
-  méthode (déroulé rub par rub, difficulté étoilée, cartes, difficultés
+  méthode (déroulé roub' par roub', difficulté étoilée, cartes, difficultés
   de mémorisation, tajwid, rappels de règles, tafsir, vocabulaire).
 - Yusuf, interne en médecine : co-fondateur, conception et réalisation
   (translittération double, site, synchronisation,

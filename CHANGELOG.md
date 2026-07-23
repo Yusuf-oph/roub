@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.5.3 · 2026-07-23
+- Vocabulaire unifié : « roub' » partout dans l'interface et la documentation
+
 ## 1.5.2 · 2026-07-23
 - Licences officialisées : code AGPL-3.0, contenu éditorial CC BY-NC-SA 4.0
 
@@ -11,7 +14,7 @@
 - Les copies locales signalent désormais quand une version plus récente est en ligne
 
 ## 1.4.0 · 2026-07-23
-- Le juz 'Amma (30) rejoint l'application : les sourates courtes idéales pour débuter, découpées en 8 rubs comme le reste
+- Le juz 'Amma (30) rejoint l'application : les sourates courtes idéales pour débuter, découpées en 8 roub' comme le reste
 - Affichage de la version corrigé dans Paramètres
 
 ## 1.3.0 · 2026-07-23
@@ -43,5 +46,5 @@
 - Renvois multi-versets cliquables (« 2:21-22 »), légende tajwid clarifiée
 
 ## 1.0.0 · 2026-07-23
-- Pilote : moteur complet + rub 1 (Al-Fâtiḥa + Al-Baqara 1-25), 3 modes
+- Pilote : moteur complet + roub' 1 (Al-Fâtiḥa + Al-Baqara 1-25), 3 modes
   d'affichage, révision espacée, paquets Anki, feedback exportable

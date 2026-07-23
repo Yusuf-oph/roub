@@ -53,7 +53,7 @@ function applyTheme() {
   document.documentElement.setAttribute("data-theme", PARAMS.theme);
 }
 
-/* index des versets toutes rubs confondues */
+/* index des versets toutes roub' confondues */
 const VIDX = {};
 for (const rid of Object.keys(QURAN)) {
   QURAN[rid].verses.forEach((v, i) => { VIDX[v.k] = { v, rid, i }; });
@@ -356,11 +356,11 @@ function render() {
 
 /* ---------------- accueil ---------------- */
 function pageHome() {
-  let h = `<div class="hero"><h1>Roub' ۞ mémoriser le Qur'an rub par rub</h1>
+  let h = `<div class="hero"><h1>Roub' ۞ mémoriser le Qur'an roub' par roub'</h1>
     <p>Juz 1 et 2 (Al-Fâtiḥa + Al-Baqara) et juz 'Amma (les sourates courtes,
     idéales pour débuter). Riwaya Hafs 'an 'Asim, récitation Al-Husary.
     Les étoiles notent la difficulté de mémorisation sur l'échelle de tous
-    les rubs du Qur'an.</p></div>`;
+    les roub' du Qur'an.</p></div>`;
   const juzList = [...new Set(RUBS.map(r => r.juz))].sort((a, b) => a - b);
   for (const juz of juzList) {
     const rubs = RUBS.filter(r => r.juz === juz);
@@ -375,7 +375,7 @@ function pageHome() {
       const pctSeen = pg.total ? Math.round(100 * pg.seen / pg.total) : 0;
       const pctMature = pg.total ? Math.round(100 * pg.mature / pg.total) : 0;
       h += `<div class="rub-card" data-rub="${r.id}">
-        <div class="head"><span class="num">Rub ${r.rub}</span>${starsHtml(r.stars || 0)}</div>
+        <div class="head"><span class="num">Roub' ${r.rub}</span>${starsHtml(r.stars || 0)}</div>
         <div class="titre">${esc(r.titre || "")}</div>
         <div class="range">${r.debut} → ${r.fin} · ${r.n} versets</div>
         <div class="pbar" title="${pg.seen}/${pg.total} cartes vues · ${pg.mature} mûres · ${pg.matureChains}/${pg.chains} enchaînements acquis">
@@ -434,7 +434,7 @@ function progressionHtml() {
   return h;
 }
 
-/* ---------------- page rub ---------------- */
+/* ---------------- page roub' ---------------- */
 const TABS = [
   ["memoriser", "Mémoriser"], ["difficultes", "Difficultés"],
   ["tajwid", "Tajwid"], ["tafsir", "Tafsir"],
@@ -464,8 +464,8 @@ function pageRub(rid, tab) {
   const R = QURAN[rid];
   const meta = RUBS.find(r => r.id === rid) || {};
   let h = `<div class="rub-head">
-    <span class="back" data-goto-home>← Tous les rubs</span>
-    <h1>Juz ${R.juz} · Rub ${R.rub} ${starsHtml(meta.stars || 0)}</h1>
+    <span class="back" data-goto-home>← Tous les roub'</span>
+    <h1>Juz ${R.juz} · Roub' ${R.rub} ${starsHtml(meta.stars || 0)}</h1>
     <div class="sub">${esc(meta.titre || "")} · ${R.debut} → ${R.fin} · ${R.n} versets</div>
   </div>`;
   h += `<div class="tabs">` + TABS.map(([id, lab]) =>
@@ -505,7 +505,7 @@ function secMemoriser(R) {
       title="calligraphie colorée tajwid (édition officielle v4) ou noir et blanc classique">Couleurs tajwid</button>
     <span class="fb-note">mise en page exacte du mushaf de Médine ·
       clic sur un mot : écouter le verset ; double-clic : lecture à partir de là ;
-      les versets hors de ce rub sont estompés</span>`;
+      les versets hors de ce roub' sont estompés</span>`;
   }
   h += `</div>`;
   let lastS = null;
@@ -551,7 +551,7 @@ function secMemoriser(R) {
     <span class="now" id="audio-now">—</span>
     <button class="evalbtn e0" id="audio-eval" style="display:none"
       title="auto-évaluer le verset en cours">●</button>
-    <button class="primary" data-audio="playall">▶ Tout le rub</button>
+    <button class="primary" data-audio="playall">▶ Tout le roub'</button>
     <button data-audio="pause" id="audio-pause">⏸</button>
     <button data-audio="stop">⏹</button>
     <span style="flex:1"></span>
@@ -605,7 +605,7 @@ function pagesHtml(R) {
 }
 
 function secDifficultes(N, meta) {
-  if (!N || !N.difficultes) return `<div class="empty">Contenu à venir pour ce rub.</div>`;
+  if (!N || !N.difficultes) return `<div class="empty">Contenu à venir pour ce roub'.</div>`;
   let h = "";
   if (meta.starsWhy) {
     h += `<div class="note-card"><div class="nc-head">Pourquoi ${meta.stars}/5</div>${fmt(meta.starsWhy)}</div>`;
@@ -618,8 +618,8 @@ function secDifficultes(N, meta) {
 }
 
 function secTajwid(N) {
-  if (!N || !N.tajwid) return `<div class="empty">Contenu à venir pour ce rub.</div>`;
-  let h = `<div class="note-sec"><h3>Particularités tajwid de ce rub</h3>`;
+  if (!N || !N.tajwid) return `<div class="empty">Contenu à venir pour ce roub'.</div>`;
+  let h = `<div class="note-sec"><h3>Particularités tajwid de ce roub'</h3>`;
   for (const t of N.tajwid) {
     h += `<div class="note-card"><div class="nc-head">${arEsc(t.titre)} ${(t.refs || []).map(vrefBtn).join(" ")}</div>
       ${fmt(t.texte)}
@@ -642,7 +642,7 @@ function secTajwid(N) {
 }
 
 function secTafsir(N) {
-  if (!N || !N.tafsir) return `<div class="empty">Contenu à venir pour ce rub.</div>`;
+  if (!N || !N.tafsir) return `<div class="empty">Contenu à venir pour ce roub'.</div>`;
   let h = `<div class="note-sec"><h3>Tafsir court (synthèse sourcée Ibn Kathîr / As-Sa'dî)</h3>`;
   for (const t of N.tafsir) {
     h += `<div class="note-card"><div class="nc-head">${arEsc(t.titre)} ${(t.refs || []).map(vrefBtn).join(" ")}</div>
@@ -652,7 +652,7 @@ function secTafsir(N) {
 }
 
 function secVocab(N) {
-  if (!N || !N.vocab) return `<div class="empty">Contenu à venir pour ce rub.</div>`;
+  if (!N || !N.vocab) return `<div class="empty">Contenu à venir pour ce roub'.</div>`;
   let h = `<div class="note-sec"><h3>Vocabulaire à connaître</h3>
     <table class="vocab-table"><tr><th>Arabe</th><th>Translit.</th><th>Sens</th><th>Où</th></tr>`;
   for (const w of N.vocab) {
@@ -666,12 +666,12 @@ function secVocab(N) {
 
 function secCartes(rid) {
   const cards = DECKS[rid] || [];
-  if (!cards.length) return `<div class="empty">Cartes à venir pour ce rub.</div>`;
+  if (!cards.length) return `<div class="empty">Cartes à venir pour ce roub'.</div>`;
   const byType = {};
   for (const c of cards) byType[c.type] = (byType[c.type] || 0) + 1;
   const labels = { chain: "Enchaînement", vocab: "Vocabulaire", mutash: "Mutashabihat", sens: "Sens des passages" };
   const st = deckStats(cards.map(c => c.id));
-  let h = `<div class="note-sec"><h3>Cartes de ce rub</h3>
+  let h = `<div class="note-sec"><h3>Cartes de ce roub'</h3>
     <div class="note-card">${Object.keys(byType).map(t =>
       `<span class="badge" style="margin-right:6px">${labels[t] || t} : ${byType[t]}</span>`).join("")}
     <div style="margin-top:10px">
@@ -679,8 +679,8 @@ function secCartes(rid) {
       <span class="badge" style="margin-left:6px">${st.fresh} nouvelles</span>
     </div>
     <div style="margin-top:12px">
-      <button class="fb-send" data-start-deck="${rid}">Réviser ce rub</button>
-      <span class="fb-note">ou l'onglet Révision pour mélanger plusieurs rubs.
+      <button class="fb-send" data-start-deck="${rid}">Réviser ce roub'</button>
+      <span class="fb-note">ou l'onglet Révision pour mélanger plusieurs roub'.
       Paquets Anki (.apkg) dans le dossier <code>apkg/</code>.</span>
     </div></div></div>`;
   return h;
@@ -938,8 +938,8 @@ const TJ_LEGEND = [
 
 function tutoTajwid() {
   let h = `<p>Le texte arabe est colorié comme dans les mushafs tajwid : chaque couleur
-    signale une règle à appliquer. La liste des règles présentes dans un rub, avec les
-    versets exacts, est dans l'onglet « Tajwid » du rub.</p>`;
+    signale une règle à appliquer. La liste des règles présentes dans un roub', avec les
+    versets exacts, est dans l'onglet « Tajwid » du roub'.</p>`;
   for (const [cls, nom, desc] of TJ_LEGEND) {
     h += `<div class="legend-item"><span class="sw" style="background:var(--${cls.replace("tj-", "tj-")})"></span>
       <span><b style="color:var(--${cls})">${esc(nom)}</b> : ${esc(desc)}</span></div>`;
@@ -1033,7 +1033,7 @@ function pageParams() {
     <button class="fb-send" data-preload ${("serviceWorker" in navigator) && navigator.serviceWorker.controller ? "" : "disabled title='disponible sur la version en ligne (après un premier chargement)'"}>Précharger</button></div>
   <p style="color:var(--muted);font-size:13px">Version : <b id="appver">${esc(APPVER || "…")}</b><br><br>
     <b>Roub'</b> est une application co-fondée par <b>Anis</b> (docteur en
-    mathématiques), à l'origine de la méthode : le déroulé rub par rub, la
+    mathématiques), à l'origine de la méthode : le déroulé roub' par roub', la
     difficulté étoilée, les cartes façon Anki, les difficultés de mémorisation,
     les particularités tajwid, les rappels de règles, le tafsir et le
     vocabulaire ; et par <b>Yusuf</b> (interne en médecine), qui l'a conçue et
@@ -1060,7 +1060,7 @@ function fbBox(rid) {
     stars += `<span data-fb-star="${i}" class="${(cur.stars || 0) >= i ? "lit" : ""}">★</span>`;
   }
   return `<div class="fb-box" data-fb-rub="${rid}">
-    <b>Ton avis sur ce rub</b> <span class="fb-note">(chaque avis est lu et sert à améliorer le contenu)</span><br>
+    <b>Ton avis sur ce roub'</b> <span class="fb-note">(chaque avis est lu et sert à améliorer le contenu)</span><br>
     <span class="fb-stars">${stars}</span>
     <textarea placeholder="Remarques : difficulté mal notée, tafsir à préciser, carte inutile...">${esc(cur.text || "")}</textarea><br>
     <button class="fb-send">Envoyer</button>
@@ -1463,7 +1463,7 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "1.5.2";   // réécrit par tools/release.py
+const BUILD_VERSION = "1.5.3";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {

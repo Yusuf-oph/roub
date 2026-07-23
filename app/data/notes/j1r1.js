@@ -1,4 +1,4 @@
-/* Rub 1 (juz 1) : Al-Fâtiḥa + Al-Baqara 1-25.
+/* Roub' 1 (juz 1) : Al-Fâtiḥa + Al-Baqara 1-25.
    Syntaxe des textes : **gras**, *italique*, {2:15} = renvoi cliquable,
    [[texte arabe]] = rendu en police coranique. */
 window.NOTES = window.NOTES || {};
@@ -59,7 +59,7 @@ window.NOTES["j1r1"] = {
     {
       titre: "Ikhfâ' à répétition", refs: ["2:3", "2:21"],
       regles: ["ikhfa"],
-      texte: "Le rub en est truffé : [[يُنفِقُونَ]] ({2:3}, n devant f), [[مِن قَبْلِكُمْ]] ({2:21}, n devant q), [[أَنتُمْ]]... À chaque fois : son nasal de 2 temps, langue décollée du palais.",
+      texte: "Le roub' en est truffé : [[يُنفِقُونَ]] ({2:3}, n devant f), [[مِن قَبْلِكُمْ]] ({2:21}, n devant q), [[أَنتُمْ]]... À chaque fois : son nasal de 2 temps, langue décollée du palais.",
     },
     {
       titre: "Mîm sakina devant bâ' : ikhfâ' shafawi", refs: ["2:8"],
@@ -72,14 +72,14 @@ window.NOTES["j1r1"] = {
       texte: "[[رَزَقْنَـٰهُمْ]] ({2:3}) : rebond du qâf. [[يَجْعَلُونَ]] ({2:19}) : rebond du djîm. [[أَبْصَـٰرِهِمْ]] ({2:7}) : rebond du bâ'. Un rebond sec, sans voyelle parasite.",
     },
     {
-      titre: "Madd muttasil et munfasil du rub", refs: ["2:13", "2:4"],
+      titre: "Madd muttasil et munfasil du roub'", refs: ["2:13", "2:4"],
       regles: ["madd-muttasil", "madd-munfasil", "madd-arid"],
       texte: "Muttasil (4-5 temps, hamza dans le mot) : [[ٱلسُّفَهَآءُ]] ({2:13}), [[ٱلسَّمَآءِ]] ({2:19}), [[مَآءً]] ({2:22}). Munfasil (hamza au mot suivant) : [[بِمَآ أُنزِلَ]] ({2:4}), [[يَـٰٓأَيُّهَا]] ({2:21}). Et à chaque fin de verset, le madd 'âriḍ : *you'minoûoûn*, *yattaqoûoûn*...",
     },
     {
       titre: "Le lâm d'Allah : sombre ou clair", refs: ["2:7", "2:8"],
       regles: ["lam-allah", "lam-shamsiyya", "hamzat-wasl"],
-      texte: "[[خَتَمَ ٱللَّهُ]] ({2:7}) : lâm **sombre** après la fatha. [[بِٱللَّهِ]] ({2:8}) : lâm **clair** après la kasra. Le rub multiplie aussi les articles solaires ([[ٱلصَّلَوٰةَ]], [[ٱلسُّفَهَآءُ]]) et les hamzat wasl à élider en liaison.",
+      texte: "[[خَتَمَ ٱللَّهُ]] ({2:7}) : lâm **sombre** après la fatha. [[بِٱللَّهِ]] ({2:8}) : lâm **clair** après la kasra. Le roub' multiplie aussi les articles solaires ([[ٱلصَّلَوٰةَ]], [[ٱلسُّفَهَآءُ]]) et les hamzat wasl à élider en liaison.",
     },
   ],
 

@@ -1,4 +1,4 @@
-/* Fiches de règles tajwid, référencées par les onglets « Tajwid » des rubs
+/* Fiches de règles tajwid, référencées par les onglets « Tajwid » des roub'
    (champ regles: [ids]) et affichées dans Tutoriels > Fiches de règles.
    Exemples pris dans les juz 1-2 chaque fois que possible. */
 window.REGLES = [

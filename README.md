@@ -1,13 +1,13 @@
-# Roub' ۞ mémoriser le Qur'an rub par rub
+# Roub' ۞ mémoriser le Qur'an roub' par roub'
 
 **Application web : https://yusuf-oph.github.io/roub/**
 
 Roub' (رُبْع, « le quart ») aide à mémoriser le Qur'an en suivant le
-découpage traditionnel du mushaf : le rub. Couverture actuelle : **juz 1
+découpage traditionnel du mushaf : le roub'. Couverture actuelle : **juz 1
 et 2** (Al-Fâtiḥa + Al-Baqara) et **juz 'Amma** (les sourates courtes,
-idéales pour débuter), soit 24 rubs et 823 versets.
+idéales pour débuter), soit 24 roub' et 823 versets.
 
-Pour chaque rub : texte du mushaf de Médine colorié tajwid, **pagination
+Pour chaque roub' : texte du mushaf de Médine colorié tajwid, **pagination
 exacte du mushaf** (calligraphie officielle QCF, en noir et blanc ou en
 édition colorée tajwid), translittération à double style (hybride
 française / scientifique), traduction Hamidullah, audio Al-Husary verset
@@ -21,7 +21,7 @@ fonctionne hors-ligne.
 ## Qui sommes-nous
 
 - **Anis** : co-fondateur, docteur en mathématiques. À l'origine de la
-  méthode : le déroulé rub par rub, la difficulté étoilée, les cartes
+  méthode : le déroulé roub' par roub', la difficulté étoilée, les cartes
   façon Anki, les listes de difficultés de mémorisation, les
   particularités tajwid, les rappels de règles, le tafsir et le
   vocabulaire.
