@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.3.0 · 2026-07-23
+- Synchronisation multi-appareils disponible : crée ton code secret dans Paramètres pour retrouver ta progression partout
+
 ## 1.2.2 · 2026-07-23
 - Adresse de retour des avis : dev.yusuf@pm.me
 
