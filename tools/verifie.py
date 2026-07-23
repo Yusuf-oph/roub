@@ -170,6 +170,9 @@ def main():
                 check_refs(it.get("refs"), ctx)
                 check_snippets(it.get("texte", ""), rid, ctx)
                 check_inline_refs(it.get("texte", ""), ctx)
+                # règle absolue : le tafsir est TOUJOURS sourcé (champ src)
+                if sec == "tafsir" and not (it.get("src") or "").strip():
+                    err(f"{ctx} : bloc de tafsir SANS source (champ src obligatoire)")
                 for rg in it.get("regles") or []:
                     if rg not in rids:
                         err(f"{ctx} : règle {rg} inconnue")
