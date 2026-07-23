@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.2.1 · 2026-07-23
+- Affichage adapté aux smartphones (bandeau de navigation)
+
 ## 1.2.0 · 2026-07-23
 - L'application s'appelle désormais Roub' ۞
 - Protection renforcée de la progression locale (stockage persistant)

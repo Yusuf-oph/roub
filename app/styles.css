@@ -462,6 +462,19 @@ h2.sec { font-size: 18px; margin: 22px 0 8px; }
 
 @media (max-width: 640px) {
   .ar { font-size: 25px; }
-  .nav button { padding: 6px 8px; font-size: 13px; }
   .wrap { padding: 14px 12px 90px; }
+  /* bandeau en 2 rangées : logo + thème, puis navigation défilante */
+  .topbar { flex-wrap: wrap; padding: 8px 10px; gap: 6px; row-gap: 4px; }
+  .logo .mark { width: 30px; height: 30px; font-size: 15px; }
+  .logo b { font-size: 15px; }
+  .iconbtn { padding: 5px 8px; font-size: 13px; }
+  .nav {
+    order: 3; width: 100%; margin-left: 0;
+    flex-wrap: nowrap; overflow-x: auto;
+    scrollbar-width: none; -webkit-overflow-scrolling: touch;
+  }
+  .nav::-webkit-scrollbar { display: none; }
+  .nav button { padding: 6px 10px; font-size: 13.5px; white-space: nowrap; flex: none; }
+  .hero h1 { font-size: 20px; }
+  .fc-actions button { min-width: 72px; padding: 8px 10px; }
 }
