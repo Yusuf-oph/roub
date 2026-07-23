@@ -1,7 +1,7 @@
 {
-  "version": "1.5.6",
+  "version": "1.5.7",
   "date": "2026-07-23",
   "notes": [
-    "Audit sourcé étendu à tout le contenu : fiches tajwid vérifiées contre Tuhfat al-Atfal et la Jazariyya (et sourcées), exception d'idghâm dans un même mot ajoutée, formulation du triplet de la qibla précisée, vocabulaire confronté à la traduction"
+    "Mention ajoutée : contenu sourcé et vérifié, toute erreur peut être signalée via les avis"
   ]
 }

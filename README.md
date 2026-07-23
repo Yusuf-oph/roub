@@ -31,8 +31,10 @@ fonctionne hors-ligne.
   web et PWA, synchronisation Supabase, auto-évaluation, affichage de la
   progression. Discord : **@ophtalmologie**.
 
-**Avis, bugs, suggestions : dev.yusuf@pm.me** (ou l'export d'avis intégré
-à l'application, dans Paramètres).
+Tout le contenu religieux (tafsir, hadiths, règles de tajwid, texte) est
+sourcé et vérifié contre ses sources ; une erreur reste toujours possible :
+merci de la signaler. **Avis, bugs, suggestions : dev.yusuf@pm.me** (ou
+l'export d'avis intégré à l'application, dans Paramètres).
 
 ## Utiliser
 

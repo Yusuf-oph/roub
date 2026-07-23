@@ -39,6 +39,8 @@ UTILISER
 
 DONNER TON AVIS (important !)
 -----------------------------
+Tout le contenu est sourcé et vérifié, mais une erreur reste toujours
+possible : si tu en repères une, signale-la !
 En bas de chaque onglet d'un roub' : étoiles + remarques, bouton Envoyer.
 Quand tu as fini : Paramètres -> « Exporter mes avis » -> envoie le
 fichier téléchargé à Yusuf : dev.yusuf@pm.me

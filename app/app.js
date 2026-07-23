@@ -1064,7 +1064,7 @@ function fbBox(rid) {
     stars += `<span data-fb-star="${i}" class="${(cur.stars || 0) >= i ? "lit" : ""}">★</span>`;
   }
   return `<div class="fb-box" data-fb-rub="${rid}">
-    <b>Ton avis sur ce roub'</b> <span class="fb-note">(chaque avis est lu et sert à améliorer le contenu)</span><br>
+    <b>Ton avis sur ce roub'</b> <span class="fb-note">(tout le contenu est sourcé et vérifié, mais une erreur reste toujours possible : signale-la, chaque avis est lu)</span><br>
     <span class="fb-stars">${stars}</span>
     <textarea placeholder="Remarques : difficulté mal notée, tafsir à préciser, carte inutile...">${esc(cur.text || "")}</textarea><br>
     <button class="fb-send">Envoyer</button>
@@ -1467,7 +1467,7 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "1.5.6";   // réécrit par tools/release.py
+const BUILD_VERSION = "1.5.7";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {
