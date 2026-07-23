@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.6.0 · 2026-07-24
+- Liens profonds vers les modes d'affichage (partager une vue précise, ex. #rub/j1r1/memoriser/pagescouleur)
+- Présentation du projet enrichie : captures d'écran, crédits à jour, licences bilingues
+
 ## 1.5.8 · 2026-07-23
 - Mention ajoutée : contenu sourcé et vérifié, toute erreur peut être signalée via les avis
 

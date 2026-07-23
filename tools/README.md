@@ -39,3 +39,12 @@ python tools/build_export.py
 - Fichiers par rub : `app/data/notes/<roub'>.js` (difficultes/tajwid/tafsir/
   vocab) et `app/data/cartes/<roub'>.js` (mutash/sens uniquement : les cartes
   d'enchaînement et de vocabulaire sont dérivées automatiquement).
+
+## Publier une mise à jour (mainteneur)
+
+1. Modifier le contenu ou le code (règles de rédaction ci-dessus).
+2. `python tools/verifie.py` : doit être TOUT VERT.
+3. Éditer les `notes` de `app/version.json`, puis
+   `python tools/release.py <version>` (SemVer : MAJOR = rupture de format,
+   MINOR = fonctionnalité ou lot de contenu, PATCH = correctif).
+4. Commit + push sur `main` : le workflow `pages.yml` déploie `app/`.

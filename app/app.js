@@ -336,7 +336,7 @@ window.addEventListener("hashchange", render);
 function route() {
   const h = (location.hash || "#home").slice(1);
   const parts = h.split("/");
-  return { page: parts[0] || "home", a: parts[1], b: parts[2] };
+  return { page: parts[0] || "home", a: parts[1], b: parts[2], c: parts[3] };
 }
 
 function render() {
@@ -345,6 +345,12 @@ function render() {
   $$(".nav button").forEach(btn =>
     btn.classList.toggle("on", btn.dataset.page === page));
   const main = $("#main");
+  const { c } = route();
+  // lien profond optionnel vers un mode d'affichage : #rub/j1r1/memoriser/pages
+  if (page === "rub" && c) {
+    if (["versets", "continu", "pages"].includes(c)) memoState.mode = c;
+    if (c === "pagescouleur") { memoState.mode = "pages"; memoState.pagesColor = true; }
+  }
   if (page === "rub" && QURAN[a]) main.innerHTML = pageRub(a, b || "memoriser");
   else if (page === "revision") main.innerHTML = pageRevision();
   else if (page === "tutoriels") main.innerHTML = pageTutoriels(a || "translit");
@@ -1469,7 +1475,7 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "1.5.8";   // réécrit par tools/release.py
+const BUILD_VERSION = "1.6.0";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {

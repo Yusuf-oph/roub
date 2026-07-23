@@ -36,3 +36,29 @@ dev.yusuf@pm.me.
 
 Du fait de ces conditions, l'application dans son ensemble est et doit
 rester **gratuite et non commerciale**.
+
+---
+
+## In English (for legal clarity)
+
+© 2026 Anis & Yusuf.
+
+- **Code** (app engine, service worker, tools, local server): licensed
+  under the **GNU AGPL-3.0** (see the `LICENSE` file, whose English text
+  is the authoritative licence).
+- **Editorial content** (memorisation notes, tajwid notes, sourced tafsir
+  summaries, vocabulary, flashcards, rule sheets, tutorials, interface
+  texts): licensed under **Creative Commons BY-NC-SA 4.0**
+  (https://creativecommons.org/licenses/by-nc-sa/4.0/ : attribution
+  required as "Roub', Anis & Yusuf", no commercial use, share-alike).
+  The CC legal code, including its official translations, governs.
+- **Third-party materials** keep their own terms: Qur'anic text and page
+  calligraphy (King Fahd Glorious Qur'an Printing Complex, via quran.com,
+  including the UthmanicHafs and QCF fonts : the Qur'anic text may not be
+  altered), French translation by Muhammad Hamidullah (non-commercial
+  distribution), recitation by Mahmoud Khalil Al-Husary via everyayah.com
+  (non-commercial use).
+
+Because of these third-party terms, the application as a whole is and must
+remain **free of charge and non-commercial**. Licence exception requests:
+dev.yusuf@pm.me.

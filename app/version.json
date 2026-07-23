@@ -1,7 +1,8 @@
 {
-  "version": "1.5.8",
-  "date": "2026-07-23",
+  "version": "1.6.0",
+  "date": "2026-07-24",
   "notes": [
-    "Mention ajoutée : contenu sourcé et vérifié, toute erreur peut être signalée via les avis"
+    "Liens profonds vers les modes d'affichage (partager une vue précise, ex. #rub/j1r1/memoriser/pagescouleur)",
+    "Présentation du projet enrichie : captures d'écran, crédits à jour, licences bilingues"
   ]
 }

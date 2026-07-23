@@ -26,10 +26,12 @@ fonctionne hors-ligne.
   particularités tajwid, les rappels de règles, le tafsir et le
   vocabulaire.
 - **Yusuf** : co-fondateur, interne en médecine. Conception et
-  réalisation, et les idées qui vont autour :
-  translittération scientifique stricte ou hybride au choix, distribution
-  web et PWA, synchronisation Supabase, auto-évaluation, affichage de la
-  progression. Discord : **@ophtalmologie**.
+  réalisation, et les idées qui vont autour : translittération
+  scientifique stricte ou hybride au choix, distribution web et PWA,
+  synchronisation par code anonyme (Supabase), auto-évaluation,
+  affichage de la progression, ouverture aux débutants par le juz 'Amma,
+  exigence d'un contenu intégralement sourcé et audité, notification de
+  mise à jour des copies locales. Discord : **@ophtalmologie**.
 
 Tout le contenu religieux (tafsir, hadiths, règles de tajwid, texte) est
 sourcé et vérifié contre ses sources ; une erreur reste toujours possible :
@@ -44,32 +46,41 @@ l'export d'avis intégré à l'application, dans Paramètres).
   automatiques (bannière en haut de page).
 - **En local, sans serveur** : Code → Download ZIP sur cette page GitHub,
   dézipper, ouvrir `app/index.html` (ou `start.bat` sous Windows avec
-  Python). Tout fonctionne, audio compris. Les copies locales ne se
-  mettent pas à jour toutes seules, mais l'application le signale
+  Python). Tout fonctionne, audio compris ; l'application signale
   lorsqu'une version plus récente est en ligne.
 
-## Mettre à jour (mainteneur)
+### L'accueil : les 24 roub' et leur difficulté
 
-1. Modifier le contenu (voir `tools/README.md` : pipeline, règles de
-   rédaction, ajout d'un juz).
-2. `python tools/verifie.py` (doit être TOUT VERT).
-3. Éditer les `notes` de `app/version.json`, puis
-   `python tools/release.py <nouvelle-version>` (SemVer : MAJOR = rupture de
-   format, MINOR = fonctionnalité ou lot de contenu, PATCH = correctif).
-4. Commit + push sur `main` : le workflow `pages.yml` déploie `app/`.
+![Accueil : les roub' des juz 1, 2 et 'Amma](docs/img/accueil.png)
+
+### Mémoriser : tajwid colorié, translittération, traduction, audio
+
+![Mémoriser un roub' : texte colorié tajwid + translittération + audio](docs/img/memoriser.png)
+
+### Les vraies pages du mushaf de Médine (édition colorée tajwid)
+
+![Pages exactes du mushaf, calligraphie officielle colorée](docs/img/pages-mushaf.png)
+
+### Révision espacée intégrée
+
+![Révision espacée, à la façon d'Anki](docs/img/revision.png)
 
 ## Sources et licences
 
 - **Code : AGPL-3.0** (fichier `LICENSE`) · **Contenu éditorial :
-  CC BY-NC-SA 4.0** : détails dans `LICENSE-CONTENU.md`.
+  CC BY-NC-SA 4.0** : détails (français et anglais) dans
+  `LICENSE-CONTENU.md`.
 - Texte coranique : mushaf de Médine, Complexe du Roi Fahd (KFGQPC), via
   l'API quran.com ; polices UthmanicHafs et QCF du KFGQPC.
 - Traduction française : Muhammad Hamidullah.
 - Récitation : Mahmoud Khalil Al-Husary (everyayah.com), usage non
   commercial.
 - Tafsir : synthèses rédigées, sourcées d'Ibn Kathîr (Tafsîr al-Qur'ân
-  al-'Adhîm) et d'As-Sa'dî (Taysîr al-Karîm ar-Rahmân).
+  al-'Adhîm) et d'As-Sa'dî (Taysîr al-Karîm ar-Rahmân) ; règles de tajwid
+  d'après Tuhfat al-Atfal et al-Muqaddima al-Jazariyya.
 
 Application gratuite et non commerciale, sans compte ni collecte de
 données personnelles ; la synchronisation optionnelle repose sur un code
 secret anonyme. © 2026 Anis & Yusuf.
+
+Développement et maintenance : voir `tools/README.md`.
