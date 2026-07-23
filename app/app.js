@@ -992,7 +992,7 @@ function pageParams() {
     </select></div>
   <div class="param-row"><div class="lab"><b>Exporter mes avis</b>
       <span>télécharge un fichier .json avec toutes tes notes et remarques,
-      à renvoyer à la personne qui t'a partagé le site</span></div>
+      à envoyer à Yusuf : <a href="mailto:dev.yusuf@pm.me">dev.yusuf@pm.me</a></span></div>
     <button class="fb-send" data-fb-export>Exporter</button></div>
   ${!SYNC_ON ? `
   <div class="param-row"><div class="lab"><b>Synchronisation multi-appareils</b>
@@ -1044,7 +1044,7 @@ function fbBox(rid) {
     <button class="fb-send">Envoyer</button>
     <span class="fb-note" id="fb-status">${cur.ts ? "envoyé le " + esc(cur.ts) : ""}</span>
     <span class="fb-note">· <a data-fb-export style="cursor:pointer">exporter tous mes avis</a>
-      (fichier à renvoyer à la personne qui t'a partagé le site)</span>
+      (fichier à envoyer à Yusuf : <a href="mailto:dev.yusuf@pm.me">dev.yusuf@pm.me</a>)</span>
   </div>`;
 }
 

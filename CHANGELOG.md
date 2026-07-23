@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.2.2 · 2026-07-23
+- Adresse de retour des avis : dev.yusuf@pm.me
+
 ## 1.2.1 · 2026-07-23
 - Affichage adapté aux smartphones (bandeau de navigation)
 

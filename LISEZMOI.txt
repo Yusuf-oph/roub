@@ -28,8 +28,11 @@ DONNER TON AVIS (important !)
 -----------------------------
 En bas de chaque onglet d'un rub : note en étoiles + zone de remarques,
 bouton Envoyer. Quand tu as fini de tester :
-Paramètres -> « Exporter mes avis » -> un fichier avis-quran-<toi>-<date>.json
-se télécharge : renvoie-le à la personne qui t'a partagé le site.
+Paramètres -> « Exporter mes avis » -> un fichier avis-roub-<toi>-<date>.json
+se télécharge : envoie-le à Yusuf, à l'adresse dev.yusuf@pm.me.
+
+Le site existe aussi en ligne (mises à jour automatiques) :
+https://yusuf-oph.github.io/roub/
 
 Sources : texte du mushaf de Médine (Complexe du Roi Fahd, via quran.com),
 traduction Muhammad Hamidullah, récitation Mahmoud Khalil Al-Husary
