@@ -1037,7 +1037,7 @@ function pageParams() {
     difficulté étoilée, les cartes façon Anki, les difficultés de mémorisation,
     les particularités tajwid, les rappels de règles, le tafsir et le
     vocabulaire ; et par <b>Yusuf</b> (interne en médecine), qui l'a conçue et
-    réalisée avec Claude en y ajoutant la translittération à double style, la
+    réalisée en y ajoutant la translittération à double style, la
     distribution web, la synchronisation multi-appareils, l'auto-évaluation et
     la progression. Avis et contact :
     <a href="mailto:dev.yusuf@pm.me">dev.yusuf@pm.me</a> · Discord
@@ -1058,7 +1058,7 @@ function fbBox(rid) {
     stars += `<span data-fb-star="${i}" class="${(cur.stars || 0) >= i ? "lit" : ""}">★</span>`;
   }
   return `<div class="fb-box" data-fb-rub="${rid}">
-    <b>Ton avis sur ce rub</b> <span class="fb-note">(lu par Claude pour améliorer le contenu)</span><br>
+    <b>Ton avis sur ce rub</b> <span class="fb-note">(chaque avis est lu et sert à améliorer le contenu)</span><br>
     <span class="fb-stars">${stars}</span>
     <textarea placeholder="Remarques : difficulté mal notée, tafsir à préciser, carte inutile...">${esc(cur.text || "")}</textarea><br>
     <button class="fb-send">Envoyer</button>
@@ -1461,7 +1461,7 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "1.5.0";   // réécrit par tools/release.py
+const BUILD_VERSION = "1.5.1";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {

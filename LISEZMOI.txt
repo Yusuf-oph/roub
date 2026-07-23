@@ -49,7 +49,7 @@ QUI SOMMES-NOUS
   méthode (déroulé rub par rub, difficulté étoilée, cartes, difficultés
   de mémorisation, tajwid, rappels de règles, tafsir, vocabulaire).
 - Yusuf, interne en médecine : co-fondateur, conception et réalisation
-  avec Claude (translittération double, site, synchronisation,
+  (translittération double, site, synchronisation,
   auto-évaluation, progression). Discord : @ophtalmologie
 
 Sources : texte du mushaf de Médine (Complexe du Roi Fahd, via quran.com),

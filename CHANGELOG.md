@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.5.1 · 2026-07-23
+- Crédits ajustés
+
 ## 1.5.0 · 2026-07-23
 - Crédits des co-fondateurs (Anis & Yusuf) et contact dans Paramètres
 - Les copies locales signalent désormais quand une version plus récente est en ligne

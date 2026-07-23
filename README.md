@@ -26,7 +26,7 @@ fonctionne hors-ligne.
   particularités tajwid, les rappels de règles, le tafsir et le
   vocabulaire.
 - **Yusuf** : co-fondateur, interne en médecine. Conception et
-  réalisation (avec Claude), et les idées qui vont autour :
+  réalisation, et les idées qui vont autour :
   translittération scientifique stricte ou hybride au choix, distribution
   web et PWA, synchronisation Supabase, auto-évaluation, affichage de la
   progression. Discord : **@ophtalmologie**.
