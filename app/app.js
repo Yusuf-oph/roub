@@ -1463,7 +1463,7 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "1.5.3";   // réécrit par tools/release.py
+const BUILD_VERSION = "1.5.4";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {

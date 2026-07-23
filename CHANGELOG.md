@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.5.4 · 2026-07-23
+- Audit des sources du roub' 1 : positions des mufassirin et hadiths vérifiés contre les textes ; corrections de fidélité (2:19-20, 2:25) et degré d'authenticité ajouté
+
 ## 1.5.3 · 2026-07-23
 - Vocabulaire unifié : « roub' » partout dans l'interface et la documentation
 

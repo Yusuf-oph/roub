@@ -64,7 +64,7 @@ window.CARTES["j1r1"] = [
   {
     id: "j1r1-sn-4", type: "sens",
     q: "Les deux paraboles des hypocrites (2:17-20) : que représentent le feu et l'averse ?",
-    a: "**Le feu** ({2:17-18}) : la foi affichée un instant puis retirée : ténèbres définitives (sourds, muets, aveugles).\n**L'averse** ({2:19-20}) : le Qur'an qui descend comme une pluie ; eux n'y voient qu'obscurités, tonnerre et éclairs, et se bouchent les oreilles. Selon Ibn Kathîr (d'après Ibn 'Abbâs) : deux degrés d'hypocrisie, totale ou hésitante.",
+    a: "**Le feu** ({2:17-18}) : la foi affichée un instant puis retirée : ténèbres définitives (sourds, muets, aveugles).\n**L'averse** ({2:19-20}) : leurs doutes et frayeurs en ténèbres et tonnerre, les lueurs de foi en éclairs ; ils se bouchent les oreilles. Selon Ibn Kathîr (d'après Ibn 'Abbâs) : deux degrés d'hypocrisie, totale ou hésitante.",
     refs: ["2:17", "2:19"],
   },
   {
@@ -82,7 +82,7 @@ window.CARTES["j1r1"] = [
   {
     id: "j1r1-sn-7", type: "sens",
     q: "2:25 : les trois éléments de l'annonce faite aux croyants.",
-    a: "1. Des **jardins** sous lesquels coulent les rivières, aux **fruits ressemblants** (moutashâbihan : l'apparence connue, le goût nouveau, dit As-Sa'dî) · 2. Des **épouses purifiées** · 3. L'**éternité** (khâlidoûn).",
+    a: "1. Des **jardins** sous lesquels coulent les rivières, aux **fruits ressemblants** (moutashâbihan : tous d'égale beauté et d'égal délice, sans fruit médiocre, selon As-Sa'dî) · 2. Des **épouses purifiées** · 3. L'**éternité** (khâlidoûn).",
     refs: ["2:25"],
   },
 ];
