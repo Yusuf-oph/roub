@@ -1,0 +1,36 @@
+Roub' ۞ mémoriser le Qur'an rub par rub — juz 1 et 2 (Hafs, récitation Al-Husary)
+======================================================
+
+LANCER LE SITE
+--------------
+Deux façons, au choix :
+1. Double-cliquer sur  start.bat  (si Python est installé : ouvre le site
+   dans ton navigateur, avec sauvegarde des avis dans un fichier local).
+2. Sinon, ouvrir directement  app\index.html  dans ton navigateur :
+   tout fonctionne pareil (audio compris), sans rien installer.
+
+Ta progression (cartes révisées, réglages, avis) est gardée dans le
+navigateur : utilise toujours le même navigateur sur le même PC.
+
+UTILISER
+--------
+- Accueil : les 16 rubs des juz 1-2, avec leur difficulté sur 5 étoiles.
+- Dans un rub : onglet Mémoriser (texte arabe colorié tajwid + prononciation
+  + traduction + audio verset par verset), puis Difficultés, Tajwid, Tafsir,
+  Vocabulaire, Cartes (le rub 1 est complet, la suite arrive).
+- Révision : flashcards à répétition espacée (comme Anki).
+- Tutoriels : comment lire la prononciation (translittération) et la légende
+  des couleurs tajwid. À lire en premier si tu ne lis pas l'arabe.
+- Paramètres : style de prononciation, thème, affichages.
+- Le dossier  apkg\  contient les paquets Anki à importer si tu utilises Anki.
+
+DONNER TON AVIS (important !)
+-----------------------------
+En bas de chaque onglet d'un rub : note en étoiles + zone de remarques,
+bouton Envoyer. Quand tu as fini de tester :
+Paramètres -> « Exporter mes avis » -> un fichier avis-quran-<toi>-<date>.json
+se télécharge : renvoie-le à la personne qui t'a partagé le site.
+
+Sources : texte du mushaf de Médine (Complexe du Roi Fahd, via quran.com),
+traduction Muhammad Hamidullah, récitation Mahmoud Khalil Al-Husary
+(everyayah.com). Tafsir : synthèses sourcées d'Ibn Kathîr et d'As-Sa'dî.

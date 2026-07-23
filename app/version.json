@@ -1,0 +1,9 @@
+{
+  "version": "1.2.0",
+  "date": "2026-07-23",
+  "notes": [
+    "L'application s'appelle désormais Roub' ۞",
+    "Protection renforcée de la progression locale (stockage persistant)",
+    "Suggestion du code de synchronisation en fin de première session"
+  ]
+}

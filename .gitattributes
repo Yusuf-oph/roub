@@ -1,0 +1,7 @@
+* text=auto eol=lf
+*.png binary
+*.mp3 binary
+*.woff2 binary
+*.otf binary
+*.apkg binary
+*.bat text eol=crlf

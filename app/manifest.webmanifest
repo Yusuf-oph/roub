@@ -1,0 +1,16 @@
+{
+  "name": "Roub' · mémorisation du Qur'an",
+  "short_name": "Roub'",
+  "description": "Mémoriser le Qur'an rub par rub : mushaf de Médine, tajwid colorié, translittération, audio Husary, révision espacée.",
+  "lang": "fr",
+  "dir": "ltr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0e1320",
+  "theme_color": "#0e1320",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}

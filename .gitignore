@@ -1,0 +1,14 @@
+# archives de partage locales
+quran-hifz-*.zip
+roub-*.zip
+
+# caches regénérables du pipeline
+tools/cache/
+__pycache__/
+
+# retours privés (les avis des amis ne vont pas sur un dépôt public)
+feedback-recus/
+app/data/feedback.json
+
+# outillage local
+.claude/

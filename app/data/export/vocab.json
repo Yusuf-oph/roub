@@ -1,0 +1,237 @@
+{
+ "genere": "2026-07-23",
+ "source": "quran-hifz",
+ "vocab": [
+  {
+   "ar": "ٱلْغَيْب",
+   "sci": "al-ġayb",
+   "fr": "al-ghayb",
+   "sens": "l'invisible, ce qui échappe aux sens",
+   "refs": [
+    "2:3"
+   ],
+   "rub": "j1r1"
+  },
+  {
+   "ar": "يُقِيمُونَ",
+   "sci": "yuqīmūna",
+   "fr": "youqîmoûna",
+   "sens": "ils accomplissent pleinement (la prière)",
+   "refs": [
+    "2:3"
+   ],
+   "rub": "j1r1"
+  },
+  {
+   "ar": "رَيْب",
+   "sci": "rayb",
+   "fr": "rayb",
+   "sens": "doute (qui insinue le soupçon)",
+   "refs": [
+    "2:2",
+    "2:23"
+   ],
+   "rub": "j1r1"
+  },
+  {
+   "ar": "خَتَمَ",
+   "sci": "ḫatama",
+   "fr": "khatama",
+   "sens": "sceller",
+   "refs": [
+    "2:7"
+   ],
+   "rub": "j1r1"
+  },
+  {
+   "ar": "غِشَـٰوَةٌ",
+   "sci": "ġišāwa",
+   "fr": "ghichâwa",
+   "sens": "voile (sur les yeux)",
+   "refs": [
+    "2:7"
+   ],
+   "rub": "j1r1"
+  },
+  {
+   "ar": "يُخَـٰدِعُونَ",
+   "sci": "yuḫādiʿūna",
+   "fr": "youkhâdiʿoûna",
+   "sens": "ils cherchent à tromper",
+   "refs": [
+    "2:9"
+   ],
+   "rub": "j1r1"
+  },
+  {
+   "ar": "مَرَض",
+   "sci": "maraḍ",
+   "fr": "maraḍ",
+   "sens": "maladie (ici : du cœur, le doute)",
+   "refs": [
+    "2:10"
+   ],
+   "rub": "j1r1"
+  },
+  {
+   "ar": "ٱلسُّفَهَآءُ",
+   "sci": "sufahāʾ",
+   "fr": "soufahâ'",
+   "sens": "insensés, faibles d'esprit",
+   "refs": [
+    "2:13"
+   ],
+   "rub": "j1r1"
+  },
+  {
+   "ar": "شَيَـٰطِينِ",
+   "sci": "šayāṭīn",
+   "fr": "chayâṭîn",
+   "sens": "démons ; ici : leurs meneurs",
+   "refs": [
+    "2:14"
+   ],
+   "rub": "j1r1"
+  },
+  {
+   "ar": "طُغْيَـٰنِ",
+   "sci": "ṭuġyān",
+   "fr": "ṭoughyân",
+   "sens": "transgression démesurée",
+   "refs": [
+    "2:15"
+   ],
+   "rub": "j1r1"
+  },
+  {
+   "ar": "يَعْمَهُونَ",
+   "sci": "yaʿmahūna",
+   "fr": "yaʿmahoûna",
+   "sens": "ils errent aveuglément",
+   "refs": [
+    "2:15"
+   ],
+   "rub": "j1r1"
+  },
+  {
+   "ar": "ٱشْتَرَوُا۟",
+   "sci": "ištarawu",
+   "fr": "ichtarawou",
+   "sens": "ils ont troqué, acheté",
+   "refs": [
+    "2:16"
+   ],
+   "rub": "j1r1"
+  },
+  {
+   "ar": "ٱسْتَوْقَدَ",
+   "sci": "istawqada",
+   "fr": "istawqada",
+   "sens": "il a allumé (un feu)",
+   "refs": [
+    "2:17"
+   ],
+   "rub": "j1r1"
+  },
+  {
+   "ar": "صَيِّبٍ",
+   "sci": "ṣayyib",
+   "fr": "ṣayyib",
+   "sens": "averse, pluie d'orage",
+   "refs": [
+    "2:19"
+   ],
+   "rub": "j1r1"
+  },
+  {
+   "ar": "ٱلصَّوَٰعِقِ",
+   "sci": "ṣawāʿiq",
+   "fr": "ṣawâʿiq",
+   "sens": "foudres",
+   "refs": [
+    "2:19"
+   ],
+   "rub": "j1r1"
+  },
+  {
+   "ar": "حَذَرَ",
+   "sci": "ḥaḏara",
+   "fr": "ḥadhara",
+   "sens": "par crainte de",
+   "refs": [
+    "2:19"
+   ],
+   "rub": "j1r1"
+  },
+  {
+   "ar": "يَخْطَفُ",
+   "sci": "yaḫṭafu",
+   "fr": "yakhṭafou",
+   "sens": "il arrache, ravit (la vue)",
+   "refs": [
+    "2:20"
+   ],
+   "rub": "j1r1"
+  },
+  {
+   "ar": "فِرَٰش",
+   "sci": "firāš",
+   "fr": "firâch",
+   "sens": "couche, tapis étendu",
+   "refs": [
+    "2:22"
+   ],
+   "rub": "j1r1"
+  },
+  {
+   "ar": "أَندَاد",
+   "sci": "ʾandād",
+   "fr": "'andâd",
+   "sens": "égaux, rivaux (donnés à Allah)",
+   "refs": [
+    "2:22"
+   ],
+   "rub": "j1r1"
+  },
+  {
+   "ar": "شُهَدَآءَ",
+   "sci": "šuhadāʾ",
+   "fr": "chouhadâ'",
+   "sens": "témoins ; soutiens (appelés au défi)",
+   "refs": [
+    "2:23"
+   ],
+   "rub": "j1r1"
+  },
+  {
+   "ar": "وَقُود",
+   "sci": "waqūd",
+   "fr": "waqoûd",
+   "sens": "combustible",
+   "refs": [
+    "2:24"
+   ],
+   "rub": "j1r1"
+  },
+  {
+   "ar": "أَزْوَٰج",
+   "sci": "ʾazwāǧ",
+   "fr": "'azwâdj",
+   "sens": "épouses ; paires",
+   "refs": [
+    "2:25"
+   ],
+   "rub": "j1r1"
+  },
+  {
+   "ar": "مُّطَهَّرَةٌ",
+   "sci": "muṭahhara",
+   "fr": "mouṭahhara",
+   "sens": "purifiées (de toute souillure)",
+   "refs": [
+    "2:25"
+   ],
+   "rub": "j1r1"
+  }
+ ]
+}
