@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.0 · 2026-07-23
+- Le juz 'Amma (30) rejoint l'application : les sourates courtes idéales pour débuter, découpées en 8 rubs comme le reste
+- Affichage de la version corrigé dans Paramètres
+
 ## 1.3.0 · 2026-07-23
 - Synchronisation multi-appareils disponible : crée ton code secret dans Paramètres pour retrouver ta progression partout
 

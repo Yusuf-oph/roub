@@ -3,7 +3,7 @@
    - coquille (html/css/js/données/police de texte) : precache versionné ;
    - audio Husary + polices de pages QCF : cache à la demande, immuable ;
    - version.json : réseau d'abord (détection de mise à jour). */
-const VERSION = "1.3.0+2026-07-23";
+const VERSION = "1.4.0+2026-07-23";
 const SHELL_CACHE = "roub-shell-" + VERSION;
 const MEDIA_CACHE = "roub-media-v1";
 
@@ -40,6 +40,14 @@ const SHELL = [
   "data/quran/j2r6.js",
   "data/quran/j2r7.js",
   "data/quran/j2r8.js",
+  "data/quran/j30r1.js",
+  "data/quran/j30r2.js",
+  "data/quran/j30r3.js",
+  "data/quran/j30r4.js",
+  "data/quran/j30r5.js",
+  "data/quran/j30r6.js",
+  "data/quran/j30r7.js",
+  "data/quran/j30r8.js",
   "data/notes/j1r1.js",
   "data/notes/j1r2.js",
   "data/notes/j1r3.js",
@@ -56,6 +64,14 @@ const SHELL = [
   "data/notes/j2r6.js",
   "data/notes/j2r7.js",
   "data/notes/j2r8.js",
+  "data/notes/j30r1.js",
+  "data/notes/j30r2.js",
+  "data/notes/j30r3.js",
+  "data/notes/j30r4.js",
+  "data/notes/j30r5.js",
+  "data/notes/j30r6.js",
+  "data/notes/j30r7.js",
+  "data/notes/j30r8.js",
   "data/cartes/j1r1.js",
   "data/cartes/j1r2.js",
   "data/cartes/j1r3.js",
@@ -71,7 +87,15 @@ const SHELL = [
   "data/cartes/j2r5.js",
   "data/cartes/j2r6.js",
   "data/cartes/j2r7.js",
-  "data/cartes/j2r8.js"
+  "data/cartes/j2r8.js",
+  "data/cartes/j30r1.js",
+  "data/cartes/j30r2.js",
+  "data/cartes/j30r3.js",
+  "data/cartes/j30r4.js",
+  "data/cartes/j30r5.js",
+  "data/cartes/j30r6.js",
+  "data/cartes/j30r7.js",
+  "data/cartes/j30r8.js"
 ];
 // __SHELL_END__
 

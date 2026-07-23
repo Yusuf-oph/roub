@@ -26,7 +26,18 @@ from translit import translit_verse  # noqa: E402
 CACHE = os.path.join(HERE, "cache")
 OUT = os.path.join(HERE, "..", "app", "data", "quran")
 
-SURAHS = {1: "Al-Fâtiḥa", 2: "Al-Baqara"}
+SURAHS = {1: "Al-Fâtiḥa", 2: "Al-Baqara",
+          78: "An-Naba'", 79: "An-Nâzi'ât", 80: "'Abasa", 81: "At-Takwîr",
+          82: "Al-Infitâr", 83: "Al-Mutaffifîn", 84: "Al-Inshiqâq",
+          85: "Al-Burûj", 86: "At-Târiq", 87: "Al-A'lâ", 88: "Al-Ghâshiya",
+          89: "Al-Fajr", 90: "Al-Balad", 91: "Ash-Shams", 92: "Al-Layl",
+          93: "Ad-Duhâ", 94: "Ash-Sharh", 95: "At-Tîn", 96: "Al-'Alaq",
+          97: "Al-Qadr", 98: "Al-Bayyina", 99: "Az-Zalzala",
+          100: "Al-'Âdiyât", 101: "Al-Qâri'a", 102: "At-Takâthur",
+          103: "Al-'Asr", 104: "Al-Humaza", 105: "Al-Fîl", 106: "Quraysh",
+          107: "Al-Mâ'ûn", 108: "Al-Kawthar", 109: "Al-Kâfirûn",
+          110: "An-Nasr", 111: "Al-Masad", 112: "Al-Ikhlâs",
+          113: "Al-Falaq", 114: "An-Nâs"}
 
 
 def parse_tajweed(html):
@@ -129,8 +140,8 @@ def main():
         rubs.setdefault(v["rub"], []).append(entry)
 
     for num in sorted(rubs):
-        juz = 1 if num <= 8 else 2
-        rub_local = num if num <= 8 else num - 8
+        juz = (num - 1) // 8 + 1
+        rub_local = (num - 1) % 8 + 1
         rid = f"j{juz}r{rub_local}"
         vv = rubs[num]
         surahs = sorted({e["s"] for e in vv})

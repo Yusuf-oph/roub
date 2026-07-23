@@ -103,5 +103,55 @@ window.META = {
       stars: 3, dispo: false,
       starsWhy: "Retour du récit (l'armée de Tâloût, l'épreuve de la rivière, David et Goliath) : la narration guide la mémoire. Versets moyens à longs ({2:246}, {2:249}) mais à forte logique interne. Respiration bienvenue avant âyat al-koursî qui ouvre le juz 3.",
     },
+
+    /* ---- juz 30 ('Amma) : le terrain des débutants ---- */
+    {
+      id: "j30r1", juz: 30, rub: 1, rubGlobal: 233, debut: "78:1", fin: "79:46", n: 86,
+      titre: "An-Naba' et An-Nâzi'ât",
+      stars: 2, dispo: false,
+      starsWhy: "Versets très courts et rimés, récits imagés du Jour dernier : la cadence porte la mémoire. C'est le rub le plus long du juz 'Amma en nombre de versets, d'où une étoile de plus que la fin du juz.",
+    },
+    {
+      id: "j30r2", juz: 30, rub: 2, rubGlobal: 234, debut: "80:1", fin: "81:29", n: 71,
+      titre: "'Abasa et At-Takwîr",
+      stars: 2, dispo: false,
+      starsWhy: "Même style rythmé ; vigilance sur les séries de serments d'At-Takwîr (idhâ... idhâ...) dont l'ordre doit être verrouillé.",
+    },
+    {
+      id: "j30r3", juz: 30, rub: 3, rubGlobal: 235, debut: "82:1", fin: "83:36", n: 55,
+      titre: "Al-Infitâr et Al-Mutaffifîn",
+      stars: 2, dispo: false,
+      starsWhy: "Al-Mutaffifîn est la plus longue sourate de la fin du juz : structure en balancier (sijjîn/'illiyoûn) qui aide une fois repérée.",
+    },
+    {
+      id: "j30r4", juz: 30, rub: 4, rubGlobal: 236, debut: "84:1", fin: "86:17", n: 64,
+      titre: "Al-Inshiqâq, Al-Burûj, At-Târiq",
+      stars: 2, dispo: false,
+      starsWhy: "Trois sourates courtes aux ouvertures par serments célestes qui se ressemblent (wa-s-samâ'i...) : bien ancrer quelle suite appartient à quel serment.",
+    },
+    {
+      id: "j30r5", juz: 30, rub: 5, rubGlobal: 237, debut: "87:1", fin: "89:30", n: 75,
+      titre: "Al-A'lâ, Al-Ghâshiya, Al-Fajr",
+      stars: 2, dispo: false,
+      starsWhy: "Sourates très récitées en prière (Al-A'lâ, Al-Ghâshiya) donc déjà familières ; Al-Fajr demande plus d'attention (récits de 'Âd, Thamûd, Pharaon).",
+    },
+    {
+      id: "j30r6", juz: 30, rub: 6, rubGlobal: 238, debut: "90:1", fin: "93:11", n: 67,
+      titre: "Al-Balad, Ash-Shams, Al-Layl, Ad-Duhâ",
+      stars: 2, dispo: false,
+      starsWhy: "Quatre sourates brèves aux serments d'ouverture proches (wa-sh-shamsi, wa-l-layli, wa-d-duhâ) : le piège est de mélanger les incipits, pas de retenir les textes.",
+    },
+    {
+      id: "j30r7", juz: 30, rub: 7, rubGlobal: 239, debut: "94:1", fin: "100:8", n: 64,
+      titre: "D'Ash-Sharh à Al-'Âdiyât",
+      stars: 1, dispo: false,
+      starsWhy: "Le cœur du répertoire du débutant (Ash-Sharh, At-Tîn, Al-'Alaq, Al-Qadr, Az-Zalzala...) : sourates minuscules, ultra-fréquentes en prière, parmi les plus faciles du Qur'an entier.",
+    },
+    {
+      id: "j30r8", juz: 30, rub: 8, rubGlobal: 240, debut: "100:9", fin: "114:6", n: 82,
+      titre: "Les 15 dernières sourates",
+      stars: 1, dispo: false,
+      starsWhy: "D'Al-Qâri'a à An-Nâs : les sourates que tout le monde apprend en premier (Al-Ikhlâs, Al-Falaq, An-Nâs, Al-Kawthar...). Le rub le plus accessible du Qur'an : idéal pour commencer.",
+    },
   ],
 };

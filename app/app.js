@@ -59,7 +59,15 @@ for (const rid of Object.keys(QURAN)) {
   QURAN[rid].verses.forEach((v, i) => { VIDX[v.k] = { v, rid, i }; });
 }
 const RUBS = (META.rubs || []).slice().sort((a, b) => a.rubGlobal - b.rubGlobal);
-const SURAH_NAMES = { 1: "Al-Fâtiḥa (L'Ouverture)", 2: "Al-Baqara (La Vache)" };
+/* noms de sourates : dérivés des données, avec glose pour les premières */
+const SURAH_NAMES = {};
+for (const rid of Object.keys(QURAN)) {
+  for (const s of (QURAN[rid].surahs || [])) SURAH_NAMES[s.num] = s.nom;
+}
+SURAH_NAMES[1] = "Al-Fâtiḥa (L'Ouverture)";
+SURAH_NAMES[2] = "Al-Baqara (La Vache)";
+/* la basmala ouvre chaque sourate sauf la Fâtiḥa (verset 1) et At-Tawba */
+const basmalaFor = v => v.a === 1 && v.s !== 1 && v.s !== 9;
 
 /* paquets de cartes : enchaînement + vocabulaire DÉRIVÉS des données,
    mutashabihat / sens rédigés à la main dans data/cartes/. Même dérivation
@@ -349,13 +357,15 @@ function render() {
 /* ---------------- accueil ---------------- */
 function pageHome() {
   let h = `<div class="hero"><h1>Roub' ۞ mémoriser le Qur'an rub par rub</h1>
-    <p>Juz 1 et 2 : Al-Fâtiḥa + Al-Baqara 1-252. Riwaya Hafs 'an 'Asim,
-    récitation Al-Husary. Les étoiles notent la difficulté de mémorisation
-    sur l'échelle de tous les rubs du Qur'an.</p></div>`;
-  for (const juz of [1, 2]) {
+    <p>Juz 1 et 2 (Al-Fâtiḥa + Al-Baqara) et juz 'Amma (les sourates courtes,
+    idéales pour débuter). Riwaya Hafs 'an 'Asim, récitation Al-Husary.
+    Les étoiles notent la difficulté de mémorisation sur l'échelle de tous
+    les rubs du Qur'an.</p></div>`;
+  const juzList = [...new Set(RUBS.map(r => r.juz))].sort((a, b) => a - b);
+  for (const juz of juzList) {
     const rubs = RUBS.filter(r => r.juz === juz);
-    h += `<div class="juz-title"><h2>Juz ${juz}</h2>
-      <span>${juz === 1 ? "1:1 → 2:141" : "2:142 → 2:252"}</span></div>`;
+    h += `<div class="juz-title"><h2>Juz ${juz}${juz === 30 ? " · 'Amma" : ""}</h2>
+      <span>${rubs[0].debut} → ${rubs[rubs.length - 1].fin}</span></div>`;
     h += `<div class="rub-grid">`;
     for (const r of rubs) {
       const cards = (DECKS[r.id] || []).map(c => c.id);
@@ -508,7 +518,7 @@ function secMemoriser(R) {
         lastS = v.s;
         if (open) { h += `</div>`; open = false; }
         h += `<div class="surah-head"><div class="nom">Sourate ${esc(SURAH_NAMES[v.s] || v.s)}</div>`;
-        if (v.s === 2 && v.a === 1) h += `<div class="basmala">${arEsc(BASMALA)}</div>`;
+        if (basmalaFor(v)) h += `<div class="basmala">${arEsc(BASMALA)}</div>`;
         h += `</div><div class="mushaf">`;
         open = true;
       }
@@ -521,7 +531,7 @@ function secMemoriser(R) {
       if (v.s !== lastS) {
         lastS = v.s;
         h += `<div class="surah-head"><div class="nom">Sourate ${esc(SURAH_NAMES[v.s] || v.s)}</div>`;
-        if (v.s === 2 && v.a === 1) h += `<div class="basmala">${arEsc(BASMALA)}</div>`;
+        if (basmalaFor(v)) h += `<div class="basmala">${arEsc(BASMALA)}</div>`;
         h += `</div>`;
       }
       h += `<div class="verse" data-k="${v.k}">
@@ -568,17 +578,17 @@ function pagesHtml(R) {
   let h = "";
   for (const p of pnums) {
     const lines = DATA[p];
-    // en-tête de sourate si elle commence sur cette page
+    // en-têtes des sourates qui commencent sur cette page
     const starts = [];
     for (const ln of Object.keys(lines)) {
       for (const w of lines[ln]) {
-        if (w.k === "1:1" && !starts.includes(1)) starts.push(1);
-        if (w.k === "2:1" && !starts.includes(2)) starts.push(2);
+        const [s, a] = w.k.split(":").map(Number);
+        if (a === 1 && !starts.includes(s)) starts.push(s);
       }
     }
-    for (const s of starts) {
+    for (const s of starts.sort((a, b) => a - b)) {
       h += `<div class="surah-head"><div class="nom">Sourate ${esc(SURAH_NAMES[s] || s)}</div>`;
-      if (s === 2) h += `<div class="basmala">${arEsc(BASMALA)}</div>`;
+      if (s !== 1 && s !== 9) h += `<div class="basmala">${arEsc(BASMALA)}</div>`;
       h += `</div>`;
     }
     h += `<div class="qpage${fpfx === "t" ? " colored" : ""}">`;
@@ -1021,7 +1031,7 @@ function pageParams() {
       l'appli fonctionne ensuite sans connexion. Sur iPhone/iPad, le quota de
       cache peut limiter le préchargement. <span id="preload-status"></span></span></div>
     <button class="fb-send" data-preload ${("serviceWorker" in navigator) && navigator.serviceWorker.controller ? "" : "disabled title='disponible sur la version en ligne (après un premier chargement)'"}>Précharger</button></div>
-  <p style="color:var(--muted);font-size:13px">Version : <b>${esc(APPVER || "…")}</b><br>
+  <p style="color:var(--muted);font-size:13px">Version : <b id="appver">${esc(APPVER || "…")}</b><br>
     Texte coranique : mushaf de Médine (Hafs), Complexe du Roi Fahd (texte et
     calligraphie des pages via quran.com et les polices QCF du KFGQPC).
     Traduction : Muhammad Hamidullah. Récitation : Mahmoud Khalil Al-Husary,
@@ -1447,6 +1457,8 @@ async function fetchVersion() {
     const v = await (await fetch("version.json", { cache: "no-store" })).json();
     APPVER = `${v.version} · ${v.date}`;
   } catch (e) { APPVER = "locale"; }
+  const el = $("#appver");
+  if (el) el.textContent = APPVER;
 }
 function swInit() {
   if (!("serviceWorker" in navigator) || !location.protocol.startsWith("http")) return;

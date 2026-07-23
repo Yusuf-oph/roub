@@ -105,13 +105,13 @@ def main():
                     err(f"{rid} {v['k']} : classe inconnue {c}")
             if not v["sci"] or not v["fr"] or not v["tr"]:
                 err(f"{rid} {v['k']} : translit/trad vide")
-    if len(QURAN) != 16:
-        err(f"{len(QURAN)} rubs au lieu de 16")
+    if len(QURAN) != 24:
+        err(f"{len(QURAN)} rubs au lieu de 24")
     print(f"B. quran : {len(vidx)} versets, textes conformes")
 
     # C. meta
-    if len(META["rubs"]) != 16:
-        err("meta : pas 16 rubs")
+    if len(META["rubs"]) != 24:
+        err("meta : pas 24 rubs")
     for m in META["rubs"]:
         R = QURAN.get(m["id"])
         if not R:
