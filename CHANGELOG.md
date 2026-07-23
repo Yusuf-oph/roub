@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.5.2 · 2026-07-23
+- Licences officialisées : code AGPL-3.0, contenu éditorial CC BY-NC-SA 4.0
+
 ## 1.5.1 · 2026-07-23
 - Crédits ajustés
 

@@ -58,6 +58,8 @@ fonctionne hors-ligne.
 
 ## Sources et licences
 
+- **Code : AGPL-3.0** (fichier `LICENSE`) · **Contenu éditorial :
+  CC BY-NC-SA 4.0** : détails dans `LICENSE-CONTENU.md`.
 - Texte coranique : mushaf de Médine, Complexe du Roi Fahd (KFGQPC), via
   l'API quran.com ; polices UthmanicHafs et QCF du KFGQPC.
 - Traduction française : Muhammad Hamidullah.
@@ -66,5 +68,6 @@ fonctionne hors-ligne.
 - Tafsir : synthèses rédigées, sourcées d'Ibn Kathîr (Tafsîr al-Qur'ân
   al-'Adhîm) et d'As-Sa'dî (Taysîr al-Karîm ar-Rahmân).
 
-Application gratuite, sans compte ni collecte de données personnelles ;
-la synchronisation optionnelle repose sur un code secret anonyme.
+Application gratuite et non commerciale, sans compte ni collecte de
+données personnelles ; la synchronisation optionnelle repose sur un code
+secret anonyme. © 2026 Anis & Yusuf.

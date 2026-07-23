@@ -1046,8 +1046,10 @@ function pageParams() {
     calligraphie des pages via quran.com et les polices QCF du KFGQPC).
     Traduction : Muhammad Hamidullah. Récitation : Mahmoud Khalil Al-Husary,
     64 kbps (everyayah.com, usage non commercial). Tafsir : synthèses sourcées
-    d'Ibn Kathîr et d'As-Sa'dî. Application gratuite, sans compte ni collecte
-    de données : progression et réglages restent dans ce navigateur.</p>`;
+    d'Ibn Kathîr et d'As-Sa'dî. Application gratuite et non commerciale, sans
+    compte ni collecte de données : progression et réglages restent dans ce
+    navigateur. Code sous licence AGPL-3.0, contenu éditorial sous
+    CC BY-NC-SA 4.0 (détails sur le dépôt GitHub). © 2026 Anis &amp; Yusuf.</p>`;
 }
 
 /* ---------------- feedback ---------------- */
@@ -1461,7 +1463,7 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "1.5.1";   // réécrit par tools/release.py
+const BUILD_VERSION = "1.5.2";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {

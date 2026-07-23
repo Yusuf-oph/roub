@@ -55,3 +55,7 @@ QUI SOMMES-NOUS
 Sources : texte du mushaf de Médine (Complexe du Roi Fahd, via quran.com),
 traduction Muhammad Hamidullah, récitation Mahmoud Khalil Al-Husary
 (everyayah.com). Tafsir : synthèses sourcées d'Ibn Kathîr et d'As-Sa'dî.
+
+Licences : code AGPL-3.0, contenu éditorial CC BY-NC-SA 4.0 (voir LICENSE
+et LICENSE-CONTENU.md). Application gratuite et non commerciale.
+© 2026 Anis & Yusuf.
