@@ -1047,9 +1047,12 @@ function pageParams() {
     difficulté étoilée, les cartes façon Anki, les difficultés de mémorisation,
     les particularités tajwid, les rappels de règles, le tafsir et le
     vocabulaire ; et par <b>Yusuf</b> (interne en médecine), qui l'a conçue et
-    réalisée en y ajoutant la translittération à double style, la
-    distribution web, la synchronisation multi-appareils, l'auto-évaluation et
-    la progression. Avis et contact :
+    réalisée en y ajoutant la translittération à double style
+    (scientifique ou hybride), la distribution web et PWA, la synchronisation
+    multi-appareils par code anonyme, l'auto-évaluation, l'affichage de la
+    progression, l'ouverture aux débutants par le juz 'Amma, l'exigence d'un
+    contenu intégralement sourcé et audité, et la notification de mise à jour
+    des copies locales. Avis et contact :
     <a href="mailto:dev.yusuf@pm.me">dev.yusuf@pm.me</a> · Discord
     <b>@ophtalmologie</b>.<br><br>
     Texte coranique : mushaf de Médine (Hafs), Complexe du Roi Fahd (texte et
@@ -1475,7 +1478,7 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "1.6.0";   // réécrit par tools/release.py
+const BUILD_VERSION = "1.6.1";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {
@@ -1568,6 +1571,14 @@ async function preloadAll(status) {
 }
 
 /* ---------------- boot ---------------- */
+{
+  // thème imposable par URL (?theme=light|dark), pratique pour partager
+  const qsTheme = new URLSearchParams(location.search).get("theme");
+  if (qsTheme === "light" || qsTheme === "dark") {
+    PARAMS.theme = qsTheme;
+    saveParams();
+  }
+}
 applyTheme();
 $("#theme-toggle").addEventListener("click", () => {
   PARAMS.theme = PARAMS.theme === "dark" ? "light" : "dark";

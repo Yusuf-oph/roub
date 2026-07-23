@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.6.1 · 2026-07-24
+- « À propos » de Paramètres aligné sur le README ; thème imposable par URL (?theme=light)
+
 ## 1.6.0 · 2026-07-24
 - Liens profonds vers les modes d'affichage (partager une vue précise, ex. #rub/j1r1/memoriser/pagescouleur)
 - Présentation du projet enrichie : captures d'écran, crédits à jour, licences bilingues

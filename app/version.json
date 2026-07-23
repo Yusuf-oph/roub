@@ -1,8 +1,7 @@
 {
-  "version": "1.6.0",
+  "version": "1.6.1",
   "date": "2026-07-24",
   "notes": [
-    "Liens profonds vers les modes d'affichage (partager une vue précise, ex. #rub/j1r1/memoriser/pagescouleur)",
-    "Présentation du projet enrichie : captures d'écran, crédits à jour, licences bilingues"
+    "« À propos » de Paramètres aligné sur le README ; thème imposable par URL (?theme=light)"
   ]
 }
