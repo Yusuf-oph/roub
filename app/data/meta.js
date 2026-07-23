@@ -59,7 +59,7 @@ window.META = {
       id: "j2r1", juz: 2, rub: 1, rubGlobal: 9, debut: "2:142", fin: "2:157", n: 16,
       titre: "Le changement de qibla",
       stars: 4, dispo: false,
-      starsWhy: "Le triplet {2:144} / {2:149} / {2:150} (*wa-min ḥaythou kharadjta...*) est l'un des mutashabihat les plus redoutés du Qur'an : trois versets quasi identiques aux suites différentes, dans le même roub'. Le reste (épreuve, patience, 2:155-157) est plus fluide.",
+      starsWhy: "Le triplet {2:144} / {2:149} / {2:150} est l'un des mutashabihat les plus redoutés du Qur'an : la consigne *fa-walli wadjhaka shaṭra l-masdjidi l-ḥarâm* y revient trois fois avec des suites différentes (et *wa-min ḥaythou kharadjta* ouvre les deux dernières seulement), dans le même roub'. Le reste (épreuve, patience, 2:155-157) est plus fluide.",
     },
     {
       id: "j2r2", juz: 2, rub: 2, rubGlobal: 10, debut: "2:158", fin: "2:176", n: 19,

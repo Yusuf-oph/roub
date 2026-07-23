@@ -64,8 +64,11 @@ process.stdout.write(JSON.stringify({
 
 
 def skel(s):
-    return "".join(c for c in s if unicodedata.category(c) != "Mn"
-                   and c not in "ۖۗۘۙۚۛۜ۞۩ٰ").replace("ٱ", "ا")
+    out = "".join(c for c in s if unicodedata.category(c) not in ("Mn", "Me", "Cf")
+                  and c not in "ۖۗۘۙۚۛۜ۞۩ٰـ")
+    for a, b in (("ٱ", "ا"), ("أ", "ا"), ("إ", "ا"), ("آ", "ا"), ("ى", "ي")):
+        out = out.replace(a, b)
+    return out
 
 
 def main():
@@ -129,7 +132,18 @@ def main():
     rids = [r["id"] for r in REGLES]
     if len(rids) != len(set(rids)):
         err("regles : ids en double")
-    print(f"D. regles : {len(rids)} fiches")
+    # exemples des fiches : présents dans le Qur'an (squelette), sauf mnémoniques
+    MNEMO = {"ينمو", "يرملون", "قطب جد"}
+    full_skels = None
+    for r in REGLES:
+        ex = r.get("exemple")
+        if not ex or skel(ex) in MNEMO:
+            continue
+        if full_skels is None:
+            full_skels = [skel(t) for t in FULL_U.values()]
+        if not any(skel(ex) in t for t in full_skels):
+            err(f"regles {r['id']} : exemple [[{ex}]] introuvable dans le Qur'an")
+    print(f"D. regles : {len(rids)} fiches, exemples contrôlés")
 
     # E. notes
     def check_refs(refs, ctx):

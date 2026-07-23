@@ -964,6 +964,10 @@ function tutoRegles() {
       </div>`;
     }
   }
+  h += `<p style="color:var(--muted);font-size:13px">Fiches établies d'après les
+    matns classiques de référence : <b>Tuhfat al-Atfal</b> (al-Jamzûrî) et
+    <b>al-Muqaddima al-Jazariyya</b> (Ibn al-Jazarî), pour la riwaya Hafs 'an
+    'Asim ; exemples pris dans le texte du mushaf.</p>`;
   return h || `<div class="empty">Fiches à venir.</div>`;
 }
 
@@ -1463,7 +1467,7 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "1.5.5";   // réécrit par tools/release.py
+const BUILD_VERSION = "1.5.6";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {

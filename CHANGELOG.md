@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.5.6 · 2026-07-23
+- Audit sourcé étendu à tout le contenu : fiches tajwid vérifiées contre Tuhfat al-Atfal et la Jazariyya (et sourcées), exception d'idghâm dans un même mot ajoutée, formulation du triplet de la qibla précisée, vocabulaire confronté à la traduction
+
 ## 1.5.5 · 2026-07-23
 - Références des hadiths précisées (Sahih Muslim 395, Tirmidhî 2954), vérifiées à la source
 

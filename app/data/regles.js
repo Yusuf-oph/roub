@@ -10,7 +10,7 @@ window.REGLES = [
   },
   {
     id: "idgham-ghunna", nom: "Idghâm avec ghunna", cat: "Noûn sakina et tanwin",
-    texte: "Devant les lettres du mot **يَنْمُو** (ي ن م و), le noûn sakina ou le tanwin **fusionne** dans la lettre suivante avec une **nasalisation de 2 temps**. Le n écrit ne s'entend plus comme n : on passe directement à la lettre suivante doublée et nasalisée.",
+    texte: "Devant les lettres du mot **يَنْمُو** (ي ن م و), le noûn sakina ou le tanwin **fusionne** dans la lettre suivante avec une **nasalisation de 2 temps**. Le n écrit ne s'entend plus comme n : on passe directement à la lettre suivante doublée et nasalisée. Exception (Tuhfat al-Atfal) : quand noûn et lettre sont dans le MÊME mot ([[دنيا]], [[صنوان]], [[بنيان]], [[قنوان]]), pas de fusion : prononciation claire.",
     exemple: "فَمَن يَعْمَلْ", exempleNote: "prononcé « fay-yaʿmal » avec nasalisation, jamais « fan yaʿmal ».",
   },
   {
@@ -100,7 +100,7 @@ window.REGLES = [
   },
   {
     id: "ra-tafkhim", nom: "Râ' emphatique ou léger", cat: "Lettres et article",
-    texte: "Le **ر** se prononce **emphatique** (sombre) quand il porte fatha ou damma, ou après a/ou ; **léger** (clair) quand il porte une kasra ou suit un i. En fin d'arrêt, c'est la voyelle précédente qui décide.",
+    texte: "Le **ر** se prononce **emphatique** (sombre) quand il porte fatha ou damma, ou après a/ou ; **léger** (clair) quand il porte une kasra ou suit un i. En fin d'arrêt, c'est la voyelle précédente qui décide. (Règle générale ; la Jazariyya détaille quelques cas particuliers, comme une lettre emphatique qui suit.)",
     exemple: "رَبِّ ٱلْعَٰلَمِينَ", exempleNote: "1:2 : râ' sombre (fatha) ; dans رِزْقًا (2:22), râ' clair (kasra).",
   },
 ];
