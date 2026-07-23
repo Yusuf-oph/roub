@@ -47,6 +47,12 @@ def main():
     with open(vpath, "w", encoding="utf-8", newline="\n") as f:
         json.dump(vj, f, ensure_ascii=False, indent=2)
 
+    app_path = os.path.join(APP, "app.js")
+    aj = open(app_path, encoding="utf-8").read()
+    aj = re.sub(r'const BUILD_VERSION = "[^"]*";',
+                f'const BUILD_VERSION = "{new}";', aj, count=1)
+    open(app_path, "w", encoding="utf-8", newline="\n").write(aj)
+
     sw_path = os.path.join(APP, "sw.js")
     sw = open(sw_path, encoding="utf-8").read()
     sw = re.sub(r'const VERSION = "[^"]*";',

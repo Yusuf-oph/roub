@@ -1,21 +1,50 @@
 # Roub' ۞ mémoriser le Qur'an rub par rub
 
-Roub' (رُبْع, « le quart ») est une application web de mémorisation du
-Qur'an, rub par rub (riwaya Hafs 'an 'Asim), couvrant pour l'instant les
-juz 1-2 : texte du mushaf de Médine colorié tajwid, pagination exacte du
-mushaf (calligraphie officielle QCF), translittération double (hybride
+**Application web : https://yusuf-oph.github.io/roub/**
+
+Roub' (رُبْع, « le quart ») aide à mémoriser le Qur'an en suivant le
+découpage traditionnel du mushaf : le rub. Couverture actuelle : **juz 1
+et 2** (Al-Fâtiḥa + Al-Baqara) et **juz 'Amma** (les sourates courtes,
+idéales pour débuter), soit 24 rubs et 823 versets.
+
+Pour chaque rub : texte du mushaf de Médine colorié tajwid, **pagination
+exacte du mushaf** (calligraphie officielle QCF, en noir et blanc ou en
+édition colorée tajwid), translittération à double style (hybride
 française / scientifique), traduction Hamidullah, audio Al-Husary verset
-par verset, difficultés de mémorisation, tafsir sourcé (Ibn Kathîr,
-As-Sa'dî), vocabulaire, révision espacée (+ paquets Anki), progression et
-auto-évaluation des lacunes. PWA installable, fonctionne hors-ligne.
+par verset, difficulté notée sur 5 étoiles, difficultés de mémorisation,
+particularités tajwid reliées à des fiches de règles, tafsir sourcé
+(Ibn Kathîr, As-Sa'dî), vocabulaire, **révision espacée** intégrée
+(+ paquets Anki), progression visible, auto-évaluation des lacunes et
+**synchronisation multi-appareils par code anonyme**. PWA installable,
+fonctionne hors-ligne.
+
+## Qui sommes-nous
+
+- **Anis** : co-fondateur, docteur en mathématiques. À l'origine de la
+  méthode : le déroulé rub par rub, la difficulté étoilée, les cartes
+  façon Anki, les listes de difficultés de mémorisation, les
+  particularités tajwid, les rappels de règles, le tafsir et le
+  vocabulaire.
+- **Yusuf** : co-fondateur, interne en médecine. Conception et
+  réalisation (avec Claude), et les idées qui vont autour :
+  translittération scientifique stricte ou hybride au choix, distribution
+  web et PWA, synchronisation Supabase, auto-évaluation, affichage de la
+  progression. Discord : **@ophtalmologie**.
+
+**Avis, bugs, suggestions : dev.yusuf@pm.me** (ou l'export d'avis intégré
+à l'application, dans Paramètres).
 
 ## Utiliser
 
-- **En ligne** : ouvrir l'URL GitHub Pages du dépôt ; « Ajouter à l'écran
-  d'accueil » pour l'installer. Paramètres → « Tout précharger » pour le
-  hors-ligne complet.
-- **En local** : `start.bat` (Windows, avec Python) ou ouvrir
-  `app/index.html` directement.
+- **En ligne (recommandé)** : ouvrir l'URL ci-dessus. « Ajouter à l'écran
+  d'accueil » pour l'installer comme une application ; Paramètres →
+  « Tout précharger » pour un hors-ligne complet ; les mises à jour sont
+  automatiques (bannière en haut de page).
+- **En local, sans serveur** : Code → Download ZIP sur cette page GitHub,
+  dézipper, ouvrir `app/index.html` (ou `start.bat` sous Windows avec
+  Python). Tout fonctionne, audio compris. Les copies locales ne se
+  mettent pas à jour toutes seules, mais l'application le signale
+  lorsqu'une version plus récente est en ligne.
 
 ## Mettre à jour (mainteneur)
 
@@ -37,4 +66,5 @@ auto-évaluation des lacunes. PWA installable, fonctionne hors-ligne.
 - Tafsir : synthèses rédigées, sourcées d'Ibn Kathîr (Tafsîr al-Qur'ân
   al-'Adhîm) et d'As-Sa'dî (Taysîr al-Karîm ar-Rahmân).
 
-Application gratuite, sans compte ni collecte de données.
+Application gratuite, sans compte ni collecte de données personnelles ;
+la synchronisation optionnelle repose sur un code secret anonyme.

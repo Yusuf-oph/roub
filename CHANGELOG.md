@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.5.0 · 2026-07-23
+- Crédits des co-fondateurs (Anis & Yusuf) et contact dans Paramètres
+- Les copies locales signalent désormais quand une version plus récente est en ligne
+
 ## 1.4.0 · 2026-07-23
 - Le juz 'Amma (30) rejoint l'application : les sourates courtes idéales pour débuter, découpées en 8 rubs comme le reste
 - Affichage de la version corrigé dans Paramètres

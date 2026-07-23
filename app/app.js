@@ -1031,7 +1031,17 @@ function pageParams() {
       l'appli fonctionne ensuite sans connexion. Sur iPhone/iPad, le quota de
       cache peut limiter le préchargement. <span id="preload-status"></span></span></div>
     <button class="fb-send" data-preload ${("serviceWorker" in navigator) && navigator.serviceWorker.controller ? "" : "disabled title='disponible sur la version en ligne (après un premier chargement)'"}>Précharger</button></div>
-  <p style="color:var(--muted);font-size:13px">Version : <b id="appver">${esc(APPVER || "…")}</b><br>
+  <p style="color:var(--muted);font-size:13px">Version : <b id="appver">${esc(APPVER || "…")}</b><br><br>
+    <b>Roub'</b> est une application co-fondée par <b>Anis</b> (docteur en
+    mathématiques), à l'origine de la méthode : le déroulé rub par rub, la
+    difficulté étoilée, les cartes façon Anki, les difficultés de mémorisation,
+    les particularités tajwid, les rappels de règles, le tafsir et le
+    vocabulaire ; et par <b>Yusuf</b> (interne en médecine), qui l'a conçue et
+    réalisée avec Claude en y ajoutant la translittération à double style, la
+    distribution web, la synchronisation multi-appareils, l'auto-évaluation et
+    la progression. Avis et contact :
+    <a href="mailto:dev.yusuf@pm.me">dev.yusuf@pm.me</a> · Discord
+    <b>@ophtalmologie</b>.<br><br>
     Texte coranique : mushaf de Médine (Hafs), Complexe du Roi Fahd (texte et
     calligraphie des pages via quran.com et les polices QCF du KFGQPC).
     Traduction : Muhammad Hamidullah. Récitation : Mahmoud Khalil Al-Husary,
@@ -1451,12 +1461,33 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
+const BUILD_VERSION = "1.5.0";   // réécrit par tools/release.py
+const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {
-  try {
-    const v = await (await fetch("version.json", { cache: "no-store" })).json();
-    APPVER = `${v.version} · ${v.date}`;
-  } catch (e) { APPVER = "locale"; }
+  if (location.protocol.startsWith("http")) {
+    try {
+      const v = await (await fetch("version.json", { cache: "no-store" })).json();
+      APPVER = `${v.version} · ${v.date}`;
+    } catch (e) { APPVER = "hors-ligne"; }
+  } else {
+    // copie locale (file://) : version embarquée + comparaison avec le site
+    APPVER = BUILD_VERSION + " · copie locale";
+    try {
+      const v = await (await fetch(SITE_URL + "version.json", { cache: "no-store" })).json();
+      if (v.version !== BUILD_VERSION && !$("#maj-banner")) {
+        const b = document.createElement("div");
+        b.id = "maj-banner";
+        b.innerHTML = `<span>Ta copie locale (${esc(BUILD_VERSION)}) n'est plus à jour :
+          la version ${esc(v.version)} est en ligne.</span>
+          <button>Ouvrir le site</button>`;
+        b.querySelector("button").addEventListener("click", () => {
+          window.open(SITE_URL, "_blank");
+        });
+        document.body.appendChild(b);
+      }
+    } catch (e) { /* pas de réseau : silencieux */ }
+  }
   const el = $("#appver");
   if (el) el.textContent = APPVER;
 }
