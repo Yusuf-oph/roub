@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.5.8 · 2026-07-23
+- Mention ajoutée : contenu sourcé et vérifié, toute erreur peut être signalée via les avis
+
 ## 1.5.7 · 2026-07-23
 - Mention ajoutée : contenu sourcé et vérifié, toute erreur peut être signalée via les avis
 

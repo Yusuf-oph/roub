@@ -1052,7 +1052,9 @@ function pageParams() {
     64 kbps (everyayah.com, usage non commercial). Tafsir : synthèses sourcées
     d'Ibn Kathîr et d'As-Sa'dî. Application gratuite et non commerciale, sans
     compte ni collecte de données : progression et réglages restent dans ce
-    navigateur. Code sous licence AGPL-3.0, contenu éditorial sous
+    navigateur. Tout le contenu religieux est sourcé et vérifié contre ses
+    sources ; une erreur restant toujours possible, merci de signaler tout
+    doute via le widget d'avis ou dev.yusuf@pm.me. Code sous licence AGPL-3.0, contenu éditorial sous
     CC BY-NC-SA 4.0 (détails sur le dépôt GitHub). © 2026 Anis &amp; Yusuf.</p>`;
 }
 
@@ -1467,7 +1469,7 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "1.5.7";   // réécrit par tools/release.py
+const BUILD_VERSION = "1.5.8";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {
