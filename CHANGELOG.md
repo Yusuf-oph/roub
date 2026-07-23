@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.5.5 · 2026-07-23
+- Références des hadiths précisées (Sahih Muslim 395, Tirmidhî 2954), vérifiées à la source
+
 ## 1.5.4 · 2026-07-23
 - Audit des sources du roub' 1 : positions des mufassirin et hadiths vérifiés contre les textes ; corrections de fidélité (2:19-20, 2:25) et degré d'authenticité ajouté
 

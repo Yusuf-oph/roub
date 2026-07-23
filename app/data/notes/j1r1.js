@@ -86,8 +86,8 @@ window.NOTES["j1r1"] = {
   tafsir: [
     {
       titre: "Al-Fâtiḥa : la mère du Livre", refs: ["1:1", "1:7"],
-      texte: "Sept versets récités dans chaque unité de prière. Le hadith qudsi (Muslim) la partage en deux moitiés : la louange pour Allah ({1:1-4}), la demande pour le serviteur ({1:5-7}), et *iyyâka na'boudou wa iyyâka nasta'în* est la charnière : tout le culte tient dans l'adoration et la demande d'aide. Selon **As-Sa'dî**, *ihdinâ ṣ-ṣirâṭa l-moustaqîm* est la plus complète des demandes : guidée vers le chemin ET dans le chemin. Selon **Ibn Kathîr**, rapportant le hadith de 'Adî ibn Hâtim (Ahmad ; Tirmidhî, qui le juge hasan gharib), *al-maghḍoûb 'alayhim* désigne ceux qui connaissent la vérité sans la suivre (à l'image des juifs), *aḍ-ḍâllîn* ceux qui adorent sans science (à l'image des chrétiens) : savoir sans œuvre, œuvre sans savoir.",
-      src: "Ibn Kathîr sur 1:7 ; As-Sa'dî, Taysîr al-Karîm ar-Raḥmân ; Muslim (hadith qudsi de la Fâtiḥa).",
+      texte: "Sept versets récités dans chaque unité de prière. Le hadith qudsi (Muslim) la partage en deux moitiés : la louange pour Allah ({1:1-4}), la demande pour le serviteur ({1:5-7}), et *iyyâka na'boudou wa iyyâka nasta'în* est la charnière : tout le culte tient dans l'adoration et la demande d'aide. Selon **As-Sa'dî**, *ihdinâ ṣ-ṣirâṭa l-moustaqîm* est la plus complète des demandes : guidée vers le chemin ET dans le chemin. Selon **Ibn Kathîr**, rapportant le hadith de 'Adî ibn Hâtim (Ahmad ; Tirmidhî 2954, qu'il juge hasan gharib), *al-maghḍoûb 'alayhim* désigne ceux qui connaissent la vérité sans la suivre (à l'image des juifs), *aḍ-ḍâllîn* ceux qui adorent sans science (à l'image des chrétiens) : savoir sans œuvre, œuvre sans savoir.",
+      src: "Ibn Kathîr sur 1:7 ; As-Sa'dî, Taysîr al-Karîm ar-Raḥmân ; Sahih Muslim 395 (hadith qudsi de la Fâtiḥa) ; Tirmidhî 2954.",
     },
     {
       titre: "2:1-5 : le Livre et les mouttaqîn", refs: ["2:1", "2:5"],
