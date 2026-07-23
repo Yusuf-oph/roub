@@ -51,19 +51,19 @@ l'export d'avis intégré à l'application, dans Paramètres).
 
 ### L'accueil : les 24 roub' et leur difficulté
 
-![Accueil : les roub' des juz 1, 2 et 'Amma](docs/img/accueil.png)
+![Accueil : les roub' des juz 1, 2 et 'Amma](docs/img/accueil-clair.png)
 
 ### Mémoriser : tajwid colorié, translittération, traduction, audio
 
-![Mémoriser un roub' : texte colorié tajwid + translittération + audio](docs/img/memoriser.png)
+![Mémoriser un roub' : texte colorié tajwid + translittération + audio](docs/img/memoriser-clair.png)
 
 ### Les vraies pages du mushaf de Médine (édition colorée tajwid)
 
-![Pages exactes du mushaf, calligraphie officielle colorée](docs/img/pages-mushaf.png)
+![Pages exactes du mushaf, calligraphie officielle colorée](docs/img/pages-mushaf-clair.png)
 
 ### Révision espacée intégrée
 
-![Révision espacée, à la façon d'Anki](docs/img/revision.png)
+![Révision espacée, à la façon d'Anki](docs/img/revision-clair.png)
 
 ## Sources et licences
 
