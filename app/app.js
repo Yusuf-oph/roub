@@ -1680,11 +1680,29 @@ function bindMain() {
     el.classList.add("on");
   }));
 
-  $$("[data-apkg]", main).forEach(el => el.addEventListener("click", () => {
-    const a = document.createElement("a");
-    a.href = "anki/roub-cartes.apkg";
-    a.download = "roub-cartes.apkg";
-    document.body.appendChild(a); a.click(); a.remove();
+  /* le paquet est précaché avec la coquille : le téléchargement marche donc
+     hors connexion. On passe quand même par fetch pour pouvoir prévenir si
+     le fichier manque (cache purgé, copie locale incomplète). */
+  $$("[data-apkg]", main).forEach(el => el.addEventListener("click", async () => {
+    const initial = el.textContent;
+    el.disabled = true;
+    el.textContent = "préparation…";
+    try {
+      const r = await fetch("anki/roub-cartes.apkg");
+      if (!r.ok) throw new Error(r.status);
+      const url = URL.createObjectURL(await r.blob());
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "roub-cartes.apkg";
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 30000);
+      el.textContent = initial;
+    } catch (e) {
+      el.textContent = "indisponible hors connexion : réessaie une fois en ligne";
+      setTimeout(() => { el.textContent = initial; el.disabled = false; }, 6000);
+      return;
+    }
+    el.disabled = false;
   }));
   $$("[data-preload]", main).forEach(el => el.addEventListener("click", () => {
     el.disabled = true;
@@ -1882,7 +1900,7 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "1.12.0";   // réécrit par tools/release.py
+const BUILD_VERSION = "1.12.1";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {

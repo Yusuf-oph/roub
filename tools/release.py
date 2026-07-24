@@ -25,6 +25,10 @@ def shell_files():
     files = ["./", "index.html", "styles.css", "app.js",
              "manifest.webmanifest", "version.json",
              "fonts/UthmanicHafs.woff2"]
+    # paquet Anki proposé au téléchargement : précaché, sinon le bouton
+    # échoue sans connexion (1,4 Mo, régénéré par build_apkg.py collection)
+    if os.path.exists(os.path.join(APP, "anki", "roub-cartes.apkg")):
+        files.append("anki/roub-cartes.apkg")
     for f in sorted(os.listdir(os.path.join(APP, "icons"))):
         files.append(f"icons/{f}")
     for sub in ("", "quran", "notes", "cartes", "tafsirfr", "segments"):

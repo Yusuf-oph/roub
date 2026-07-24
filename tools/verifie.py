@@ -364,6 +364,14 @@ def main():
         rel = open(os.path.join(HERE, "release.py"), encoding="utf-8").read()
         if "segments" not in rel:
             err("segments : sous-dossier absent de release.py::shell_files (SW)")
+        # paquet Anki : présent, et précaché (sinon le bouton casse hors-ligne)
+        apkg = os.path.join(APP, "anki", "roub-cartes.apkg")
+        if not os.path.exists(apkg):
+            err("anki : roub-cartes.apkg absent (python tools/build_apkg.py collection)")
+        elif "anki/roub-cartes.apkg" not in open(
+                os.path.join(APP, "sw.js"), encoding="utf-8").read():
+            err("anki : roub-cartes.apkg hors de la coquille du SW"
+                " (relancer tools/release.py) : téléchargement impossible hors-ligne")
         sw = open(os.path.join(APP, "sw.js"), encoding="utf-8").read()
         for host in ("mirrors.quranicaudio.com", "audio-cdn.tarteel.ai"):
             if host not in sw:

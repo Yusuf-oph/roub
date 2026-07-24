@@ -3,7 +3,7 @@
    - coquille (html/css/js/données/police de texte) : precache versionné ;
    - audio Husary + polices de pages QCF : cache à la demande, immuable ;
    - version.json : réseau d'abord (détection de mise à jour). */
-const VERSION = "1.12.0+2026-07-25";
+const VERSION = "1.12.1+2026-07-25";
 const SHELL_CACHE = "roub-shell-" + VERSION;
 const MEDIA_CACHE = "roub-media-v1";
 
@@ -16,6 +16,7 @@ const SHELL = [
   "manifest.webmanifest",
   "version.json",
   "fonts/UthmanicHafs.woff2",
+  "anki/roub-cartes.apkg",
   "icons/apple-touch-icon.png",
   "icons/icon-192.png",
   "icons/icon-512.png",

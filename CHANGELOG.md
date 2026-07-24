@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.12.1 · 2026-07-25
+- Le paquet de cartes Anki est gardé hors-ligne comme le reste de l'appli : son téléchargement fonctionne désormais sans connexion
+
 ## 1.12.0 · 2026-07-25
 - Les 8 roub' du juz 'Amma s'ouvrent désormais : texte, tafsir, audio, pages du mushaf et cartes d'enchaînement y sont disponibles (les notes rédigées restent à venir)
 - Nouvelle page Tutoriels → Sources : la bibliographie complète (éditions, versions, provenance, conditions d'usage), reprise dans SOURCES.md
