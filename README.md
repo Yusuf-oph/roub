@@ -29,9 +29,10 @@ fonctionne hors-ligne.
   réalisation, et les idées qui vont autour : translittération
   scientifique stricte ou hybride au choix, distribution web et PWA,
   synchronisation par code anonyme (Supabase), auto-évaluation,
-  affichage de la progression, ouverture aux débutants par le juz 'Amma,
-  exigence d'un contenu intégralement sourcé et audité, notification de
-  mise à jour des copies locales. Discord : **@ophtalmologie**.
+  affichage de la progression. Discord : **@ophtalmologie**.
+- **Israa** : conseillère pédagogique, ostéopathe. L'idée du parcours
+  tajwid progressif : découvrir peu de règles à la fois, sourate après
+  sourate.
 
 Tout le contenu religieux (tafsir, hadiths, règles de tajwid, texte) est
 sourcé et vérifié contre ses sources ; une erreur reste toujours possible :

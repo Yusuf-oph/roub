@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.7.0 · 2026-07-24
+- Parcours de tajwid progressif (idée d'Israa) : sous chaque sourate courte (Fâtiḥa + juz 'Amma), un encart liste les règles de tajwid présentes et signale celles qui sont nouvelles dans le parcours (Fâtiḥa puis An-Nâs → An-Naba)
+- Crédits : Israa (conseillère pédagogique) rejoint l'équipe ; ligne de Yusuf allégée
+
 ## 1.6.2 · 2026-07-24
 - Roub' 1 : citations d'Ibn Kathîr re-vérifiées sur son tafsir arabe intégral ; attribution précisée pour les deux paraboles (la lecture en deux catégories est d'Ibn Kathîr, la description des hésitants d'Ibn 'Abbâs)
 

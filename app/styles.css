@@ -359,6 +359,20 @@ button { font: inherit; cursor: pointer; }
 }
 .pill:hover { color: var(--accent); border-color: var(--accent); }
 
+/* encart « tajwid de cette sourate » (parcours progressif) */
+.tajcur {
+  margin: 2px 0 14px; padding: 7px 12px;
+  border: 1px solid var(--border); border-radius: 10px; background: var(--bg2);
+}
+.tajcur summary { cursor: pointer; font-size: 13px; color: var(--muted); }
+.tajcur summary b { color: var(--accent); font-weight: 700; }
+.tajcur .fb-note { margin: 8px 0 2px; }
+.pill.new { border-color: var(--accent); color: var(--text); }
+.tag-new {
+  font-size: 10px; color: var(--accent); margin-left: 5px;
+  text-transform: uppercase; letter-spacing: .4px;
+}
+
 /* vocabulaire */
 .vocab-table { width: 100%; border-collapse: collapse; }
 .vocab-table th, .vocab-table td {

@@ -6,13 +6,16 @@ Vérifie :
   A. audio complet (1 mp3 par verset, non vide)
   B. données quran/*.js : texte identique au cache API, spans bornés,
      classes tajwid connues, translittérations présentes
-  C. meta.js : bornes exactes, étoiles 1-5, 16 rubs
+  C. meta.js : bornes exactes, étoiles 1-5, 24 rubs
   D. regles.js : ids uniques ; ids référencés par les notes existants
   E. notes : renvois {s:a} résolubles, citations [[...]] présentes MOT POUR
      MOT (harakat comprises) dans le texte uthmani du verset cité ou du rub,
      vocabulaire présent dans ses versets de référence
   F. cartes : ids uniques, types connus, renvois résolubles,
      enchaînements = paires réelles de versets consécutifs
+  G. pagination mushaf : polices présentes, tous les versets couverts
+  H. tajcur.js : mapping span→fiche exhaustif, parcours cohérent et à jour
+     (recalcul via tools/build_tajcur.py)
 """
 import json
 import os
@@ -55,6 +58,7 @@ process.stdout.write(JSON.stringify({
   META: window.META, REGLES: window.REGLES || [], QURAN: window.QURAN || {},
   NOTES: window.NOTES || {}, CARTES: window.CARTES || {},
   PAGES: window.PAGES || {}, PAGES2: window.PAGES2 || {},
+  TAJCUR: window.TAJCUR || {},
 }));
 """
     r = subprocess.run(["node", "-e", script, APP], capture_output=True)
@@ -243,6 +247,41 @@ def main():
         if missing_pg:
             err(f"pages {label} : versets absents : {missing_pg[:5]}")
         print(f"G. pages {label} : {len(PG)} pages, {len(keys_in_pages)} versets couverts")
+
+    # H. tajcur (parcours tajwid progressif par sourate)
+    sys.path.insert(0, HERE)
+    from build_tajcur import SPAN2FICHE, SANS_FICHE, HORS_CURRICULUM, compute
+    TAJCUR = data.get("TAJCUR") or {}
+    if not TAJCUR:
+        err("tajcur : window.TAJCUR absent (lancer tools/build_tajcur.py)")
+    else:
+        mapped = set(SPAN2FICHE) | SANS_FICHE
+        if mapped != CLASSES:
+            err(f"tajcur : mapping et CLASSES désynchronisés : {sorted(mapped ^ CLASSES)}")
+        bad = sorted(set(SPAN2FICHE.values()) - set(rids))
+        if bad:
+            err(f"tajcur : SPAN2FICHE renvoie vers des fiches inconnues : {bad}")
+        ordre = TAJCUR.get("ordre") or []
+        surs = {v["s"] for R in QURAN.values() for v in R["verses"]}
+        if len(ordre) != len(set(ordre)):
+            err("tajcur : doublons dans l'ordre")
+        if set(ordre) != surs - HORS_CURRICULUM:
+            err("tajcur : ordre != sourates couvertes hors curriculum : "
+                f"{sorted(set(ordre) ^ (surs - HORS_CURRICULUM))}")
+        if set(TAJCUR.get("parSourate") or {}) != {str(s) for s in ordre}:
+            err("tajcur : clés parSourate != ordre")
+        try:
+            if compute(QURAN, ordre, rids) != TAJCUR.get("parSourate"):
+                err("tajcur : contenu périmé ou incohérent (relancer tools/build_tajcur.py)")
+        except ValueError as e:
+            err(f"tajcur : {e}")
+        cur = json.load(open(os.path.join(HERE, "curriculum.json"), encoding="utf-8"))
+        if cur != ordre:
+            err("tajcur : tools/curriculum.json != TAJCUR.ordre (relancer tools/build_tajcur.py)")
+        idx_html = open(os.path.join(APP, "index.html"), encoding="utf-8").read()
+        if "data/tajcur.js" not in idx_html:
+            err("tajcur : data/tajcur.js absent d'index.html")
+        print(f"H. tajcur : {len(ordre)} sourates, parcours cohérent")
 
     print()
     if ERR:

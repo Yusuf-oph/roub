@@ -487,6 +487,25 @@ function pageRub(rid, tab) {
   return h + `<div class="footer-pad"></div>`;
 }
 
+/* encart « tajwid de cette sourate » : parcours progressif (idée d'Israa),
+   dérivé des spans par tools/build_tajcur.py ; sourates courtes seulement */
+function tajCurHtml(s) {
+  const TC = window.TAJCUR;
+  const e = TC && TC.parSourate && TC.parSourate[s];
+  if (!e || !e.regles.length) return "";
+  const nouv = new Set(e.nouvelles);
+  const pill = id => {
+    const r = REGLES.find(x => x.id === id);
+    return r ? `<span class="pill${nouv.has(id) ? " new" : ""}" data-regle="${id}">${esc(r.nom)}${nouv.has(id) ? `<b class="tag-new">nouveau</b>` : ""}</span>` : "";
+  };
+  const ordered = e.nouvelles.concat(e.regles.filter(id => !nouv.has(id)));
+  const nR = e.regles.length, nN = e.nouvelles.length;
+  return `<details class="tajcur"><summary>Tajwid de cette sourate · ${nR} règle${nR > 1 ? "s" : ""}${nN ? ` <b>dont ${nN} nouvelle${nN > 1 ? "s" : ""}</b>` : ""}</summary>
+    <div class="pill-row">${ordered.map(pill).join("")}</div>
+    <p class="fb-note">« nouveau » = première apparition dans le parcours (Fâtiḥa, puis les
+    sourates courtes en remontant d'An-Nâs vers An-Naba) ; cliquer une règle ouvre sa fiche.</p></details>`;
+}
+
 function secMemoriser(R) {
   const mode = memoState.mode;
   let h = `<div class="memo-opts">
@@ -525,7 +544,7 @@ function secMemoriser(R) {
         if (open) { h += `</div>`; open = false; }
         h += `<div class="surah-head"><div class="nom">Sourate ${esc(SURAH_NAMES[v.s] || v.s)}</div>`;
         if (basmalaFor(v)) h += `<div class="basmala">${arEsc(BASMALA)}</div>`;
-        h += `</div><div class="mushaf">`;
+        h += `</div>` + tajCurHtml(v.s) + `<div class="mushaf">`;
         open = true;
       }
       h += `<span class="mver" data-k="${v.k}" data-i="${i}" title="${v.k}${(EVAL[v.k] || {}).n ? " · " + EVAL_LABELS[EVAL[v.k].n] : ""}">` +
@@ -538,7 +557,7 @@ function secMemoriser(R) {
         lastS = v.s;
         h += `<div class="surah-head"><div class="nom">Sourate ${esc(SURAH_NAMES[v.s] || v.s)}</div>`;
         if (basmalaFor(v)) h += `<div class="basmala">${arEsc(BASMALA)}</div>`;
-        h += `</div>`;
+        h += `</div>` + tajCurHtml(v.s);
       }
       h += `<div class="verse" data-k="${v.k}">
         <div class="vhead"><span class="vnum">${v.k}</span>
@@ -1049,10 +1068,10 @@ function pageParams() {
     vocabulaire ; et par <b>Yusuf</b> (interne en médecine), qui l'a conçue et
     réalisée en y ajoutant la translittération à double style
     (scientifique ou hybride), la distribution web et PWA, la synchronisation
-    multi-appareils par code anonyme, l'auto-évaluation, l'affichage de la
-    progression, l'ouverture aux débutants par le juz 'Amma, l'exigence d'un
-    contenu intégralement sourcé et audité, et la notification de mise à jour
-    des copies locales. Avis et contact :
+    multi-appareils par code anonyme, l'auto-évaluation et l'affichage de la
+    progression. <b>Israa</b> (ostéopathe), conseillère pédagogique, a donné
+    l'idée du parcours de tajwid progressif : découvrir peu de règles à la
+    fois, sourate après sourate. Avis et contact :
     <a href="mailto:dev.yusuf@pm.me">dev.yusuf@pm.me</a> · Discord
     <b>@ophtalmologie</b>.<br><br>
     Texte coranique : mushaf de Médine (Hafs), Complexe du Roi Fahd (texte et
@@ -1478,7 +1497,7 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "1.6.2";   // réécrit par tools/release.py
+const BUILD_VERSION = "1.7.0";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {
