@@ -449,12 +449,43 @@ function render() {
 }
 
 /* ---------------- accueil ---------------- */
+/* bloc d'accueil : ce que le LISEZMOI disait, mais là où on le lit vraiment.
+   Replié après la première visite ; les sources et licences complètes restent
+   dans Paramètres (pas de doublon : ici l'essentiel, là-bas le détail). */
+function accueilHtml() {
+  const vu = store.get("quran-accueil-vu", false);
+  return `<details class="accueil" ${vu ? "" : "open"}>
+    <summary>Bienvenue · comment ça marche, qui écrit, quelles sources</summary>
+    <div class="accueil-corps">
+      <p><b>Comment ça marche.</b> Choisis un roub' ci-dessous : l'onglet
+      <b>Mémoriser</b> affiche le texte (versets, texte continu ou pages exactes
+      du mushaf) avec l'audio et le surlignage mot à mot ; les autres onglets
+      donnent les points durs, le tajwid, le tafsir, le vocabulaire et les
+      cartes. L'onglet <b>Révision</b> fait revenir les cartes à intervalle
+      croissant, et exporte tout pour Anki.</p>
+      <p><b>Qui écrit.</b> Roub' est co-fondée par <b>Anis</b> (docteur en
+      mathématiques, à l'origine de la méthode) et <b>Yusuf</b> (interne en
+      médecine, conception et réalisation) ; <b>Israa</b> (ostéopathe) en est la
+      conseillère pédagogique. Contact et avis :
+      <a href="mailto:dev.yusuf@pm.me">dev.yusuf@pm.me</a>.</p>
+      <p><b>Sources.</b> Texte du mushaf de Médine (Complexe du Roi Fahd),
+      traduction Hamidullah, récitation Al-Husary, tafsir verset par verset
+      <i>al-Mukhtaṣar</i> (Tafsir Center, via QuranEnc.com). Tout le contenu
+      religieux est sourcé et vérifié ; une erreur reste possible, signale-la.
+      Détail des sources, licences et réglages : onglet <b>Paramètres</b>.</p>
+      <p><b>Gratuit, sans compte, sans collecte</b> : progression et réglages
+      restent dans ce navigateur. <span class="vref" data-accueil-ok>J'ai lu,
+      replier</span></p>
+    </div></details>`;
+}
+
 function pageHome() {
   let h = `<div class="hero"><h1>Roub' ۞ mémoriser le Qur'an roub' par roub'</h1>
     <p>Juz 1 et 2 (Al-Fâtiḥa + Al-Baqara) et juz 'Amma (les sourates courtes,
     idéales pour débuter). Riwaya Hafs 'an 'Asim, récitation Al-Husary.
     Les étoiles notent la difficulté de mémorisation sur l'échelle de tous
     les roub' du Qur'an.</p></div>`;
+  h += accueilHtml();
   const juzList = [...new Set(RUBS.map(r => r.juz))].sort((a, b) => a - b);
   for (const juz of juzList) {
     const rubs = RUBS.filter(r => r.juz === juz);
@@ -978,14 +1009,101 @@ function cardHtml(c, shown) {
 
 /* ---------------- tutoriels ---------------- */
 function pageTutoriels(sub) {
-  const pages = [["translit", "Lire la translittération"], ["tajwid", "Légende tajwid"], ["regles", "Fiches de règles"]];
+  const pages = [["translit", "Lire la translittération"], ["tajwid", "Légende tajwid"],
+    ["regles", "Fiches de règles"], ["styles", "Styles de récitation"]];
   let h = `<div class="hero"><h1>Tutoriels</h1></div><div class="tabs">` +
     pages.map(([id, lab]) => `<button data-tuto="${id}" class="${id === sub ? "on" : ""}">${lab}</button>`).join("") +
     `</div><div class="prose">`;
   if (sub === "translit") h += tutoTranslit();
   else if (sub === "tajwid") h += tutoTajwid();
+  else if (sub === "styles") h += tutoStyles();
   else h += tutoRegles();
   return h + `</div><div class="footer-pad"></div>`;
+}
+
+/* termes techniques cliquables : {{terme}} dans un texte de tutoriel devient
+   une bulle (fiche de règle existante ou définition sourcée du glossaire) */
+function gloss(txt) {
+  return txt.replace(/\{\{([^}|]+)(?:\|([^}]+))?\}\}/g, (_, mot, cle) => {
+    const k = (cle || mot).trim();
+    return (window.GLOSSAIRE || {})[k]
+      ? `<span class="gloss" data-gloss="${esc(k)}">${esc(mot)}</span>`
+      : esc(mot);
+  });
+}
+
+function glossBulle(cle) {
+  const g = (window.GLOSSAIRE || {})[cle];
+  if (!g) return "";
+  if (g.regle) {
+    const r = REGLES.find(x => x.id === g.regle);
+    if (!r) return "";
+    return `<div class="gloss-bulle"><b>${esc(r.nom)}</b>${fmt(r.texte)}
+      <div class="src">Fiche de règle · cliquer le terme pour refermer</div></div>`;
+  }
+  return `<div class="gloss-bulle"><b>${esc(cle)}</b><p>${esc(g.def)}</p>
+    <div class="src">${esc(g.src || "")} · cliquer le terme pour refermer</div></div>`;
+}
+
+function tutoStyles() {
+  return gloss(`<h2>Les styles de récitation : lequel choisir ?</h2>
+<p>Le Qur'an se récite à plusieurs allures, et la tradition les a nommées et
+définies bien avant l'enregistrement sonore. <b>Ibn al-Jazarî</b> (m. 833 H),
+dans <i>an-Nashr fî l-qirâ'ât al-'ashr</i>, chapitre « Comment lit-on le
+Qur'an ? », en distingue trois, toutes valides : « Le Livre d'Allah se lit en
+{{taḥqîq}}, en {{ḥadr}} et en {{tadwîr}}, qui est l'intermédiaire entre les
+deux états, en récitant avec {{tartîl}} et {{tajwîd}} ».</p>
+
+<p><b>Le {{taḥqîq}}</b> : la lecture posée, qui donne à chaque lettre
+{{son dû}} : {{madd}} rassasié, {{hamza}} réalisée, voyelles complètes,
+{{gémination}} appuyée, {{ghunna}} tenue, lettres nettement détachées.
+Ibn al-Jazarî précise qu'elle sert « à assouplir les langues et à redresser la
+prononciation », et surtout que c'est <b>l'allure recommandée à celui qui
+apprend</b>, sans tomber dans l'excès inverse.</p>
+
+<p><b>Le {{ḥadr}}</b> : la lecture rapide, allégée par le raccourcissement des
+{{madd}}, l'{{idghâm}} et l'allègement de la {{hamza}}, à condition de ne
+jamais amputer les lettres de prolongation ni faire disparaître la
+{{ghunna}}. Elle vise « la multiplication des bonnes actions par l'abondance
+de la lecture ».</p>
+
+<p><b>Le {{tadwîr}}</b> : le juste milieu entre les deux ; Ibn al-Jazarî le
+donne pour « le choix de la plupart des gens de la transmission ».</p>
+
+<p><b>Le {{tartîl}}</b>, lui, n'est pas une quatrième vitesse mais la manière
+commandée par le verset « et récite le Qur'an lentement et clairement »
+(sourate 73, verset 4) : Ibn 'Abbâs le glose par « rends-le distinct »,
+Mujâhid par « prends ton temps ».</p>
+
+<h3>Ce que proposent les enregistrements de Roub'</h3>
+<p>Les quatre choix de l'appli sont tous du cheikh <b>Mahmoud Khalil
+al-Husary</b>, en {{riwâya}} Hafs 'an 'Âsim :</p>
+<ul>
+<li><b>Murattal</b> (64 ou 128 kbps : même récitation, seule la qualité sonore
+change) : la lecture mesurée, régulière, sans ornementation, celle qu'on suit
+pour mémoriser. Al-Husary fut le premier à enregistrer un <i>muṣḥaf
+murattal</i> complet en Hafs.</li>
+<li><b>Mu'allim</b> (« l'enseignant ») : la lecture d'enseignement, plus lente
+et plus détachée, pensée pour être répétée après le cheikh ; c'est l'esprit
+même du {{taḥqîq}} recommandé au débutant. Al-Husary a enregistré le premier
+<i>muṣḥaf mu'allim</i> en 1969.</li>
+<li><b>Mujawwad</b> : la lecture solennelle et mélodique, aux prolongations
+longuement tenues. Sur un même verset (114:1), elle dure 13,4 secondes
+contre 8,0 en murattal : magnifique à écouter, mais peu commode pour caler une
+mémorisation.</li>
+</ul>
+
+<h3>En pratique</h3>
+<p>Pour apprendre par cœur : <b>murattal</b>, et <b>mu'allim</b> quand un
+passage résiste et qu'on veut répéter derrière le cheikh. Le <b>mujawwad</b>
+se réserve à l'écoute. Le surlignage mot à mot est calé séparément sur chaque
+style, et le choix se fait dans Paramètres.</p>
+
+<p class="src">Sources : Ibn al-Jazarî, <i>an-Nashr fî l-qirâ'ât al-'ashr</i>,
+t. I, chapitre « wa ammâ kayfa yuqra'u l-Qur'ân » (citations traduites de
+l'arabe) ; premières mondiales d'enregistrement d'al-Husary : notice
+biographique du cheikh ; durées comparées : mesures faites sur les fichiers
+audio de l'application. Texte rédigé pour Roub' d'après ces sources.</p>`);
 }
 
 const TL_TABLE = [
@@ -1144,6 +1262,19 @@ function pageParams() {
       ${Object.entries(RECITS).map(([k, r]) =>
         `<option value="${k}" ${recitKey() === k ? "selected" : ""}>${esc(r.nom)}</option>`).join("")}
     </select></div>
+  <div class="param-row"><div class="lab"><details class="tajcur"><summary>Lequel choisir ?</summary>
+    <div class="aide-styles">${gloss(`<p>Les quatre enregistrements sont du cheikh <b>Mahmoud Khalil
+    al-Husary</b> (Hafs 'an 'Âsim) : ils diffèrent par l'allure, non par le texte.</p>
+    <p><b>Murattal</b> — pour mémoriser : lecture mesurée, sans ornementation. Les versions
+    64 et 128 kbps sont la <b>même récitation</b>, seule la finesse du son change.</p>
+    <p><b>Mu'allim</b> — pour répéter derrière le cheikh : plus lente, plus détachée. Elle
+    rejoint ce qu'Ibn al-Jazarî appelle le {{taḥqîq}}, « l'allure recommandée à celui qui
+    apprend » (<i>an-Nashr</i>, t. I).</p>
+    <p><b>Mujawwad</b> — pour écouter : solennelle et mélodique, prolongations longuement
+    tenues ; sur un même verset, 13,4 secondes contre 8,0 en murattal.</p>
+    <p class="src">Ibn al-Jazarî rappelle que ces allures sont toutes licites.
+    <span class="vref" data-tuto="styles">Tout le tutoriel des styles →</span></p>`)}</div>
+    </details></div></div>
   <div class="param-row"><div class="lab"><b>Surlignage mot à mot</b>
       <span>suit la récitation mot par mot dans le texte arabe</span></div>
     <label class="switch"><input type="checkbox" data-param="karaoke" ${PARAMS.karaoke ? "checked" : ""}><span class="sl"></span></label></div>
@@ -1440,6 +1571,23 @@ function bindMain() {
   /* feedback + préchargement */
   $$("[data-fb-export]", main).forEach(el =>
     el.addEventListener("click", () => exportFB()));
+  $$("[data-accueil-ok]", main).forEach(el => el.addEventListener("click", () => {
+    store.set("quran-accueil-vu", true);
+    const d = el.closest("details");
+    if (d) d.open = false;
+  }));
+
+  /* glossaire : la bulle s'ouvre au clic sur le terme, se referme au reclic */
+  $$("[data-gloss]", main).forEach(el => el.addEventListener("click", ev => {
+    ev.stopPropagation();
+    const ouverte = el.nextElementSibling && el.nextElementSibling.classList.contains("gloss-bulle");
+    $$(".gloss-bulle", main).forEach(b => b.remove());
+    $$(".gloss.on", main).forEach(g => g.classList.remove("on"));
+    if (ouverte) return;
+    el.insertAdjacentHTML("afterend", glossBulle(el.dataset.gloss));
+    el.classList.add("on");
+  }));
+
   $$("[data-apkg]", main).forEach(el => el.addEventListener("click", () => {
     const a = document.createElement("a");
     a.href = "anki/roub-cartes.apkg";
@@ -1642,7 +1790,7 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "1.10.0";   // réécrit par tools/release.py
+const BUILD_VERSION = "1.11.0";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {

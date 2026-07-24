@@ -384,6 +384,37 @@ button { font: inherit; cursor: pointer; }
 .wpause { opacity: .7; }
 
 /* tafsir verset par verset (al-Mukhtaṣar, texte tiers verbatim) */
+/* bloc d'accueil (remplace le LISEZMOI pour qui n'ouvre jamais le dépôt) */
+.accueil {
+  border: 1px solid var(--border); border-radius: 12px; background: var(--panel);
+  padding: 10px 14px; margin-bottom: 18px;
+}
+.accueil summary { cursor: pointer; color: var(--accent); font-weight: 600; font-size: 14px; }
+.accueil-corps { font-size: 14px; line-height: 1.6; color: var(--text); }
+.accueil-corps p { margin: 10px 0; }
+
+/* aide contextuelle « Lequel choisir ? » : elle vit dans un .lab de Paramètres,
+   dont la règle « .lab b { display:block } » casserait les phrases */
+.aide-styles { font-size: 13.5px; line-height: 1.6; color: var(--text); }
+.aide-styles b { display: inline !important; color: var(--text); }
+.aide-styles p { margin: 8px 0; }
+.aide-styles .src { color: var(--muted); font-size: 12.5px; }
+
+/* termes techniques cliquables (tutoriels) */
+.gloss {
+  border-bottom: 1px dotted var(--accent); color: var(--accent);
+  cursor: help; white-space: nowrap;
+}
+.gloss.on { background: color-mix(in srgb, var(--accent) 14%, transparent); }
+.gloss-bulle {
+  display: block; margin: 8px 0; padding: 10px 12px;
+  border: 1px solid var(--accent); border-radius: 10px; background: var(--bg2);
+  font-size: 14px; line-height: 1.5;
+}
+.gloss-bulle b { color: var(--accent); display: block; margin-bottom: 4px; }
+.gloss-bulle p { margin: 0; }
+.gloss-bulle .src { color: var(--muted); font-size: 12px; margin-top: 6px; }
+
 .preload-list { margin-top: 8px; display: flex; flex-direction: column; gap: 5px; }
 .preload-item {
   display: flex; align-items: center; justify-content: space-between; gap: 10px;

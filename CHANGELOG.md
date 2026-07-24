@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.11.0 · 2026-07-25
+- Nouveau tutoriel « Styles de récitation » : d'où viennent taḥqîq, ḥadr et tadwîr (Ibn al-Jazarî), et lequel choisir pour mémoriser
+- Termes techniques cliquables dans les tutoriels : une bulle donne la définition (fiche de règle ou définition sourcée), un second clic la referme
+- Aide « Lequel choisir ? » directement sous le sélecteur de récitation, avec renvoi vers le tutoriel complet
+- Bloc d'accueil : comment ça marche, qui écrit, quelles sources, repliable une fois lu
+
 ## 1.10.0 · 2026-07-24
 - Cartes exportables pour Anki depuis l'onglet Révision : 804 cartes en 24 sous-paquets (1,4 Mo), avec la recommandation d'utiliser le planificateur FSRS d'Anki
 - Surlignage mot à mot : simple soulignement, sans halo autour du mot

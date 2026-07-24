@@ -17,8 +17,24 @@ import os
 import re
 import sys
 import time
+import urllib.error
+import urllib.request
 
-from curl_cffi import requests
+# volontairement SANS dépendance externe : n'importe quel Python 3 suffit
+UA = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) roub-mirror"}
+
+
+def telecharger(url, timeout=120, essais=3):
+    """Renvoie les octets, ou lève la dernière erreur après plusieurs essais."""
+    for n in range(essais):
+        try:
+            req = urllib.request.Request(url, headers=UA)
+            with urllib.request.urlopen(req, timeout=timeout) as r:
+                return r.read()
+        except Exception:
+            if n == essais - 1:
+                raise
+            time.sleep(2 * (n + 1))
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 APP = os.path.join(HERE, "..", "app")
@@ -65,7 +81,6 @@ def main():
     cles = cles_completes() if a.tout else cles_appli()
     dossier = os.path.join(a.dest, a.style)
     os.makedirs(dossier, exist_ok=True)
-    s = requests.Session(impersonate="chrome")
     faits = sautes = echecs = 0
     octets = 0
     t0 = time.time()
@@ -75,14 +90,14 @@ def main():
             sautes += 1
             continue
         try:
-            r = s.get(STYLES[a.style].format(k), timeout=120)
-            if r.status_code == 200 and len(r.content) > 1024:
-                open(cible, "wb").write(r.content)
+            data = telecharger(STYLES[a.style].format(k))
+            if len(data) > 1024:
+                open(cible, "wb").write(data)
                 faits += 1
-                octets += len(r.content)
+                octets += len(data)
             else:
                 echecs += 1
-                print(f"  échec {k} (HTTP {r.status_code})", file=sys.stderr)
+                print(f"  échec {k} : fichier trop court", file=sys.stderr)
         except Exception as e:
             echecs += 1
             print(f"  échec {k} : {e}", file=sys.stderr)
