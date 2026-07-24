@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-"""Récupère les données sources du projet quran-hifz (juz 1-2, Hafs).
+"""Récupère les données sources du projet quran-hifz (juz demandés, Hafs).
 
 Sorties dans tools/cache/ :
-  - verses.json      : 259 versets {verse_key, rub_el_hizb_number, text_uthmani,
+  - verses.json      : un verset par entrée {verse_key, rub_el_hizb_number, text_uthmani,
                        text_uthmani_tajweed, text_imlaei, trad (Hamidullah)}
   - quran_full.json  : Qur'an complet (uthmani + simple) pour vérifier les citations
   - translit_ref.json: translittération anglaise établie (QA de translit.py)
-  - rubs.json        : bornes calculées des 16 rubs
+  - rubs.json        : bornes calculées des rubs demandés
 
 Aucune donnée n'est réécrite à la main : tout vient des API (quran.com v4,
 alquran.cloud), stocké tel quel.

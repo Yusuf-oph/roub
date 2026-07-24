@@ -415,7 +415,12 @@ button { font: inherit; cursor: pointer; }
   border: 1px solid var(--accent); border-radius: 10px; background: var(--bg2);
   font-size: 14px; line-height: 1.5;
 }
-.gloss-bulle b { color: var(--accent); display: block; margin-bottom: 4px; }
+/* seul le TITRE de la bulle est en bloc : les gras du texte restent en ligne
+   (sinon chaque terme en gras casse la phrase en morceaux) */
+.gloss-bulle > b:first-child {
+  color: var(--accent); display: block; margin-bottom: 4px;
+}
+.gloss-bulle b { display: inline; }
 .gloss-bulle p { margin: 0; }
 .gloss-bulle .src { color: var(--muted); font-size: 12px; margin-top: 6px; }
 
@@ -491,9 +496,15 @@ button { font: inherit; cursor: pointer; }
   width: 30px; height: 16px; border-radius: 4px; flex: none;
 }
 h2.sec { font-size: 18px; margin: 22px 0 8px; }
-.prose p { margin: 8px 0; }
-.prose ul { margin: 6px 0; padding-left: 22px; }
-.prose li { margin: 4px 0; }
+/* pages de tutoriels : lecture longue, donc justifié et bien aéré */
+.prose { line-height: 1.75; }
+.prose p { margin: 12px 0; text-align: justify; hyphens: auto; }
+.prose ul { margin: 10px 0; padding-left: 22px; }
+.prose li { margin: 7px 0; text-align: justify; hyphens: auto; }
+.prose h2 { margin: 22px 0 10px; }
+.prose h3 { margin: 20px 0 8px; }
+/* pas de justification sur les tableaux, légendes et exemples courts */
+.prose table, .prose .legend-item, .prose .src { text-align: initial; }
 
 /* ---------- paramètres ---------- */
 .param-row {

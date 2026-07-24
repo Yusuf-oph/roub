@@ -13,5 +13,8 @@ app/data/feedback.json
 # pièces de travail interne (licences archivées, échantillons, arbitrages)
 arbitrage/
 
+# pièces mises de côté (PoC terminés, essais) : gardées, pas publiées
+archive/
+
 # outillage local
 .claude/

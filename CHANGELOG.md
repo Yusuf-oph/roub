@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.12.0 · 2026-07-25
+- Les 8 roub' du juz 'Amma s'ouvrent désormais : texte, tafsir, audio, pages du mushaf et cartes d'enchaînement y sont disponibles (les notes rédigées restent à venir)
+- Nouvelle page Tutoriels → Sources : la bibliographie complète (éditions, versions, provenance, conditions d'usage), reprise dans SOURCES.md
+- Tutoriels justifiés et aérés ; bulles du glossaire d'un seul tenant
+- Poids de préchargement corrigés et textes remis en accord avec l'application (préchargement à la carte, paquets Anki, confidentialité et synchronisation)
+
 ## 1.11.1 · 2026-07-25
 - Aide « Lequel choisir ? » fusionnée dans l'encadré du style de récitation
 - Crédits condensés ; documents (README, LISEZMOI, à propos) remis en cohérence, y compris le retrait du tafsir rédigé remplacé par al-Mukhtaṣar

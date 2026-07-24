@@ -459,10 +459,13 @@ function accueilHtml() {
     <div class="accueil-corps">
       <p><b>Comment ça marche.</b> Choisis un roub' ci-dessous : l'onglet
       <b>Mémoriser</b> affiche le texte (versets, texte continu ou pages exactes
-      du mushaf) avec l'audio et le surlignage mot à mot ; les autres onglets
-      donnent les points durs, le tajwid, le tafsir, le vocabulaire et les
-      cartes. L'onglet <b>Révision</b> fait revenir les cartes à intervalle
-      croissant, et exporte tout pour Anki.</p>
+      du mushaf) avec l'audio et le surlignage mot à mot, et l'onglet
+      <b>Tafsir</b> le commentaire verset par verset. Les notes rédigées
+      (points durs, particularités tajwid, vocabulaire, cartes) existent pour le
+      roub' 1 ; ailleurs, ces onglets affichent « contenu à venir », et les
+      roub' marqués <i>notes à venir</i> sur l'accueil s'ouvriront à mesure
+      qu'ils seront rédigés. L'onglet <b>Révision</b> fait revenir les cartes à
+      intervalle croissant, et exporte tout pour Anki.</p>
       <p><b>Qui écrit.</b> <b>Anis</b> (co-fondateur, docteur en mathématiques) :
       à l'origine de la méthode. <b>Yusuf</b> (co-fondateur, interne en
       médecine) : conception et réalisation. <b>Israa</b> (ostéopathe) :
@@ -470,11 +473,13 @@ function accueilHtml() {
       <a href="mailto:dev.yusuf@pm.me">dev.yusuf@pm.me</a>.</p>
       <p><b>Sources.</b> Texte du mushaf de Médine (Complexe du Roi Fahd),
       traduction Hamidullah, récitation Al-Husary, tafsir verset par verset
-      <i>al-Mukhtaṣar</i> (Tafsir Center, via QuranEnc.com). Tout le contenu
+      <i>al-Mukhtaṣar</i> (Tafsir Center, via QuranEnc.com), règles de tajwid
+      d'après Tuhfat al-Atfâl et al-Muqaddima al-Jazariyya. Tout le contenu
       religieux est sourcé et vérifié ; une erreur reste possible, signale-la.
-      Détail des sources, licences et réglages : onglet <b>Paramètres</b>.</p>
-      <p><b>Gratuit, sans compte, sans collecte</b> : progression et réglages
-      restent dans ce navigateur.</p>
+      <span class="vref" data-tuto="sources">Bibliographie complète →</span></p>
+      <p><b>Gratuit et sans compte</b> : progression et réglages restent dans ce
+      navigateur. Rien n'est envoyé ailleurs, sauf si tu actives toi-même la
+      synchronisation multi-appareils, qui repose sur un code secret anonyme.</p>
     </div></details>`;
 }
 
@@ -867,7 +872,8 @@ function pageRevision() {
     <p><button class="fb-send" data-apkg>Télécharger les cartes pour Anki (.apkg)</button>
     <span class="fb-note">804 cartes, 24 sous-paquets (un par roub'), 1,4 Mo :
     enchaînements, vocabulaire, mutashabihat et sens. Sans audio : la récitation
-    s'écoute ici. Les paquets AVEC audio sont dans <code>apkg/</code> sur le dépôt.</span></p></div>`;
+    s'écoute ici. Un paquet avec audio (roub' 1) est disponible dans
+    <code>apkg/</code> sur le dépôt.</span></p></div>`;
   h += `<div class="deck-opts">`;
   for (const r of avail) {
     h += `<button class="chip ${rev.sel.has(r.id) ? "on" : ""}" data-rev-rub="${r.id}">J${r.juz} R${r.rub}</button>`;
@@ -1009,13 +1015,15 @@ function cardHtml(c, shown) {
 /* ---------------- tutoriels ---------------- */
 function pageTutoriels(sub) {
   const pages = [["translit", "Lire la translittération"], ["tajwid", "Légende tajwid"],
-    ["regles", "Fiches de règles"], ["styles", "Styles de récitation"]];
+    ["regles", "Fiches de règles"], ["styles", "Styles de récitation"],
+    ["sources", "Sources"]];
   let h = `<div class="hero"><h1>Tutoriels</h1></div><div class="tabs">` +
     pages.map(([id, lab]) => `<button data-tuto="${id}" class="${id === sub ? "on" : ""}">${lab}</button>`).join("") +
     `</div><div class="prose">`;
   if (sub === "translit") h += tutoTranslit();
   else if (sub === "tajwid") h += tutoTajwid();
   else if (sub === "styles") h += tutoStyles();
+  else if (sub === "sources") h += tutoSources();
   else h += tutoRegles();
   return h + `</div><div class="footer-pad"></div>`;
 }
@@ -1042,6 +1050,93 @@ function glossBulle(cle) {
   }
   return `<div class="gloss-bulle"><b>${esc(cle)}</b><p>${esc(g.def)}</p>
     <div class="src">${esc(g.src || "")} · cliquer le terme pour refermer</div></div>`;
+}
+
+/* bibliographie complète : c'est LA page de référence des sources ; les
+   mentions courtes ailleurs (accueil, à propos, README) y renvoient.
+   Doit rester synchronisée avec SOURCES.md à la racine du dépôt. */
+function tutoSources() {
+  return `<h2>Sources</h2>
+<p>Le détail de tout ce que l'application reprend à d'autres : édition,
+version, provenance, conditions d'usage. Règle de travail : <b>rien de ce qui
+touche à la religion n'est écrit sans source nommée et vérifiable</b> ; ce qui
+relève de la méthode d'apprentissage est notre travail propre et n'est pas
+présenté comme une position savante.</p>
+
+<h3>Texte coranique</h3>
+<p>Mushaf de Médine, riwâya Hafs 'an 'Âsim, texte de référence du <b>Complexe
+du Roi Fahd</b> (KFGQPC), obtenu par l'API quran.com v4. Le texte n'est jamais
+modifié : les seules transformations sont d'affichage (graphie du soukoun
+propre au mushaf de Médine) et sont réversibles. Un contrôle automatique
+compare, verset par verset, le texte publié à celui de la source.</p>
+
+<h3>Calligraphie et pages du mushaf</h3>
+<p>Polices <b>QCF</b> du KFGQPC, un glyphe par mot (version 1 en noir et blanc,
+version 4 en couleurs tajwid), et police <b>UthmanicHafs</b> pour le texte
+courant. La mise en page ligne à ligne reprend celle du mushaf imprimé.</p>
+
+<h3>Traduction française</h3>
+<p><b>Muhammad Hamidullah</b>, <i>Le Noble Coran et la traduction en langue
+française de ses sens</i>, via quran.com. Diffusion non commerciale.</p>
+
+<h3>Tafsir verset par verset</h3>
+<p>« French Translation of Al-Mukhtasar in Interpreting the Noble Quran »,
+traduction française d'<i>al-Mukhtaṣar fî tafsîr al-Qur'ân al-karîm</i>,
+<b>Tafsir Center for Quranic Studies</b>, version 1.0.0 du 03/10/2019,
+distribuée par <b>QuranEnc.com</b>. Texte <b>reproduit sans aucune
+modification</b>, conformément aux conditions de QuranEnc.com : attribution de
+l'éditeur et de la source, numéro de version affiché, contenu inchangé.</p>
+
+<h3>Récitations</h3>
+<p>Toutes du cheikh <b>Mahmoud Khalil al-Husary</b> (m. 1980), riwâya Hafs 'an
+'Âsim : murattal 64 kbps (fourni avec l'appli) et 128 kbps, mu'allim, via
+everyayah.com et quranicaudio.com ; mujawwad via le CDN de Tarteel. Usage non
+commercial. Les murattal 64 et 128 kbps sont le <b>même enregistrement</b> à
+deux qualités d'encodage ; le mu'allim est le premier <i>muṣḥaf mu'allim</i>
+enregistré au monde (1969).</p>
+
+<h3>Surlignage mot à mot</h3>
+<p>Segments temporels de la <b>Quranic Universal Library</b> (qul.tarteel.ai) :
+pour chaque verset, le début et la fin de chaque mot récité, un jeu par style.</p>
+
+<h3>Règles de tajwid</h3>
+<p><b>Al-Jamzûrî</b>, <i>Tuhfat al-Atfâl</i> (noûn sakina, tanwin, mîm sakina,
+madd) et <b>Ibn al-Jazarî</b>, <i>al-Muqaddima al-Jazariyya</i> (qalqala, lâm
+du nom d'Allah, râ'). Les fiches s'en tiennent au contenu de ces deux matns ;
+chaque exemple cité est vérifié par script comme présent dans le Qur'an.</p>
+
+<h3>Tutoriels et glossaire</h3>
+<p><b>Ibn al-Jazarî</b> (m. 833 H), <i>an-Nashr fî l-qirâ'ât al-'ashr</i>,
+tome I, chapitre « Comment lit-on le Qur'an ? » : définitions du taḥqîq, du
+ḥadr, du tadwîr et du tartîl, et entrées du glossaire. Qur'an 73:4 pour le
+tartîl, avec les gloses d'<b>Ibn 'Abbâs</b> et de <b>Mujâhid</b> rapportées par
+Ibn al-Jazarî au même endroit.</p>
+
+<h3>Notes et cartes des roub'</h3>
+<p><b>Ibn Kathîr</b>, <i>Tafsîr al-Qur'ân al-'aẓîm</i>, consulté dans son texte
+arabe intégral (et non dans son abrégé) pour toute position qui lui est
+attribuée ; <b>As-Sa'dî</b>, <i>Taysîr al-Karîm ar-Raḥmân</i>. Les hadiths sont
+toujours donnés avec leur collection et, si elle est connue, leur appréciation
+(hadith qudsi de la Fâtiḥa : <i>Sahih Muslim</i> 395 ; hadith de 'Adî ibn
+Hâtim : <i>Tirmidhî</i> 2954, <i>hasan gharîb</i> selon at-Tirmidhî). Les
+affirmations sur le texte lui-même sont vérifiées par script, jamais de
+mémoire.</p>
+
+<h3>Ce que l'application ne reprend à personne</h3>
+<p>Le découpage roub' par roub', la difficulté sur cinq étoiles, le choix des
+points durs, l'ordre du parcours de tajwid progressif, la formulation des
+cartes et le moteur de révision espacée sont le travail propre de Roub' : des
+choix pédagogiques, pas des positions savantes.</p>
+
+<h3>Licences</h3>
+<p>Code sous <b>AGPL-3.0</b> ; contenu éditorial de Roub' sous
+<b>CC BY-NC-SA 4.0</b> (attribution « Roub', Anis &amp; Yusuf »). Chaque
+élément tiers conserve ses propres conditions : c'est pourquoi l'application
+est et doit rester gratuite et non commerciale.</p>
+
+<p class="src">Une erreur, une source mal citée, un doute :
+<a href="mailto:dev.yusuf@pm.me">dev.yusuf@pm.me</a>. Cette page correspond au
+fichier SOURCES.md du dépôt.</p>`;
 }
 
 function tutoStyles() {
@@ -1256,8 +1351,8 @@ function pageParams() {
       <span>Al-Husary dans les quatre cas. Le murattal 64 kbps est fourni avec
       l'appli (et fonctionne donc aussi depuis une copie locale) ; les autres se
       chargent depuis leur source. Dans tous les cas, ce qui a été écouté reste
-      en cache sur cet appareil, et « Tout précharger » met hors-ligne le style
-      choisi ici</span>
+      en cache sur cet appareil ; pour tout avoir d'avance, chaque style se
+      précharge séparément plus bas dans cette page</span>
       <details class="aide-repli"><summary>Lequel choisir ?</summary>
     <div class="aide-styles">${gloss(`<p>Les quatre enregistrements sont du cheikh <b>Mahmoud Khalil
     al-Husary</b> (Hafs 'an 'Âsim) : ils diffèrent par l'allure, non par le texte.</p>
@@ -1338,12 +1433,14 @@ function pageParams() {
     Quranic Universal Library (qul.tarteel.ai) ; usage non commercial. Tafsir
     verset par verset : « French Translation of Al-Mukhtasar in Interpreting
     the Noble Quran » (Tafsir Center for Quranic Studies, V1.0.0, via
-    QuranEnc.com, texte reproduit sans modification). Notes, cartes et
-    tutoriels : sources citées au fil du texte (Ibn Kathîr, As-Sa'dî,
-    Ibn al-Jazarî) ; fiches de règles d'après les matns Tuhfat al-Atfal et
-    al-Muqaddima al-Jazariyya. Application gratuite et non commerciale, sans
-    compte ni collecte de données : progression et réglages restent dans ce
-    navigateur. Tout le contenu religieux est sourcé et vérifié contre ses
+    QuranEnc.com, texte reproduit sans modification). Cartes et tutoriels :
+    sources citées au fil du texte (Ibn Kathîr, As-Sa'dî, Ibn al-Jazarî) ;
+    fiches de règles d'après les matns Tuhfat al-Atfal et
+    al-Muqaddima al-Jazariyya. <b>Détail complet : Tutoriels → Sources</b>
+    (fichier SOURCES.md sur le dépôt). Application gratuite et non commerciale,
+    sans compte : progression et réglages restent dans ce navigateur, et rien
+    n'est envoyé ailleurs sauf si la synchronisation multi-appareils est activée
+    (code secret anonyme, aucune donnée personnelle). Tout le contenu religieux est sourcé et vérifié contre ses
     sources ; une erreur restant toujours possible, merci de signaler tout
     doute via le widget d'avis ou dev.yusuf@pm.me. Code sous licence AGPL-3.0, contenu éditorial sous
     CC BY-NC-SA 4.0 (détails sur le dépôt GitHub). © 2026 Anis &amp; Yusuf.</p>`;
@@ -1785,7 +1882,7 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "1.11.1";   // réécrit par tools/release.py
+const BUILD_VERSION = "1.12.0";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {
@@ -1888,7 +1985,7 @@ async function preloadAll(status, quoi) {
 }
 
 /* poids indicatifs (mesurés) pour aider à choisir quoi précharger */
-const PRELOAD_MO = { pages: 30, husary64: 117, husary128: 240, muallim: 265, mujawwad: 330 };
+const PRELOAD_MO = { pages: 10, husary64: 121, husary128: 240, muallim: 265, mujawwad: 330 };
 
 /* ---------------- boot ---------------- */
 {

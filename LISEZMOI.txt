@@ -33,11 +33,13 @@ UTILISER
   Débutant ? Commence par les derniers roub' du juz 'Amma (les sourates
   courtes de la prière).
 - Dans un roub' : Mémoriser (3 affichages, dont les vraies pages du mushaf
-  de Médine), puis Difficultés, Tajwid, Tafsir, Vocabulaire, Cartes.
+  de Médine) et Tafsir sont disponibles partout ; Difficultés, Tajwid,
+  Vocabulaire et Cartes ne sont rédigés que pour le roub' 1 pour l'instant
+  (ailleurs : « contenu à venir »).
 - Révision : flashcards à répétition espacée. Pour un vrai suivi au long
   cours, nous recommandons Anki et son planificateur FSRS : le bouton
   « Télécharger les cartes pour Anki » exporte les 804 cartes (24 sous-
-  paquets, sans audio). Les paquets AVEC audio sont dans le dossier  apkg\
+  paquets, sans audio). Un paquet avec audio (roub' 1) est dans  apkg\
 - Tutoriels : lire la translittération, légende des couleurs tajwid, fiches
   de règles, styles de récitation. À lire en premier si tu ne lis pas l'arabe.
   Les termes techniques y sont cliquables : leur définition s'affiche.
@@ -57,14 +59,17 @@ QUI SOMMES-NOUS
   Discord : @ophtalmologie
 - Israa (ostéopathe) : conseillère pédagogique.
 
+Bibliographie détaillée : fichier SOURCES.md (et, dans l'appli,
+Tutoriels -> Sources).
+
 Sources : texte du mushaf de Médine (Complexe du Roi Fahd, via quran.com),
 traduction Muhammad Hamidullah, récitation Mahmoud Khalil Al-Husary en
 quatre styles au choix (murattal 64 kbps fourni avec l'appli ; murattal 128 kbps et
-muallim via everyayah.com ; mujawwad via le CDN de Tarteel), segments du
+muallim via everyayah.com/quranicaudio.com ; mujawwad via le CDN de Tarteel), segments du
 surlignage mot à mot : Quranic Universal Library (qul.tarteel.ai).
 Tafsir verset par verset : « French Translation of Al-Mukhtasar in
 Interpreting the Noble Quran » (Tafsir Center for Quranic Studies, V1.0.0,
-via QuranEnc.com, texte reproduit sans modification). Les notes, cartes et
+via QuranEnc.com, texte reproduit sans modification). Les cartes, tutoriels et
 fiches de règles citent leurs propres sources (Ibn Kathîr, As-Sa'dî,
 Ibn al-Jazarî, matns Tuhfat al-Atfal et al-Muqaddima al-Jazariyya).
 

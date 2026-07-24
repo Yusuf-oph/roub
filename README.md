@@ -7,18 +7,24 @@ découpage traditionnel du mushaf : le roub'. Couverture actuelle : **juz 1
 et 2** (Al-Fâtiḥa + Al-Baqara) et **juz 'Amma** (les sourates courtes,
 idéales pour débuter), soit 24 roub' et 823 versets.
 
-Pour chaque roub' : texte du mushaf de Médine colorié tajwid, **pagination
-exacte du mushaf** (calligraphie officielle QCF, en noir et blanc ou en
-édition colorée tajwid), translittération à double style (hybride
-française / scientifique), traduction Hamidullah, audio Al-Husary verset
-par verset, difficulté notée sur 5 étoiles, difficultés de mémorisation,
-particularités tajwid reliées à des fiches de règles, **tafsir verset par
-verset** (al-Mukhtaṣar, traduction française), vocabulaire, **révision
-espacée** intégrée (et export des cartes pour Anki, planificateur FSRS),
-**surlignage mot à mot** de la récitation dans quatre styles au choix,
-progression visible, auto-évaluation des lacunes et
-**synchronisation multi-appareils par code anonyme**. PWA installable,
-fonctionne hors-ligne.
+Pour **chaque** roub' : texte du mushaf de Médine colorié tajwid,
+**pagination exacte du mushaf** (calligraphie officielle QCF, en noir et
+blanc ou en édition colorée tajwid), translittération à double style
+(hybride française / scientifique), traduction Hamidullah, audio Al-Husary
+verset par verset dans **quatre styles au choix** avec **surlignage mot à
+mot**, difficulté notée sur 5 étoiles, **tafsir verset par verset**
+(al-Mukhtaṣar, traduction française), cartes d'enchaînement, progression
+visible et auto-évaluation des lacunes.
+
+Le **contenu rédigé** (points durs de mémorisation, particularités tajwid,
+vocabulaire, cartes mutashabihat et de sens) existe pour le **roub' 1** ;
+les autres roub' portent la mention « notes à venir » et s'ouvriront à
+mesure de leur rédaction. Le juz 'Amma est accessible en entier.
+
+Également : **révision espacée** intégrée avec export des cartes pour Anki
+(planificateur FSRS) et **synchronisation multi-appareils par code
+anonyme**. PWA installable ; le texte, le tafsir et l'interface fonctionnent
+hors-ligne dès la première visite.
 
 ## Qui sommes-nous
 
@@ -67,6 +73,10 @@ l'export d'avis intégré à l'application, dans Paramètres).
 
 ## Sources et licences
 
+**Bibliographie détaillée : [SOURCES.md](SOURCES.md)** (éditions, versions,
+provenance exacte, conditions d'usage) ; résumé ci-dessous. Dans l'application :
+onglet Tutoriels → **Sources**.
+
 - **Code : AGPL-3.0** (fichier `LICENSE`) · **Contenu éditorial :
   CC BY-NC-SA 4.0** : détails (français et anglais) dans
   `LICENSE-CONTENU.md`.
@@ -75,14 +85,15 @@ l'export d'avis intégré à l'application, dans Paramètres).
 - Traduction française : Muhammad Hamidullah.
 - Récitation : Mahmoud Khalil Al-Husary, quatre styles au choix : murattal
   64 kbps fourni avec l'appli, murattal 128 kbps et muallim via
-  everyayah.com, mujawwad via le CDN de Tarteel ; les styles non embarqués
+  everyayah.com (miroir quranicaudio.com), mujawwad via le CDN de Tarteel ;
+  les styles non fournis avec l'appli
   se mettent en cache au fil de l'écoute. Usage non commercial.
 - Surlignage mot à mot : segments de la Quranic Universal Library
   (qul.tarteel.ai), un jeu par style.
 - Tafsir : « French Translation of Al-Mukhtasar in Interpreting the Noble
   Quran », Tafsir Center for Quranic Studies, V1.0.0, via QuranEnc.com,
   reproduit sans modification (conditions de QuranEnc.com).
-- Notes, cartes et tutoriels : sources citées au fil du texte (Ibn Kathîr,
+- Cartes et tutoriels : sources citées au fil du texte (Ibn Kathîr,
   As-Sa'dî, Ibn al-Jazarî) ; fiches de règles d'après les matns Tuhfat
   al-Atfal et al-Muqaddima al-Jazariyya.
 

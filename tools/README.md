@@ -1,7 +1,8 @@
 # Pipeline quran-hifz
 
-Tout le contenu généré vient d'API vérifiables (quran.com v4, alquran.cloud,
-everyayah) ; rien n'est écrit à la main. Le contenu éditorial (notes, cartes
+Tout le contenu généré vient de sources vérifiables (quran.com v4,
+alquran.cloud, everyayah/quranicaudio, QuranEnc.com pour le tafsir,
+qul.tarteel.ai pour les segments) ; rien n'est écrit à la main. Le contenu éditorial (notes, cartes
 mutashabihat/sens, meta) est rédigé puis contrôlé par `verifie.py`.
 
 ## Ajouter un juz (ex. juz 3)
@@ -18,14 +19,36 @@ python tools/build_data.py
 python tools/build_pages.py 1 2 3
 #    + télécharger les polices QCF_P###.woff2 des nouvelles pages dans app/fonts/qcf/
 
-# 4. déclarer les nouveaux roub' dans app/data/meta.js (+ étoiles), créer les
-#    placeholders notes/cartes, ajouter les <script> dans app/index.html
+# 4. déclarer les nouveaux roub' dans app/data/meta.js (+ étoiles, dispo),
+#    créer les placeholders notes/cartes, ajouter dans app/index.html les
+#    <script> de data/quran, data/notes, data/cartes ET data/tafsirfr
 
-# 5. contrôle + paquets + export
+# 5. segments mot à mot des 4 styles de récitation (surlignage)
+python tools/fetch_segments.py
+
+# 6. tafsir français verset par verset (base QuranEnc déjà en cache)
+python tools/build_tafsirfr.py
+
+# 7. parcours de tajwid progressif (ordre : tools/curriculum.json)
+python tools/build_tajcur.py
+
+# 8. contrôle + paquets + export
 python tools/verifie.py
-python tools/build_apkg.py all
+python tools/build_apkg.py all          # un .apkg par roub', AVEC audio
+python tools/build_apkg.py collection   # app/anki/roub-cartes.apkg, sans audio
 python tools/build_export.py
 ```
+
+## Les autres outils
+
+| Script | À quoi il sert |
+|---|---|
+| `mirror_audio.py <style> [--tout]` | sauvegarde locale d'un style de récitation, hors dépôt (assurance si une source distante disparaît) |
+| `segments_check.py` | vérifie que les segments mot à mot collent bien à NOS mp3 (dérive, couverture) |
+| `fetch_tafsir_corpus.py` | constitue le corpus d'audit local (Ibn Kathîr, As-Sa'dî en arabe) |
+| `tafsir_local.py <clé>` | consulte ce corpus hors ligne pendant un audit de contenu |
+| `md2pdf.py <fichier.md>` | met un document de travail au propre en PDF A4 |
+| `translit.py` | moteur de translittération (scientifique + hybride), utilisé par `build_data.py` |
 
 ## Règles de rédaction du contenu (rappels)
 
@@ -36,8 +59,8 @@ python tools/build_export.py
   premier verset). Arabe inline : `[[...]]`. Gras `**`, italique `*`.
 - L'affichage transforme le soukoun U+0652 en U+06E1 (graphie de Médine) et
   peut masquer les ronds muets U+06DF : ne PAS modifier les données pour ça.
-- Fichiers par rub : `app/data/notes/<roub'>.js` (difficultes/tajwid/tafsir/
-  vocab) et `app/data/cartes/<roub'>.js` (mutash/sens uniquement : les cartes
+- Fichiers par rub : `app/data/notes/<roub'>.js` (difficultes/tajwid/vocab :
+  la clé `tafsir` a disparu en v1.8.0, le tafsir vient d'al-Mukhtaṣar) et `app/data/cartes/<roub'>.js` (mutash/sens uniquement : les cartes
   d'enchaînement et de vocabulaire sont dérivées automatiquement).
 
 ## Publier une mise à jour (mainteneur)
