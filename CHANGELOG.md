@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.9.1 · 2026-07-24
+- Surlignage mot à mot : ce sont les lettres qui s'allument (plus de cadre), avec 70 ms d'avance et un rafraîchissement plus fin
+- « Tout précharger » met désormais hors-ligne le style de récitation choisi (et non plus seulement celui fourni avec l'appli) ; libellés corrigés : seuls le texte, les notes et l'interface sont hors-ligne dès la première visite
+
 ## 1.9.0 · 2026-07-24
 - Quatre styles de récitation Al-Husary au choix dans Paramètres : murattal 64 kbps (embarqué, hors-ligne), murattal 128 kbps, muallim (enseignement), mujawwad (mélodique) ; les styles non embarqués se mettent en cache au fil de l'écoute
 - Surlignage mot à mot pendant la récitation, calé sur le style choisi (activable dans Paramètres)

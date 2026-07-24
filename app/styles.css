@@ -373,11 +373,14 @@ button { font: inherit; cursor: pointer; }
   text-transform: uppercase; letter-spacing: .4px;
 }
 
-/* surlignage mot à mot pendant la récitation */
-.wd { border-radius: 4px; transition: background-color .12s, color .12s; }
-.wd.on { background: var(--accent); color: var(--bg); }
-:root[data-theme="light"] .wd.on { color: #fff; }
-.wd.done { opacity: .55; }
+/* surlignage mot à mot pendant la récitation : ce sont les LETTRES qui
+   s'allument (pas de cadre), la couleur tajwid cède la place le temps du mot */
+.wd { transition: color .09s linear, opacity .18s linear; }
+.wd.on, .wd.on [class^="tj-"] {
+  color: var(--accent);
+  text-shadow: 0 0 10px color-mix(in srgb, var(--accent) 45%, transparent);
+}
+.wd.done { opacity: .5; }
 .wpause { opacity: .7; }
 
 /* tafsir verset par verset (al-Mukhtaṣar, texte tiers verbatim) */

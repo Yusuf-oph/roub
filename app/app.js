@@ -213,7 +213,7 @@ function deckStats(cardIds) {
    leur source d'origine et mis en cache par le service worker au fil de
    l'écoute. Chaque style a ses propres segments mot à mot (data/segments/). */
 const RECITS = {
-  husary64: { nom: "Murattal 64 kbps (embarqué, hors-ligne)",
+  husary64: { nom: "Murattal 64 kbps (fourni avec l'appli)",
     url: f => "audio/" + f, local: true },
   husary128: { nom: "Murattal 128 kbps (même récitation, son plus net)",
     url: f => "https://mirrors.quranicaudio.com/everyayah/Husary_128kbps/" + f },
@@ -273,6 +273,7 @@ player.el.addEventListener("ended", () => player.next());
 /* surlignage mot à mot : les segments donnent [i_mot, i_fin, début_ms, fin_ms] ;
    un timer plutôt que timeupdate (déclenché trop rarement : ~4 fois/seconde) */
 let wordTimer = null;
+const KARAOKE_LEAD = 70;   // ms d'avance sur le temps audio (voir wordTick)
 function clearWords() {
   $$(".wd.on, .wd.done").forEach(el => el.classList.remove("on", "done"));
 }
@@ -280,7 +281,9 @@ function wordTick() {
   if (!PARAMS.karaoke || !player.curKey || player.el.paused) return;
   const sg = segsOf(player.curKey);
   if (!sg) return;
-  const t = player.el.currentTime * 1000;
+  /* petite avance : le temps que le mot s'allume et que l'œil le voie, la
+     syllabe est déjà commencée ; 70 ms recale le ressenti sans anticiper */
+  const t = player.el.currentTime * 1000 + KARAOKE_LEAD;
   /* mot courant = dernier mot commencé : les silences entre deux mots ne sont
      pas couverts par les segments (surtout en 128k/muallim/mujawwad), garder
      le mot précédent évite un clignotement à chaque blanc */
@@ -295,7 +298,7 @@ function wordTick() {
 }
 player.el.addEventListener("play", () => {
   clearInterval(wordTimer);
-  wordTimer = setInterval(wordTick, 60);
+  wordTimer = setInterval(wordTick, 40);
 });
 player.el.addEventListener("pause", () => clearInterval(wordTimer));
 player.el.addEventListener("ended", () => { clearInterval(wordTimer); clearWords(); });
@@ -1125,9 +1128,11 @@ function pageParams() {
   <div class="param-row"><div class="lab"><b>Traduction visible</b><span>Hamidullah, affichée par défaut</span></div>
     <label class="switch"><input type="checkbox" data-param="showTr" ${PARAMS.showTr ? "checked" : ""}><span class="sl"></span></label></div>
   <div class="param-row"><div class="lab"><b>Style de récitation</b>
-      <span>Al-Husary dans les quatre cas ; seul le murattal 64 kbps est embarqué
-      (disponible hors connexion d'emblée), les autres se chargent depuis leur
-      source et restent ensuite en cache sur cet appareil</span></div>
+      <span>Al-Husary dans les quatre cas. Le murattal 64 kbps est fourni avec
+      l'appli (et fonctionne donc aussi depuis une copie locale) ; les autres se
+      chargent depuis leur source. Dans tous les cas, ce qui a été écouté reste
+      en cache sur cet appareil, et « Tout précharger » met hors-ligne le style
+      choisi ici</span></div>
     <select data-param="recitation">
       ${Object.entries(RECITS).map(([k, r]) =>
         `<option value="${k}" ${recitKey() === k ? "selected" : ""}>${esc(r.nom)}</option>`).join("")}
@@ -1170,9 +1175,12 @@ function pageParams() {
       <button class="iconbtn" data-sync-join>Saisir un code</button>
     </span></div>`}
   <div class="param-row"><div class="lab"><b>Tout précharger pour le hors-ligne</b>
-      <span>met en cache l'audio complet et les pages du mushaf (~85 Mo) :
-      l'appli fonctionne ensuite sans connexion. Sur iPhone/iPad, le quota de
-      cache peut limiter le préchargement. <span id="preload-status"></span></span></div>
+      <span>met en cache les pages du mushaf et la récitation choisie ci-dessus
+      (${esc(RECITS[recitKey()].nom)}) : environ ${recitKey() === "husary64" ? "120" : "250 à 330"} Mo,
+      après quoi l'appli fonctionne sans connexion. Le texte, les notes et
+      l'interface, eux, sont déjà gardés hors-ligne dès la première visite.
+      Sur iPhone/iPad, le quota de cache peut limiter le préchargement.
+      <span id="preload-status"></span></span></div>
     <button class="fb-send" data-preload ${("serviceWorker" in navigator) && navigator.serviceWorker.controller ? "" : "disabled title='disponible sur la version en ligne (après un premier chargement)'"}>Précharger</button></div>
   <p style="color:var(--muted);font-size:13px">Version : <b id="appver">${esc(APPVER || "…")}</b><br><br>
     <b>Roub'</b> est une application co-fondée par <b>Anis</b> (docteur en
@@ -1616,7 +1624,7 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "1.9.0";   // réécrit par tools/release.py
+const BUILD_VERSION = "1.9.1";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {
@@ -1680,7 +1688,7 @@ async function showUpdateBanner(reg) {
 async function preloadAll(status) {
   const urls = [];
   for (const rid of Object.keys(QURAN)) {
-    for (const v of QURAN[rid].verses) urls.push("audio/" + v.audio);
+    for (const v of QURAN[rid].verses) urls.push(audioUrl(v.audio));
   }
   for (const p of Object.keys(PAGES)) {
     urls.push("fonts/qcf/QCF_P" + String(p).padStart(3, "0") + ".woff2");
