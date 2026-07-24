@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.9.0 · 2026-07-24
+- Quatre styles de récitation Al-Husary au choix dans Paramètres : murattal 64 kbps (embarqué, hors-ligne), murattal 128 kbps, muallim (enseignement), mujawwad (mélodique) ; les styles non embarqués se mettent en cache au fil de l'écoute
+- Surlignage mot à mot pendant la récitation, calé sur le style choisi (activable dans Paramètres)
+
 ## 1.8.0 · 2026-07-24
 - Tafsir verset par verset pour LES 24 ROUB' : « French Translation of Al-Mukhtasar in Interpreting the Noble Quran » (Tafsir Center for Quranic Studies, V1.0.0, via QuranEnc.com), reproduit sans modification
 - L'onglet Tafsir n'affiche plus de synthèse rédigée : place à l'œuvre de référence, attribuée et versionnée

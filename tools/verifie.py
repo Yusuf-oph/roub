@@ -18,6 +18,8 @@ Vérifie :
      (recalcul via tools/build_tajcur.py)
   I. tafsirfr/ : tafsir français (al-Mukhtaṣar) verset par verset, couverture
      complète, textes non vides, attribution présente (appli + docs)
+  J. segments/ : segments mot à mot des 4 styles de récitation (couverture,
+     temps cohérents, index de mots plausibles, câblage index.html/SW/release)
 """
 import json
 import os
@@ -52,7 +54,7 @@ const app = process.argv[1];
 const load = f => eval(fs.readFileSync(f, 'utf8'));
 for (const f of fs.readdirSync(path.join(app, 'data')))
   if (f.endsWith('.js')) load(path.join(app, 'data', f));
-for (const sub of ['quran', 'notes', 'cartes', 'tafsirfr']) {
+for (const sub of ['quran', 'notes', 'cartes', 'tafsirfr', 'segments']) {
   const dir = path.join(app, 'data', sub);
   for (const f of fs.readdirSync(dir)) if (f.endsWith('.js')) load(path.join(dir, f));
 }
@@ -61,6 +63,7 @@ process.stdout.write(JSON.stringify({
   NOTES: window.NOTES || {}, CARTES: window.CARTES || {},
   PAGES: window.PAGES || {}, PAGES2: window.PAGES2 || {},
   TAJCUR: window.TAJCUR || {}, TAFSIRFR: window.TAFSIRFR || {},
+  SEGMENTS: window.SEGMENTS || {},
 }));
 """
     r = subprocess.run(["node", "-e", script, APP], capture_output=True)
@@ -323,6 +326,49 @@ def main():
         if "tafsirfr" not in rel:
             err("tafsirfr : sous-dossier absent de release.py::shell_files (SW)")
         print(f"I. tafsirfr : {len(TFR)} rubs, {n_tfr} versets, attribution en place")
+
+    # J. segments mot à mot (karaoké) : un jeu complet par style de récitation
+    SEG = data.get("SEGMENTS") or {}
+    STYLES = ("husary64", "husary128", "muallim", "mujawwad")
+    if not SEG:
+        err("segments : window.SEGMENTS absent (lancer tools/fetch_segments.py)")
+    else:
+        if set(SEG) != set(STYLES):
+            err(f"segments : styles {sorted(SEG)} au lieu de {sorted(STYLES)}")
+        app_js = open(os.path.join(APP, "app.js"), encoding="utf-8").read()
+        idx_html = open(os.path.join(APP, "index.html"), encoding="utf-8").read()
+        for st in STYLES:
+            d = SEG.get(st) or {}
+            manq = [k for k in vidx if k not in d]
+            if manq:
+                err(f"segments {st} : {len(manq)} versets sans segments ({manq[:3]})")
+            # bornes : mots numérotés dans l'ordre, temps croissants et positifs
+            for k, sg in list(d.items())[:200]:
+                if not sg:
+                    err(f"segments {st} {k} : vide")
+                    continue
+                if any(s[2] < 0 or s[3] < s[2] for s in sg):
+                    err(f"segments {st} {k} : temps incohérents")
+            # le nombre de mots ne doit pas dépasser les mots récités du verset
+            for k, sg in list(d.items())[:200]:
+                v = vidx[k][1] if k in vidx else None
+                if not v:
+                    continue
+                mots = [w for w in v["ar"].split() if not all(c in "ۖۗۘۙۚۛۜ۞۩" for c in w)]
+                if sg and max(s[0] for s in sg) >= len(mots) + 2:
+                    err(f"segments {st} {k} : index de mot hors texte")
+            if f"data/segments/{st}.js" not in idx_html:
+                err(f"segments {st} : absent d'index.html")
+            if st not in app_js:
+                err(f"segments {st} : style inconnu de app.js (RECITS)")
+        rel = open(os.path.join(HERE, "release.py"), encoding="utf-8").read()
+        if "segments" not in rel:
+            err("segments : sous-dossier absent de release.py::shell_files (SW)")
+        sw = open(os.path.join(APP, "sw.js"), encoding="utf-8").read()
+        for host in ("mirrors.quranicaudio.com", "audio-cdn.tarteel.ai"):
+            if host not in sw:
+                err(f"segments : hôte {host} absent du service worker (pas de cache hors-ligne)")
+        print(f"J. segments : {len(SEG)} styles × {len(SEG.get('husary64') or {})} versets")
 
     print()
     if ERR:

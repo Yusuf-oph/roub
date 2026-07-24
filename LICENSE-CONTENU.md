@@ -37,8 +37,10 @@ dev.yusuf@pm.me.
   conditions de QuranEnc.com (attribution, version mentionnée, mise à
   jour selon les versions de la source). Ce texte tiers N'EST PAS couvert
   par notre licence CC BY-NC-SA.
-- Récitation : Mahmoud Khalil Al-Husary, via everyayah.com (usage non
-  commercial).
+- Récitation : Mahmoud Khalil Al-Husary, quatre styles : murattal 64 kbps
+  (embarqué) et murattal 128 kbps / muallim via everyayah.com, mujawwad via
+  le CDN de Tarteel ; usage non commercial. Segments mot à mot (surlignage) :
+  Quranic Universal Library, qul.tarteel.ai.
 
 Du fait de ces conditions, l'application dans son ensemble est et doit
 rester **gratuite et non commerciale**.

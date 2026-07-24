@@ -28,6 +28,7 @@ const store = {
 const PARAMS = Object.assign({
   theme: "dark", translit: "fr", showTl: true, showTr: true,
   taj: true, speed: 1, newLimit: 15, silentMarks: true,
+  recitation: "husary64", karaoke: true,
 }, store.get("quran-params", {}));
 
 /* Affichage du texte arabe :
@@ -207,6 +208,24 @@ function deckStats(cardIds) {
 }
 
 /* ---------------- audio ---------------- */
+/* styles de récitation (Mahmoud Khalil Al-Husary) : le murattal 64 kbps est
+   embarqué dans l'appli (hors-ligne par défaut) ; les autres sont lus depuis
+   leur source d'origine et mis en cache par le service worker au fil de
+   l'écoute. Chaque style a ses propres segments mot à mot (data/segments/). */
+const RECITS = {
+  husary64: { nom: "Murattal 64 kbps (embarqué, hors-ligne)",
+    url: f => "audio/" + f, local: true },
+  husary128: { nom: "Murattal 128 kbps (même récitation, son plus net)",
+    url: f => "https://mirrors.quranicaudio.com/everyayah/Husary_128kbps/" + f },
+  muallim: { nom: "Muallim (lecture d'enseignement, lente)",
+    url: f => "https://mirrors.quranicaudio.com/everyayah/Husary_Muallim_128kbps/" + f },
+  mujawwad: { nom: "Mujawwad (lecture mélodique)",
+    url: f => "https://audio-cdn.tarteel.ai/quran/husaryMujawwad/" + f },
+};
+const recitKey = () => RECITS[PARAMS.recitation] ? PARAMS.recitation : "husary64";
+const audioUrl = f => RECITS[recitKey()].url(f);
+const segsOf = key => ((window.SEGMENTS || {})[recitKey()] || {})[key] || null;
+
 const player = {
   el: new Audio(),
   queue: [], qi: 0, rep: 1, repLeft: 1, loopRange: false, playing: false,
@@ -218,7 +237,8 @@ const player = {
   _launch() {
     if (!this.queue.length || this.qi >= this.queue.length) { this.stop(); return; }
     const item = this.queue[this.qi];
-    this.el.src = "audio/" + item.audio;
+    this.curKey = item.k;
+    this.el.src = audioUrl(item.audio);
     this.el.playbackRate = PARAMS.speed;
     this.el.play().catch(() => this.stop());
     highlightVerse(item.k);
@@ -241,26 +261,61 @@ const player = {
   },
   stop() {
     this.playing = false;
+    this.curKey = null;
     this.el.pause();
     highlightVerse(null);
+    clearWords();
     updateAudioBar();
   },
 };
 player.el.addEventListener("ended", () => player.next());
 
+/* surlignage mot à mot : les segments donnent [i_mot, i_fin, début_ms, fin_ms] ;
+   un timer plutôt que timeupdate (déclenché trop rarement : ~4 fois/seconde) */
+let wordTimer = null;
+function clearWords() {
+  $$(".wd.on, .wd.done").forEach(el => el.classList.remove("on", "done"));
+}
+function wordTick() {
+  if (!PARAMS.karaoke || !player.curKey || player.el.paused) return;
+  const sg = segsOf(player.curKey);
+  if (!sg) return;
+  const t = player.el.currentTime * 1000;
+  /* mot courant = dernier mot commencé : les silences entre deux mots ne sont
+     pas couverts par les segments (surtout en 128k/muallim/mujawwad), garder
+     le mot précédent évite un clignotement à chaque blanc */
+  let cur = -1;
+  for (let i = 0; i < sg.length; i++) if (t >= sg[i][2]) cur = i;
+  const els = $$(`.verse[data-k="${player.curKey}"] .wd, .mver[data-k="${player.curKey}"] .wd`);
+  els.forEach(el => {
+    const w = +el.dataset.w;
+    el.classList.toggle("on", w === cur);
+    el.classList.toggle("done", w < cur);
+  });
+}
+player.el.addEventListener("play", () => {
+  clearInterval(wordTimer);
+  wordTimer = setInterval(wordTick, 60);
+});
+player.el.addEventListener("pause", () => clearInterval(wordTimer));
+player.el.addEventListener("ended", () => { clearInterval(wordTimer); clearWords(); });
+
 function highlightVerse(key) {
   $$(".verse.playing, .mver.playing, .qw.playing").forEach(el => el.classList.remove("playing"));
+  clearWords();
   if (!key) return;
   const els = $$(`.verse[data-k="${key}"], .mver[data-k="${key}"], .qw[data-k="${key}"]`);
   els.forEach(el => el.classList.add("playing"));
   if (els[0]) els[0].scrollIntoView({ block: "center", behavior: "smooth" });
 }
-function playOneShot(audio) {
+function playOneShot(audio, key) {
   player.stop();
-  player.el.src = "audio/" + audio;
+  player.curKey = key || null;
+  player.el.src = audioUrl(audio);
   player.el.playbackRate = PARAMS.speed;
   player.el.play().catch(() => {});
   player.playing = false;
+  if (key) highlightVerse(key);
 }
 
 /* ---------------- feedback ---------------- */
@@ -312,15 +367,45 @@ function starsHtml(n) {
   for (let i = 1; i <= 5; i++) h += `<span class="${i <= n ? "" : "off"}">★</span>`;
   return `<span class="stars" title="difficulté ${n}/5 (échelle : tout le Qur'an)">${h}</span>`;
 }
-function arHtml(v) {
-  if (!PARAMS.taj || !v.taj || !v.taj.length) return arEsc(v.ar);
-  let out = "", pos = 0;
-  for (const [st, en, cls] of v.taj) {
-    if (st > pos) out += arEsc(v.ar.slice(pos, st));
-    out += `<span class="tj-${cls}">${arEsc(v.ar.slice(st, en))}</span>`;
-    pos = en;
+/* marques de pause : elles occupent un « mot » dans le texte mais ne sont pas
+   récitées, donc elles ne comptent pas dans l'index des segments audio */
+const PAUSES = "ۖۗۘۙۚۛۜ۞۩";
+const estPause = w => [...w].every(c => PAUSES.includes(c));
+
+/* rendu d'une tranche avec ses classes tajwid (une classe par caractère) */
+function tajChunk(s, from, to, cls) {
+  if (!cls) return arEsc(s.slice(from, to));
+  let out = "", i = from;
+  while (i < to) {
+    const c = cls[i];
+    let j = i + 1;
+    while (j < to && cls[j] === c) j++;
+    const txt = arEsc(s.slice(i, j));
+    out += c ? `<span class="tj-${c}">${txt}</span>` : txt;
+    i = j;
   }
-  if (pos < v.ar.length) out += arEsc(v.ar.slice(pos));
+  return out;
+}
+
+/* chaque mot récité est encapsulé (data-w = index dans les segments audio) :
+   c'est le support du surlignage mot à mot pendant la récitation */
+function arHtml(v) {
+  const taj = PARAMS.taj && v.taj && v.taj.length ? v.taj : null;
+  let cls = null;
+  if (taj) {
+    cls = new Array(v.ar.length).fill(null);
+    for (const [st, en, c] of taj) for (let i = st; i < en; i++) cls[i] = c;
+  }
+  let out = "", wi = 0, last = 0, m;
+  const re = /\S+/g;
+  while ((m = re.exec(v.ar))) {
+    if (m.index > last) out += arEsc(v.ar.slice(last, m.index));
+    const inner = tajChunk(v.ar, m.index, m.index + m[0].length, cls);
+    out += estPause(m[0]) ? `<span class="wpause">${inner}</span>`
+                          : `<span class="wd" data-w="${wi++}">${inner}</span>`;
+    last = m.index + m[0].length;
+  }
+  if (last < v.ar.length) out += arEsc(v.ar.slice(last));
   return out;
 }
 function tlOf(v) { return PARAMS.translit === "sci" ? v.sci : v.fr; }
@@ -1039,6 +1124,17 @@ function pageParams() {
     <label class="switch"><input type="checkbox" data-param="showTl" ${PARAMS.showTl ? "checked" : ""}><span class="sl"></span></label></div>
   <div class="param-row"><div class="lab"><b>Traduction visible</b><span>Hamidullah, affichée par défaut</span></div>
     <label class="switch"><input type="checkbox" data-param="showTr" ${PARAMS.showTr ? "checked" : ""}><span class="sl"></span></label></div>
+  <div class="param-row"><div class="lab"><b>Style de récitation</b>
+      <span>Al-Husary dans les quatre cas ; seul le murattal 64 kbps est embarqué
+      (disponible hors connexion d'emblée), les autres se chargent depuis leur
+      source et restent ensuite en cache sur cet appareil</span></div>
+    <select data-param="recitation">
+      ${Object.entries(RECITS).map(([k, r]) =>
+        `<option value="${k}" ${recitKey() === k ? "selected" : ""}>${esc(r.nom)}</option>`).join("")}
+    </select></div>
+  <div class="param-row"><div class="lab"><b>Surlignage mot à mot</b>
+      <span>suit la récitation mot par mot dans le texte arabe</span></div>
+    <label class="switch"><input type="checkbox" data-param="karaoke" ${PARAMS.karaoke ? "checked" : ""}><span class="sl"></span></label></div>
   <div class="param-row"><div class="lab"><b>Vitesse audio</b><span>récitation Husary</span></div>
     <select data-param="speed">
       ${[0.75, 1, 1.25].map(x => `<option value="${x}" ${PARAMS.speed === x ? "selected" : ""}>${x}×</option>`).join("")}
@@ -1094,8 +1190,10 @@ function pageParams() {
     <b>@ophtalmologie</b>.<br><br>
     Texte coranique : mushaf de Médine (Hafs), Complexe du Roi Fahd (texte et
     calligraphie des pages via quran.com et les polices QCF du KFGQPC).
-    Traduction : Muhammad Hamidullah. Récitation : Mahmoud Khalil Al-Husary,
-    64 kbps (everyayah.com, usage non commercial). Tafsir verset par verset :
+    Traduction : Muhammad Hamidullah. Récitation : Mahmoud Khalil Al-Husary :
+    murattal 64 kbps embarqué et murattal 128 kbps / muallim via everyayah.com,
+    mujawwad via le CDN de Tarteel ; segments mot à mot de la Quranic Universal
+    Library (qul.tarteel.ai) ; usage non commercial. Tafsir verset par verset :
     « French Translation of Al-Mukhtasar in Interpreting the Noble Quran »
     (Tafsir Center for Quranic Studies, V1.0.0, via QuranEnc.com, texte
     reproduit sans modification) ; et synthèses sourcées d'Ibn Kathîr et
@@ -1518,7 +1616,7 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "1.8.0";   // réécrit par tools/release.py
+const BUILD_VERSION = "1.9.0";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {

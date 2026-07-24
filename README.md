@@ -78,8 +78,12 @@ l'export d'avis intégré à l'application, dans Paramètres).
 - Texte coranique : mushaf de Médine, Complexe du Roi Fahd (KFGQPC), via
   l'API quran.com ; polices UthmanicHafs et QCF du KFGQPC.
 - Traduction française : Muhammad Hamidullah.
-- Récitation : Mahmoud Khalil Al-Husary (everyayah.com), usage non
-  commercial.
+- Récitation : Mahmoud Khalil Al-Husary, quatre styles au choix : murattal
+  64 kbps embarqué (hors-ligne d'emblée), murattal 128 kbps et muallim via
+  everyayah.com, mujawwad via le CDN de Tarteel ; les styles non embarqués
+  se mettent en cache au fil de l'écoute. Usage non commercial.
+- Surlignage mot à mot : segments de la Quranic Universal Library
+  (qul.tarteel.ai), un jeu par style.
 - Tafsir : « French Translation of Al-Mukhtasar in Interpreting the Noble
   Quran », Tafsir Center for Quranic Studies, V1.0.0, via QuranEnc.com,
   reproduit sans modification (conditions de QuranEnc.com) ; règles de

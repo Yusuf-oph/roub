@@ -3,7 +3,7 @@
    - coquille (html/css/js/données/police de texte) : precache versionné ;
    - audio Husary + polices de pages QCF : cache à la demande, immuable ;
    - version.json : réseau d'abord (détection de mise à jour). */
-const VERSION = "1.8.0+2026-07-24";
+const VERSION = "1.9.0+2026-07-24";
 const SHELL_CACHE = "roub-shell-" + VERSION;
 const MEDIA_CACHE = "roub-media-v1";
 
@@ -120,7 +120,11 @@ const SHELL = [
   "data/tafsirfr/j30r5.js",
   "data/tafsirfr/j30r6.js",
   "data/tafsirfr/j30r7.js",
-  "data/tafsirfr/j30r8.js"
+  "data/tafsirfr/j30r8.js",
+  "data/segments/husary128.js",
+  "data/segments/husary64.js",
+  "data/segments/muallim.js",
+  "data/segments/mujawwad.js"
 ];
 // __SHELL_END__
 
@@ -143,9 +147,27 @@ self.addEventListener("message", e => {
   if (e.data && e.data.type === "SKIP_WAITING") self.skipWaiting();
 });
 
+/* hôtes des styles de récitation non embarqués : mis en cache au fil de
+   l'écoute (ils autorisent CORS, la réponse est donc réutilisable hors-ligne) */
+const AUDIO_HOSTS = ["mirrors.quranicaudio.com", "audio-cdn.tarteel.ai"];
+
 self.addEventListener("fetch", e => {
   const url = new URL(e.request.url);
-  if (url.origin !== location.origin || e.request.method !== "GET") return;
+  if (e.request.method !== "GET") return;
+
+  if (url.origin !== location.origin) {
+    if (!AUDIO_HOSTS.includes(url.hostname)) return;
+    e.respondWith((async () => {
+      const cache = await caches.open(MEDIA_CACHE);
+      const hit = await cache.match(e.request);
+      if (hit) return hit;
+      const resp = await fetch(e.request);
+      // 206 (lecture partielle) : jamais mis en cache, il serait tronqué
+      if (resp.status === 200) cache.put(e.request, resp.clone());
+      return resp;
+    })());
+    return;
+  }
 
   // média immuable : cache d'abord, réseau sinon (et mise en cache)
   if (url.pathname.includes("/audio/") || url.pathname.includes("/fonts/qcf")) {
