@@ -16,6 +16,8 @@ Vérifie :
   G. pagination mushaf : polices présentes, tous les versets couverts
   H. tajcur.js : mapping span→fiche exhaustif, parcours cohérent et à jour
      (recalcul via tools/build_tajcur.py)
+  I. tafsirfr/ : tafsir français (al-Mukhtaṣar) verset par verset, couverture
+     complète, textes non vides, attribution présente (appli + docs)
 """
 import json
 import os
@@ -50,7 +52,7 @@ const app = process.argv[1];
 const load = f => eval(fs.readFileSync(f, 'utf8'));
 for (const f of fs.readdirSync(path.join(app, 'data')))
   if (f.endsWith('.js')) load(path.join(app, 'data', f));
-for (const sub of ['quran', 'notes', 'cartes']) {
+for (const sub of ['quran', 'notes', 'cartes', 'tafsirfr']) {
   const dir = path.join(app, 'data', sub);
   for (const f of fs.readdirSync(dir)) if (f.endsWith('.js')) load(path.join(dir, f));
 }
@@ -58,7 +60,7 @@ process.stdout.write(JSON.stringify({
   META: window.META, REGLES: window.REGLES || [], QURAN: window.QURAN || {},
   NOTES: window.NOTES || {}, CARTES: window.CARTES || {},
   PAGES: window.PAGES || {}, PAGES2: window.PAGES2 || {},
-  TAJCUR: window.TAJCUR || {},
+  TAJCUR: window.TAJCUR || {}, TAFSIRFR: window.TAFSIRFR || {},
 }));
 """
     r = subprocess.run(["node", "-e", script, APP], capture_output=True)
@@ -181,6 +183,11 @@ def main():
                 if f"{s}:{b}" not in FULL_U:
                     err(f"{ctx} : fin de plage {m.group(0)} inexistante")
 
+    # décision éditoriale 2026-07-24 : plus de tafsir rédigé maison
+    # (l'onglet Tafsir affiche l'œuvre tierce verbatim, cf. section I)
+    for rid, N in NOTES.items():
+        if N.get("tafsir"):
+            err(f"notes {rid} : bloc tafsir rédigé (interdit, l'onglet affiche al-Mukhtaṣar)")
     for rid, N in NOTES.items():
         for sec in ("difficultes", "tajwid", "tafsir"):
             for it in N.get(sec) or []:
@@ -282,6 +289,40 @@ def main():
         if "data/tajcur.js" not in idx_html:
             err("tajcur : data/tajcur.js absent d'index.html")
         print(f"H. tajcur : {len(ordre)} sourates, parcours cohérent")
+
+    # I. tafsir français (al-Mukhtaṣar) verset par verset
+    TFR = data.get("TAFSIRFR") or {}
+    if not TFR:
+        err("tafsirfr : window.TAFSIRFR absent (lancer tools/build_tafsirfr.py)")
+    else:
+        if set(TFR) != set(QURAN):
+            err(f"tafsirfr : rubs != QURAN : {sorted(set(TFR) ^ set(QURAN))}")
+        n_tfr = 0
+        for rid, R in QURAN.items():
+            d = TFR.get(rid) or {}
+            keys = [v["k"] for v in R["verses"]]
+            if set(d) != set(keys):
+                err(f"tafsirfr {rid} : clés != versets du rub")
+            vides = [k for k, t in d.items() if not (t or "").strip()]
+            if vides:
+                err(f"tafsirfr {rid} : textes vides : {vides[:3]}")
+            n_tfr += len(d)
+        idx_html = open(os.path.join(APP, "index.html"), encoding="utf-8").read()
+        n_inc = idx_html.count("data/tafsirfr/")
+        if n_inc != len(QURAN):
+            err(f"tafsirfr : {n_inc} inclusions dans index.html au lieu de {len(QURAN)}")
+        ATTR = "Tafsir Center for Quranic Studies"
+        app_js = open(os.path.join(APP, "app.js"), encoding="utf-8").read()
+        for label, txt in (("app.js", app_js),
+                           ("README.md", open(os.path.join(ROOT, "README.md"), encoding="utf-8").read()),
+                           ("LISEZMOI.txt", open(os.path.join(ROOT, "LISEZMOI.txt"), encoding="utf-8").read()),
+                           ("LICENSE-CONTENU.md", open(os.path.join(ROOT, "LICENSE-CONTENU.md"), encoding="utf-8").read())):
+            if ATTR not in re.sub(r"\s+", " ", txt):
+                err(f"tafsirfr : attribution absente de {label}")
+        rel = open(os.path.join(HERE, "release.py"), encoding="utf-8").read()
+        if "tafsirfr" not in rel:
+            err("tafsirfr : sous-dossier absent de release.py::shell_files (SW)")
+        print(f"I. tafsirfr : {len(TFR)} rubs, {n_tfr} versets, attribution en place")
 
     print()
     if ERR:

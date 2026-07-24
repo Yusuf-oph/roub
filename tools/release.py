@@ -27,7 +27,7 @@ def shell_files():
              "fonts/UthmanicHafs.woff2"]
     for f in sorted(os.listdir(os.path.join(APP, "icons"))):
         files.append(f"icons/{f}")
-    for sub in ("", "quran", "notes", "cartes"):
+    for sub in ("", "quran", "notes", "cartes", "tafsirfr"):
         d = os.path.join(APP, "data", sub)
         for f in sorted(os.listdir(d)):
             if f.endswith(".js"):

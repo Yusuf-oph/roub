@@ -480,7 +480,7 @@ function pageRub(rid, tab) {
   if (tab === "memoriser") h += secMemoriser(R);
   else if (tab === "difficultes") h += secDifficultes(N, meta);
   else if (tab === "tajwid") h += secTajwid(N);
-  else if (tab === "tafsir") h += secTafsir(N);
+  else if (tab === "tafsir") h += secTafsir(R);
   else if (tab === "vocab") h += secVocab(N);
   else if (tab === "cartes") h += secCartes(rid);
   h += fbBox(rid);
@@ -666,14 +666,32 @@ function secTajwid(N) {
   return h;
 }
 
-function secTafsir(N) {
-  if (!N || !N.tafsir) return `<div class="empty">Contenu à venir pour ce roub'.</div>`;
-  let h = `<div class="note-sec"><h3>Tafsir court (synthèse sourcée Ibn Kathîr / As-Sa'dî)</h3>`;
-  for (const t of N.tafsir) {
-    h += `<div class="note-card"><div class="nc-head">${arEsc(t.titre)} ${(t.refs || []).map(vrefBtn).join(" ")}</div>
-      ${fmt(t.texte)}${t.src ? `<div class="src">${esc(t.src)}</div>` : ""}</div>`;
+/* Tafsir : œuvre tierce reproduite verbatim (al-Mukhtaṣar), jamais de
+   rédaction maison ici (décision éditoriale du 2026-07-24). */
+function secTafsir(R) {
+  let h = "";
+  const TF = window.TAFSIRFR && R && window.TAFSIRFR[R.id];
+  if (TF) {
+    h += `<div class="note-sec"><h3>Tafsir verset par verset (al-Mukhtaṣar)</h3>
+      <p class="tfr-attr">« French Translation of Al-Mukhtasar in Interpreting the Noble Quran »,
+      Tafsir Center for Quranic Studies · V1.0.0 · source : QuranEnc.com ·
+      texte reproduit sans modification.</p>`;
+    let lastS = null;
+    for (const v of R.verses) {
+      const t = TF[v.k];
+      if (!t) continue;
+      if (v.s !== lastS) {
+        lastS = v.s;
+        h += `<div class="tfr-surah">Sourate ${esc(SURAH_NAMES[v.s] || v.s)}</div>`;
+      }
+      h += `<details class="tfr"><summary><b>${v.k}</b> <span class="tfr-apercu">${esc(t.slice(0, 110))}…</span></summary>
+        <div class="tfr-body">${esc(t)}</div>
+        <div class="tfr-foot">${vrefBtn(v.k)} <span class="fb-note">voir le verset dans Mémoriser</span></div>
+      </details>`;
+    }
+    h += `</div>`;
   }
-  return h + `</div>`;
+  return h || `<div class="empty">Contenu à venir pour ce roub'.</div>`;
 }
 
 function secVocab(N) {
@@ -1077,8 +1095,11 @@ function pageParams() {
     Texte coranique : mushaf de Médine (Hafs), Complexe du Roi Fahd (texte et
     calligraphie des pages via quran.com et les polices QCF du KFGQPC).
     Traduction : Muhammad Hamidullah. Récitation : Mahmoud Khalil Al-Husary,
-    64 kbps (everyayah.com, usage non commercial). Tafsir : synthèses sourcées
-    d'Ibn Kathîr et d'As-Sa'dî. Application gratuite et non commerciale, sans
+    64 kbps (everyayah.com, usage non commercial). Tafsir verset par verset :
+    « French Translation of Al-Mukhtasar in Interpreting the Noble Quran »
+    (Tafsir Center for Quranic Studies, V1.0.0, via QuranEnc.com, texte
+    reproduit sans modification) ; et synthèses sourcées d'Ibn Kathîr et
+    d'As-Sa'dî. Application gratuite et non commerciale, sans
     compte ni collecte de données : progression et réglages restent dans ce
     navigateur. Tout le contenu religieux est sourcé et vérifié contre ses
     sources ; une erreur restant toujours possible, merci de signaler tout
@@ -1497,7 +1518,7 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "1.7.0";   // réécrit par tools/release.py
+const BUILD_VERSION = "1.8.0";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {

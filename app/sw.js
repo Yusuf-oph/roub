@@ -3,7 +3,7 @@
    - coquille (html/css/js/données/police de texte) : precache versionné ;
    - audio Husary + polices de pages QCF : cache à la demande, immuable ;
    - version.json : réseau d'abord (détection de mise à jour). */
-const VERSION = "1.7.0+2026-07-24";
+const VERSION = "1.8.0+2026-07-24";
 const SHELL_CACHE = "roub-shell-" + VERSION;
 const MEDIA_CACHE = "roub-media-v1";
 
@@ -96,7 +96,31 @@ const SHELL = [
   "data/cartes/j30r5.js",
   "data/cartes/j30r6.js",
   "data/cartes/j30r7.js",
-  "data/cartes/j30r8.js"
+  "data/cartes/j30r8.js",
+  "data/tafsirfr/j1r1.js",
+  "data/tafsirfr/j1r2.js",
+  "data/tafsirfr/j1r3.js",
+  "data/tafsirfr/j1r4.js",
+  "data/tafsirfr/j1r5.js",
+  "data/tafsirfr/j1r6.js",
+  "data/tafsirfr/j1r7.js",
+  "data/tafsirfr/j1r8.js",
+  "data/tafsirfr/j2r1.js",
+  "data/tafsirfr/j2r2.js",
+  "data/tafsirfr/j2r3.js",
+  "data/tafsirfr/j2r4.js",
+  "data/tafsirfr/j2r5.js",
+  "data/tafsirfr/j2r6.js",
+  "data/tafsirfr/j2r7.js",
+  "data/tafsirfr/j2r8.js",
+  "data/tafsirfr/j30r1.js",
+  "data/tafsirfr/j30r2.js",
+  "data/tafsirfr/j30r3.js",
+  "data/tafsirfr/j30r4.js",
+  "data/tafsirfr/j30r5.js",
+  "data/tafsirfr/j30r6.js",
+  "data/tafsirfr/j30r7.js",
+  "data/tafsirfr/j30r8.js"
 ];
 // __SHELL_END__
 

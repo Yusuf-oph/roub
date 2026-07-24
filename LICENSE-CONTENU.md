@@ -13,7 +13,7 @@ comme service en ligne : reste publiée sous la même licence.
 ## Contenu éditorial
 
 Les contenus rédigés pour Roub' : notes de mémorisation (difficultés,
-particularités tajwid, synthèses de tafsir, vocabulaire), cartes
+particularités tajwid, vocabulaire), cartes
 mutashabihat et « sens des passages », fiches de règles, justifications
 des difficultés étoilées, tutoriels et textes de l'interface : sont
 publiés sous **Creative Commons BY-NC-SA 4.0** :
@@ -31,6 +31,12 @@ dev.yusuf@pm.me.
   quran.com ; polices UthmanicHafs et QCF du KFGQPC. Le texte du Qur'an
   ne se modifie pas.
 - Traduction française : Muhammad Hamidullah (diffusion non commerciale).
+- Tafsir verset par verset : « French Translation of Al-Mukhtasar in
+  Interpreting the Noble Quran », Tafsir Center for Quranic Studies,
+  V1.0.0, via QuranEnc.com. Reproduit sans modification, conformément aux
+  conditions de QuranEnc.com (attribution, version mentionnée, mise à
+  jour selon les versions de la source). Ce texte tiers N'EST PAS couvert
+  par notre licence CC BY-NC-SA.
 - Récitation : Mahmoud Khalil Al-Husary, via everyayah.com (usage non
   commercial).
 
@@ -46,9 +52,9 @@ rester **gratuite et non commerciale**.
 - **Code** (app engine, service worker, tools, local server): licensed
   under the **GNU AGPL-3.0** (see the `LICENSE` file, whose English text
   is the authoritative licence).
-- **Editorial content** (memorisation notes, tajwid notes, sourced tafsir
-  summaries, vocabulary, flashcards, rule sheets, tutorials, interface
-  texts): licensed under **Creative Commons BY-NC-SA 4.0**
+- **Editorial content** (memorisation notes, tajwid notes, vocabulary,
+  flashcards, rule sheets, tutorials, interface texts): licensed under
+  **Creative Commons BY-NC-SA 4.0**
   (https://creativecommons.org/licenses/by-nc-sa/4.0/ : attribution
   required as "Roub', Anis & Yusuf", no commercial use, share-alike).
   The CC legal code, including its official translations, governs.
@@ -56,8 +62,11 @@ rester **gratuite et non commerciale**.
   calligraphy (King Fahd Glorious Qur'an Printing Complex, via quran.com,
   including the UthmanicHafs and QCF fonts : the Qur'anic text may not be
   altered), French translation by Muhammad Hamidullah (non-commercial
-  distribution), recitation by Mahmoud Khalil Al-Husary via everyayah.com
-  (non-commercial use).
+  distribution), "French Translation of Al-Mukhtasar in Interpreting the
+  Noble Quran" (Tafsir Center for Quranic Studies, V1.0.0, via
+  QuranEnc.com, reproduced without modification under QuranEnc.com terms,
+  NOT covered by our CC BY-NC-SA licence), recitation by Mahmoud Khalil
+  Al-Husary via everyayah.com (non-commercial use).
 
 Because of these third-party terms, the application as a whole is and must
 remain **free of charge and non-commercial**. Licence exception requests:

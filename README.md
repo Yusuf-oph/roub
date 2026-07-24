@@ -12,8 +12,9 @@ exacte du mushaf** (calligraphie officielle QCF, en noir et blanc ou en
 édition colorée tajwid), translittération à double style (hybride
 française / scientifique), traduction Hamidullah, audio Al-Husary verset
 par verset, difficulté notée sur 5 étoiles, difficultés de mémorisation,
-particularités tajwid reliées à des fiches de règles, tafsir sourcé
-(Ibn Kathîr, As-Sa'dî), vocabulaire, **révision espacée** intégrée
+particularités tajwid reliées à des fiches de règles, **tafsir verset par
+verset** (al-Mukhtaṣar, traduction française), vocabulaire, **révision
+espacée** intégrée
 (+ paquets Anki), progression visible, auto-évaluation des lacunes et
 **synchronisation multi-appareils par code anonyme**. PWA installable,
 fonctionne hors-ligne.
@@ -36,7 +37,10 @@ fonctionne hors-ligne.
 
 Tout le contenu religieux (tafsir, hadiths, règles de tajwid, texte) est
 sourcé et vérifié contre ses sources ; une erreur reste toujours possible :
-merci de la signaler. **Avis, bugs, suggestions : dev.yusuf@pm.me** (ou
+merci de la signaler. Le tafsir verset par verset est la « French
+Translation of Al-Mukhtasar in Interpreting the Noble Quran » (Tafsir
+Center for Quranic Studies, V1.0.0, via QuranEnc.com), reproduite sans
+modification. **Avis, bugs, suggestions : dev.yusuf@pm.me** (ou
 l'export d'avis intégré à l'application, dans Paramètres).
 
 ## Utiliser
@@ -76,9 +80,10 @@ l'export d'avis intégré à l'application, dans Paramètres).
 - Traduction française : Muhammad Hamidullah.
 - Récitation : Mahmoud Khalil Al-Husary (everyayah.com), usage non
   commercial.
-- Tafsir : synthèses rédigées, sourcées d'Ibn Kathîr (Tafsîr al-Qur'ân
-  al-'Adhîm) et d'As-Sa'dî (Taysîr al-Karîm ar-Rahmân) ; règles de tajwid
-  d'après Tuhfat al-Atfal et al-Muqaddima al-Jazariyya.
+- Tafsir : « French Translation of Al-Mukhtasar in Interpreting the Noble
+  Quran », Tafsir Center for Quranic Studies, V1.0.0, via QuranEnc.com,
+  reproduit sans modification (conditions de QuranEnc.com) ; règles de
+  tajwid d'après Tuhfat al-Atfal et al-Muqaddima al-Jazariyya.
 
 Application gratuite et non commerciale, sans compte ni collecte de
 données personnelles ; la synchronisation optionnelle repose sur un code

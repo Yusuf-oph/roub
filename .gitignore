@@ -10,5 +10,8 @@ __pycache__/
 feedback-recus/
 app/data/feedback.json
 
+# pièces de travail interne (licences archivées, échantillons, arbitrages)
+arbitrage/
+
 # outillage local
 .claude/

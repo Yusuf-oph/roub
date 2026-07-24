@@ -83,39 +83,6 @@ window.NOTES["j1r1"] = {
     },
   ],
 
-  tafsir: [
-    {
-      titre: "Al-Fâtiḥa : la mère du Livre", refs: ["1:1", "1:7"],
-      texte: "Sept versets récités dans chaque unité de prière. Le hadith qudsi (Muslim) la partage en deux moitiés : la louange pour Allah ({1:1-4}), la demande pour le serviteur ({1:5-7}), et *iyyâka na'boudou wa iyyâka nasta'în* est la charnière : tout le culte tient dans l'adoration et la demande d'aide. Selon **As-Sa'dî**, *ihdinâ ṣ-ṣirâṭa l-moustaqîm* est la plus complète des demandes : guidée vers le chemin ET dans le chemin. Selon **Ibn Kathîr**, rapportant le hadith de 'Adî ibn Hâtim (Ahmad ; Tirmidhî 2954, qu'il juge hasan gharib), *al-maghḍoûb 'alayhim* désigne ceux qui connaissent la vérité sans la suivre (à l'image des juifs), *aḍ-ḍâllîn* ceux qui adorent sans science (à l'image des chrétiens) : savoir sans œuvre, œuvre sans savoir.",
-      src: "Ibn Kathîr sur 1:7 ; As-Sa'dî, Taysîr al-Karîm ar-Raḥmân ; Sahih Muslim 395 (hadith qudsi de la Fâtiḥa) ; Tirmidhî 2954.",
-    },
-    {
-      titre: "2:1-5 : le Livre et les mouttaqîn", refs: ["2:1", "2:5"],
-      texte: "Sur [[الٓمٓ]], **Ibn Kathîr** retient la position des salaf : ces lettres relèvent du savoir d'Allah, et défient en même temps les Arabes : le Livre est fait de leurs propres lettres et reste inimitable. *Lâ rayba fîh* : aucun doute n'est fondé à son sujet. Cinq qualités des mouttaqîn, dans l'ordre : foi au **ghayb** (tout ce que les sens n'atteignent pas : selon As-Sa'dî, c'est le critère qui distingue le croyant), **prière accomplie** (piliers et présence du cœur), **dépense** de ce qu'Allah a attribué (zakât et au-delà), foi en **ce qui t'a été révélé et avant toi**, **certitude** de l'au-delà. La récompense répond à l'effort : *ceux-là sont sur une guidée de leur Seigneur*.",
-      src: "Ibn Kathîr sur 2:1-5 ; As-Sa'dî sur 2:3.",
-    },
-    {
-      titre: "2:6-7 : le refus scellé", refs: ["2:6", "2:7"],
-      texte: "Pour ceux dont le rejet est ancré, avertir ou non revient au même. Le scellement des cœurs et de l'ouïe n'est pas une injustice qui précéderait leur choix : **As-Sa'dî** souligne qu'il est la **conséquence** de leur refus répété : à force de repousser la vérité, la porte se ferme. Le voile sur les regards complète l'image : rien n'entre plus, ni par le cœur, ni par l'oreille, ni par l'œil.",
-      src: "As-Sa'dî sur 2:7 ; Ibn Kathîr sur 2:6.",
-    },
-    {
-      titre: "2:8-16 : le portrait des hypocrites", refs: ["2:8", "2:16"],
-      texte: "Treize versets pour les hypocrites quand deux suffisaient aux mécréants : le danger intérieur est le plus grave. Ils *disent* croire ({2:8}) mais la maladie du cœur : le **doute** selon Ibn Kathîr : les ronge ({2:10}). Leur « tromperie » d'Allah se retourne contre eux : c'est eux-mêmes qu'ils trompent. Leur corruption se présente comme réforme ({2:11-12}), leur mépris des croyants comme lucidité ({2:13}). *Allah se moque d'eux* ({2:15}) : rétribution à la mesure de leur moquerie, dit Ibn Kathîr, non une raillerie gratuite. Bilan en un mot de commerce : ils ont **troqué la guidée contre l'égarement**, et le marché est ruineux ({2:16}).",
-      src: "Ibn Kathîr sur 2:9-10 et 2:15 ; As-Sa'dî sur 2:16.",
-    },
-    {
-      titre: "2:17-20 : les deux paraboles", refs: ["2:17", "2:20"],
-      texte: "Deux images des hypocrites. **Le feu** : ils allument la lumière de la foi (par leur profession extérieure), puis Allah la leur retire ; il reste les ténèbres, et la triade *sourds, muets, aveugles*. **L'averse** : ténèbres, tonnerre et éclairs figurent leurs doutes et leurs frayeurs ; l'éclair, les lueurs de foi qui les traversent par instants ; et ils se bouchent les oreilles de peur. Ibn Kathîr y voit deux catégories d'hypocrites : l'hypocrisie totale (le feu éteint) et les hésitants de l'averse ; pour ces derniers il rapporte d'Ibn 'Abbâs : rassurés tant que l'islam triomphe, prêts à retourner à la mécréance dès qu'un revers le frappe ; ils marchent à chaque éclair, s'arrêtent à chaque obscurité.",
-      src: "Ibn Kathîr sur 2:17-20 (les deux catégories sont sa lecture) et Ibn 'Abbâs rapporté par lui sur 2:20 ; As-Sa'dî sur 2:19-20.",
-    },
-    {
-      titre: "2:21-25 : l'appel, le défi, l'annonce", refs: ["2:21", "2:25"],
-      texte: "Premier [[يَـٰٓأَيُّهَا ٱلنَّاسُ]] du mushaf : appel universel à adorer le Créateur, appuyé sur cinq bienfaits ({2:21-22}) : création, la terre pour couche, le ciel pour édifice, l'eau descendue, les fruits comme subsistance. D'où l'interdit central : *ne donnez pas à Allah d'égaux alors que vous savez*. Suit le **défi** ({2:23-24}) : produire une seule sourate comparable : et la sentence : vous ne le ferez jamais ; craignez le Feu dont le combustible est les hommes et les pierres. Puis le contraste : l'**annonce** aux croyants ({2:25}) : jardins, fruits à l'apparence familière (donnés *moutashâbihan* : se ressemblant), épouses purifiées de toute souillure, éternité. Sur leur ressemblance, As-Sa'dî retient qu'ils se ressemblent **entre eux** : tous d'égale beauté et d'égal délice, sans un fruit médiocre.",
-      src: "Ibn Kathîr sur 2:21-24 ; As-Sa'dî sur 2:25.",
-    },
-  ],
-
   vocab: [
     { ar: "ٱلْغَيْب", sci: "al-ġayb", fr: "al-ghayb", sens: "l'invisible, ce qui échappe aux sens", refs: ["2:3"] },
     { ar: "يُقِيمُونَ", sci: "yuqīmūna", fr: "youqîmoûna", sens: "ils accomplissent pleinement (la prière)", refs: ["2:3"] },

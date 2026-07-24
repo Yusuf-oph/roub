@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.8.0 · 2026-07-24
+- Tafsir verset par verset pour LES 24 ROUB' : « French Translation of Al-Mukhtasar in Interpreting the Noble Quran » (Tafsir Center for Quranic Studies, V1.0.0, via QuranEnc.com), reproduit sans modification
+- L'onglet Tafsir n'affiche plus de synthèse rédigée : place à l'œuvre de référence, attribuée et versionnée
+
 ## 1.7.0 · 2026-07-24
 - Parcours de tajwid progressif (idée d'Israa) : sous chaque sourate courte (Fâtiḥa + juz 'Amma), un encart liste les règles de tajwid présentes et signale celles qui sont nouvelles dans le parcours (Fâtiḥa puis An-Nâs → An-Naba)
 - Crédits : Israa (conseillère pédagogique) rejoint l'équipe ; ligne de Yusuf allégée

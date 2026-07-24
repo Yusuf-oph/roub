@@ -373,6 +373,21 @@ button { font: inherit; cursor: pointer; }
   text-transform: uppercase; letter-spacing: .4px;
 }
 
+/* tafsir verset par verset (al-Mukhtaṣar, texte tiers verbatim) */
+.tfr-attr { color: var(--muted); font-size: 12px; margin: 2px 0 10px; }
+.tfr-surah {
+  color: var(--accent2); font-weight: 700; font-size: 13px;
+  margin: 14px 0 6px; text-transform: uppercase; letter-spacing: .4px;
+}
+.tfr {
+  border: 1px solid var(--border); border-radius: 10px;
+  background: var(--bg2); padding: 7px 12px; margin-bottom: 8px;
+}
+.tfr summary { cursor: pointer; font-size: 13.5px; color: var(--muted); }
+.tfr summary b { color: var(--accent); font-weight: 700; margin-right: 6px; }
+.tfr .tfr-body { margin-top: 8px; font-size: 14.5px; line-height: 1.55; white-space: pre-line; }
+.tfr .tfr-foot { margin-top: 8px; display: flex; align-items: center; gap: 8px; }
+
 /* vocabulaire */
 .vocab-table { width: 100%; border-collapse: collapse; }
 .vocab-table th, .vocab-table td {
