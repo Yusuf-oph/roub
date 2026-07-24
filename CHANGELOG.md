@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.10.0 · 2026-07-24
+- Cartes exportables pour Anki depuis l'onglet Révision : 804 cartes en 24 sous-paquets (1,4 Mo), avec la recommandation d'utiliser le planificateur FSRS d'Anki
+- Surlignage mot à mot : simple soulignement, sans halo autour du mot
+
 ## 1.9.2 · 2026-07-24
 - Préchargement à la carte : pages du mushaf et chaque style de récitation se téléchargent séparément (poids indiqué), au lieu d'un bloc unique
 - Surlignage mot à mot : soulignement en surbrillance qui préserve les couleurs tajwid des lettres

@@ -811,8 +811,8 @@ function secCartes(rid) {
     </div>
     <div style="margin-top:12px">
       <button class="fb-send" data-start-deck="${rid}">Réviser ce roub'</button>
-      <span class="fb-note">ou l'onglet Révision pour mélanger plusieurs roub'.
-      Paquets Anki (.apkg) dans le dossier <code>apkg/</code>.</span>
+      <span class="fb-note">ou l'onglet Révision pour mélanger plusieurs roub'
+      et télécharger les cartes pour Anki (recommandé : planificateur FSRS).</span>
     </div></div></div>`;
   return h;
 }
@@ -829,8 +829,15 @@ function pageRevision() {
   let pool = collectCards();
   const st = deckStats(pool.map(c => c.id));
   let h = `<div class="hero"><h1>Révision espacée</h1>
-    <p>Les cartes reviennent à intervalle croissant selon tes réponses (comme Anki).
-    Les paquets .apkg équivalents sont dans le dossier <code>apkg/</code> du projet.</p></div>`;
+    <p>Les cartes reviennent à intervalle croissant selon tes réponses. Pour un
+    vrai suivi au long cours, <b>nous recommandons Anki</b> : son planificateur
+    <b>FSRS</b> (disponible depuis Anki 23.10, à activer dans les options du
+    paquet) place les révisions bien plus finement que le moteur simple intégré
+    ici.</p>
+    <p><button class="fb-send" data-apkg>Télécharger les cartes pour Anki (.apkg)</button>
+    <span class="fb-note">804 cartes, 24 sous-paquets (un par roub'), 1,4 Mo :
+    enchaînements, vocabulaire, mutashabihat et sens. Sans audio : la récitation
+    s'écoute ici. Les paquets AVEC audio sont dans <code>apkg/</code> sur le dépôt.</span></p></div>`;
   h += `<div class="deck-opts">`;
   for (const r of avail) {
     h += `<button class="chip ${rev.sel.has(r.id) ? "on" : ""}" data-rev-rub="${r.id}">J${r.juz} R${r.rub}</button>`;
@@ -1433,6 +1440,12 @@ function bindMain() {
   /* feedback + préchargement */
   $$("[data-fb-export]", main).forEach(el =>
     el.addEventListener("click", () => exportFB()));
+  $$("[data-apkg]", main).forEach(el => el.addEventListener("click", () => {
+    const a = document.createElement("a");
+    a.href = "anki/roub-cartes.apkg";
+    a.download = "roub-cartes.apkg";
+    document.body.appendChild(a); a.click(); a.remove();
+  }));
   $$("[data-preload]", main).forEach(el => el.addEventListener("click", () => {
     el.disabled = true;
     el.textContent = "en cours…";
@@ -1629,7 +1642,7 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "1.9.2";   // réécrit par tools/release.py
+const BUILD_VERSION = "1.10.0";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {

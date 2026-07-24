@@ -379,10 +379,7 @@ button { font: inherit; cursor: pointer; }
    est préservée (c'est elle qui porte l'information pédagogique) */
 /* pas de transition sur le soulignement : il doit tomber pile sur la syllabe */
 .wd { transition: opacity .18s linear; padding-bottom: 2px; }
-.wd.on {
-  box-shadow: inset 0 -3px 0 var(--accent),
-              0 0 12px color-mix(in srgb, var(--accent) 22%, transparent);
-}
+.wd.on { box-shadow: inset 0 -3px 0 var(--accent); }
 .wd.done { opacity: .5; }
 .wpause { opacity: .7; }
 

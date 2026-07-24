@@ -119,7 +119,9 @@ MODEL_TXT = genanki.Model(
 
 
 def deck_id_for(rid):
-    return 1720810000 + int(rid[1]) * 100 + int(rid[3])
+    # jXrY : X peut avoir deux chiffres (j30r5), d'où la regex plutôt qu'un index
+    juz, rub = re.match(r"j(\d+)r(\d+)", rid).groups()
+    return 1720810000 + int(juz) * 100 + int(rub)
 
 
 def note(model, cid, recto, verso, ref):
@@ -138,7 +140,7 @@ def verse_block(v, with_tr=False, audio=True):
     return h
 
 
-def build_rub(data, rid):
+def build_rub(data, rid, audio=True, ecrire=True):
     META, QURAN, NOTES, CARTES = (data["META"], data["QURAN"],
                                   data["NOTES"], data["CARTES"])
     R = QURAN[rid]
@@ -153,13 +155,14 @@ def build_rub(data, rid):
         a, b = vv[i], vv[i + 1]
         if a["s"] != b["s"]:
             continue
-        recto = (f'<div>Verset {a["k"]} :</div>' + verse_block(a)
+        recto = (f'<div>Verset {a["k"]} :</div>' + verse_block(a, audio=audio)
                  + "<div><b>Quel est le verset suivant ?</b></div>")
-        verso = f'<div>Verset {b["k"]} :</div>' + verse_block(b, with_tr=True)
+        verso = f'<div>Verset {b["k"]} :</div>' + verse_block(b, with_tr=True, audio=audio)
         deck.add_note(note(MODEL_CHAIN, "ch-" + a["k"], recto, verso,
                            f'{a["k"]} → {b["k"]}'))
-        for v in (a, b):
-            media[os.path.join(APP, "audio", v["audio"])] = v["audio"]
+        if audio:
+            for v in (a, b):
+                media[os.path.join(APP, "audio", v["audio"])] = v["audio"]
 
     for w in (NOTES.get(rid) or {}).get("vocab", []):
         recto = (f'<div class="qar">{ar_display(w["ar"])}</div>'
@@ -177,6 +180,8 @@ def build_rub(data, rid):
         deck.add_note(note(MODEL_TXT, c["id"], recto, verso,
                            ", ".join(c.get("refs", []))))
 
+    if not ecrire:
+        return deck, media
     os.makedirs(OUT, exist_ok=True)
     pkg = genanki.Package(deck)
     pkg.media_files = list(media.keys())
@@ -186,11 +191,33 @@ def build_rub(data, rid):
     n = len(deck.notes)
     print(f"{rid}: {n} notes, {len(media)} médias, "
           f"{os.path.getsize(dest) / 1e6:.1f} Mo -> {dest}")
+    return deck, media
+
+
+def build_collection(data):
+    """Un seul .apkg avec TOUS les roub' en sous-paquets, SANS audio (léger,
+    téléchargeable depuis l'appli) : l'audio s'écoute dans Roub'."""
+    decks, notes = [], 0
+    for rid in sorted(data["QURAN"].keys()):
+        deck, _ = build_rub(data, rid, audio=False, ecrire=False)
+        if deck.notes:
+            decks.append(deck)
+            notes += len(deck.notes)
+    dest = os.path.join(APP, "anki", "roub-cartes.apkg")
+    os.makedirs(os.path.dirname(dest), exist_ok=True)
+    pkg = genanki.Package(decks)
+    pkg.media_files = [FONT]
+    pkg.write_to_file(dest)
+    print(f"collection : {len(decks)} paquets, {notes} notes, "
+          f"{os.path.getsize(dest) / 1e6:.1f} Mo -> {dest}")
 
 
 if __name__ == "__main__":
     args = sys.argv[1:] or ["j1r1"]
     data = load_globals()
-    rids = sorted(data["QURAN"].keys()) if args == ["all"] else args
-    for rid in rids:
-        build_rub(data, rid)
+    if args == ["collection"]:
+        build_collection(data)
+    else:
+        rids = sorted(data["QURAN"].keys()) if args == ["all"] else args
+        for rid in rids:
+            build_rub(data, rid)

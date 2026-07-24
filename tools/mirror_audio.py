@@ -59,7 +59,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("style", choices=sorted(STYLES))
     ap.add_argument("--tout", action="store_true", help="Qur'an entier au lieu du périmètre de l'appli")
-    ap.add_argument("--dest", default=os.path.join(HERE, "..", "..", "sauvegarde-audio"))
+    ap.add_argument("--dest", default=os.path.join(HERE, "..", "..", "Récitations"))
     a = ap.parse_args()
 
     cles = cles_completes() if a.tout else cles_appli()
