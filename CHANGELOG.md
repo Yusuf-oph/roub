@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.12.2 · 2026-07-25
+- Plus d'échec muet : une récitation indisponible hors connexion, ou des pages du mushaf dont les polices manquent, sont désormais signalées avec la marche à suivre
+- Téléchargement des cartes Anki réparé pour la copie locale du dépôt (ouverte en file://), où le navigateur interdit la méthode utilisée en ligne
+
 ## 1.12.1 · 2026-07-25
 - Le paquet de cartes Anki est gardé hors-ligne comme le reste de l'appli : son téléchargement fonctionne désormais sans connexion
 

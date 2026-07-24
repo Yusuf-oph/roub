@@ -240,7 +240,8 @@ const player = {
     this.curKey = item.k;
     this.el.src = audioUrl(item.audio);
     this.el.playbackRate = PARAMS.speed;
-    this.el.play().catch(() => this.stop());
+    // stop() d'abord : il repeint la barre, le message doit venir après
+    this.el.play().catch(() => { this.stop(); audioIndispo(); });
     highlightVerse(item.k);
     updateAudioBar();
   },
@@ -311,12 +312,26 @@ function highlightVerse(key) {
   els.forEach(el => el.classList.add("playing"));
   if (els[0]) els[0].scrollIntoView({ block: "center", behavior: "smooth" });
 }
+/* un style de récitation non embarqué peut manquer (hors connexion, source
+   indisponible) : le dire, au lieu de s'arrêter sans explication */
+function audioIndispo() {
+  const local = RECITS[recitKey()].local;
+  const msg = local
+    ? "audio indisponible : fichier manquant"
+    : `récitation « ${RECITS[recitKey()].nom} » indisponible hors connexion`
+      + " · Paramètres → Précharger, ou choisis le murattal 64 kbps";
+  const now = $("#audio-now");
+  if (now) { now.textContent = msg; now.classList.add("audio-ko"); }
+  else alert(msg);
+  setTimeout(() => { if (now) now.classList.remove("audio-ko"); }, 8000);
+}
+
 function playOneShot(audio, key) {
   player.stop();
   player.curKey = key || null;
   player.el.src = audioUrl(audio);
   player.el.playbackRate = PARAMS.speed;
-  player.el.play().catch(() => {});
+  player.el.play().catch(() => audioIndispo());
   player.playing = false;
   if (key) highlightVerse(key);
 }
@@ -445,7 +460,28 @@ function render() {
   else if (page === "params") main.innerHTML = pageParams();
   else main.innerHTML = pageHome();
   bindMain();
+  verifierPolicesPages();
   window.scrollTo(0, 0);
+}
+
+/* les pages du mushaf sont dessinées par des polices chargées à la demande :
+   hors connexion et sans préchargement, elles s'affichent VIDES. On le dit. */
+async function verifierPolicesPages() {
+  const page = $(".qpage");
+  if (!page || !document.fonts) return;
+  const ligne = page.querySelector(".qline");
+  if (!ligne) return;
+  const fam = getComputedStyle(ligne).fontFamily.replace(/["']/g, "").split(",")[0].trim();
+  try { await document.fonts.load(`24px "${fam}"`); } catch (e) { /* échec = non chargée */ }
+  if (document.fonts.check(`24px "${fam}"`)) return;
+  if ($(".pages-ko")) return;
+  const avis = document.createElement("div");
+  avis.className = "pages-ko";
+  avis.textContent = "Les polices de ces pages ne sont pas encore sur cet appareil "
+    + "et ne peuvent pas être chargées maintenant : reviens en ligne, ou "
+    + "précharge « Pages du mushaf » dans Paramètres. Les autres affichages "
+    + "(versets, texte continu) fonctionnent hors connexion.";
+  page.parentNode.insertBefore(avis, page);
 }
 
 /* ---------------- accueil ---------------- */
@@ -1684,6 +1720,15 @@ function bindMain() {
      hors connexion. On passe quand même par fetch pour pouvoir prévenir si
      le fichier manque (cache purgé, copie locale incomplète). */
   $$("[data-apkg]", main).forEach(el => el.addEventListener("click", async () => {
+    const lienDirect = (href) => {
+      const a = document.createElement("a");
+      a.href = href;
+      a.download = "roub-cartes.apkg";
+      document.body.appendChild(a); a.click(); a.remove();
+    };
+    // copie locale (file://) : fetch y est interdit par le navigateur, mais le
+    // fichier est là, à côté : le lien direct suffit
+    if (location.protocol === "file:") { lienDirect("anki/roub-cartes.apkg"); return; }
     const initial = el.textContent;
     el.disabled = true;
     el.textContent = "préparation…";
@@ -1691,17 +1736,15 @@ function bindMain() {
       const r = await fetch("anki/roub-cartes.apkg");
       if (!r.ok) throw new Error(r.status);
       const url = URL.createObjectURL(await r.blob());
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "roub-cartes.apkg";
-      document.body.appendChild(a); a.click(); a.remove();
+      lienDirect(url);
       setTimeout(() => URL.revokeObjectURL(url), 30000);
-      el.textContent = initial;
     } catch (e) {
-      el.textContent = "indisponible hors connexion : réessaie une fois en ligne";
+      lienDirect("anki/roub-cartes.apkg");    // dernier recours : lien brut
+      el.textContent = "si rien ne se télécharge : réessaie une fois en ligne";
       setTimeout(() => { el.textContent = initial; el.disabled = false; }, 6000);
       return;
     }
+    el.textContent = initial;
     el.disabled = false;
   }));
   $$("[data-preload]", main).forEach(el => el.addEventListener("click", () => {
@@ -1900,7 +1943,7 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "1.12.1";   // réécrit par tools/release.py
+const BUILD_VERSION = "1.12.2";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {

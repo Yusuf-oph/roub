@@ -384,6 +384,13 @@ button { font: inherit; cursor: pointer; }
 .wpause { opacity: .7; }
 
 /* tafsir verset par verset (al-Mukhtaṣar, texte tiers verbatim) */
+/* message d'indisponibilité dans la barre audio */
+.audio-ko { color: var(--danger); font-weight: 600; }
+.pages-ko {
+  margin: 10px 0; padding: 9px 12px; border-radius: 10px;
+  border: 1px solid var(--danger); color: var(--danger); font-size: 13.5px;
+}
+
 /* bloc d'accueil (remplace le LISEZMOI pour qui n'ouvre jamais le dépôt) */
 .accueil {
   border: 1px solid var(--border); border-radius: 12px; background: var(--panel);
