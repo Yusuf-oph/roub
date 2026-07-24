@@ -27,7 +27,7 @@ window.GLOSSAIRE = {
     src: "Ibn al-Jazarî, an-Nashr, t. I.",
   },
   "son dû": {
-    def: "Donner à chaque lettre « son dû », selon Ibn al-Jazarî, c'est : rassasier le madd, réaliser la hamza, compléter les voyelles, appuyer l'izhâr et les redoublements, tenir pleinement les ghunna-s, et détacher nettement les lettres les unes des autres.",
+    def: "L'expression d'Ibn al-Jazarî (i'ṭâ' kulli ḥarfin ḥaqqahu) : rendre à chaque lettre ce qui lui revient en propre, « sans rien y ajouter ni rien en retrancher ». La suite de la phrase en donne le détail.",
     src: "Ibn al-Jazarî, an-Nashr, t. I.",
   },
   "taḥqîq": {

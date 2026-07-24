@@ -14,26 +14,19 @@ française / scientifique), traduction Hamidullah, audio Al-Husary verset
 par verset, difficulté notée sur 5 étoiles, difficultés de mémorisation,
 particularités tajwid reliées à des fiches de règles, **tafsir verset par
 verset** (al-Mukhtaṣar, traduction française), vocabulaire, **révision
-espacée** intégrée
-(+ paquets Anki), progression visible, auto-évaluation des lacunes et
+espacée** intégrée (et export des cartes pour Anki, planificateur FSRS),
+**surlignage mot à mot** de la récitation dans quatre styles au choix,
+progression visible, auto-évaluation des lacunes et
 **synchronisation multi-appareils par code anonyme**. PWA installable,
 fonctionne hors-ligne.
 
 ## Qui sommes-nous
 
-- **Anis** : co-fondateur, docteur en mathématiques. À l'origine de la
-  méthode : le déroulé roub' par roub', la difficulté étoilée, les cartes
-  façon Anki, les listes de difficultés de mémorisation, les
-  particularités tajwid, les rappels de règles, le tafsir et le
-  vocabulaire.
-- **Yusuf** : co-fondateur, interne en médecine. Conception et
-  réalisation, et les idées qui vont autour : translittération
-  scientifique stricte ou hybride au choix, distribution web et PWA,
-  synchronisation par code anonyme (Supabase), auto-évaluation,
-  affichage de la progression. Discord : **@ophtalmologie**.
-- **Israa** : conseillère pédagogique, ostéopathe. L'idée du parcours
-  tajwid progressif : découvrir peu de règles à la fois, sourate après
-  sourate.
+- **Anis** (co-fondateur, docteur en mathématiques) : à l'origine de la
+  méthode.
+- **Yusuf** (co-fondateur, interne en médecine) : conception et
+  réalisation. Discord : **@ophtalmologie**.
+- **Israa** (ostéopathe) : conseillère pédagogique.
 
 Tout le contenu religieux (tafsir, hadiths, règles de tajwid, texte) est
 sourcé et vérifié contre ses sources ; une erreur reste toujours possible :
@@ -46,8 +39,10 @@ l'export d'avis intégré à l'application, dans Paramètres).
 ## Utiliser
 
 - **En ligne (recommandé)** : ouvrir l'URL ci-dessus. « Ajouter à l'écran
-  d'accueil » pour l'installer comme une application ; Paramètres →
-  « Tout précharger » pour un hors-ligne complet ; les mises à jour sont
+  d'accueil » pour l'installer comme une application. Le texte, les notes,
+  le tafsir et l'interface sont gardés hors-ligne dès la première visite ;
+  l'audio et les pages du mushaf se préchargent **à la carte** dans
+  Paramètres, chaque style de récitation séparément. Mises à jour
   automatiques (bannière en haut de page).
 - **En local, sans serveur** : Code → Download ZIP sur cette page GitHub,
   dézipper, ouvrir `app/index.html` (ou `start.bat` sous Windows avec
@@ -79,15 +74,17 @@ l'export d'avis intégré à l'application, dans Paramètres).
   l'API quran.com ; polices UthmanicHafs et QCF du KFGQPC.
 - Traduction française : Muhammad Hamidullah.
 - Récitation : Mahmoud Khalil Al-Husary, quatre styles au choix : murattal
-  64 kbps embarqué (hors-ligne d'emblée), murattal 128 kbps et muallim via
+  64 kbps fourni avec l'appli, murattal 128 kbps et muallim via
   everyayah.com, mujawwad via le CDN de Tarteel ; les styles non embarqués
   se mettent en cache au fil de l'écoute. Usage non commercial.
 - Surlignage mot à mot : segments de la Quranic Universal Library
   (qul.tarteel.ai), un jeu par style.
 - Tafsir : « French Translation of Al-Mukhtasar in Interpreting the Noble
   Quran », Tafsir Center for Quranic Studies, V1.0.0, via QuranEnc.com,
-  reproduit sans modification (conditions de QuranEnc.com) ; règles de
-  tajwid d'après Tuhfat al-Atfal et al-Muqaddima al-Jazariyya.
+  reproduit sans modification (conditions de QuranEnc.com).
+- Notes, cartes et tutoriels : sources citées au fil du texte (Ibn Kathîr,
+  As-Sa'dî, Ibn al-Jazarî) ; fiches de règles d'après les matns Tuhfat
+  al-Atfal et al-Muqaddima al-Jazariyya.
 
 Application gratuite et non commerciale, sans compte ni collecte de
 données personnelles ; la synchronisation optionnelle repose sur un code

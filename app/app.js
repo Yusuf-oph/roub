@@ -209,7 +209,7 @@ function deckStats(cardIds) {
 
 /* ---------------- audio ---------------- */
 /* styles de récitation (Mahmoud Khalil Al-Husary) : le murattal 64 kbps est
-   embarqué dans l'appli (hors-ligne par défaut) ; les autres sont lus depuis
+   fourni avec l'appli (donc présent aussi en copie locale) ; les autres sont lus depuis
    leur source d'origine et mis en cache par le service worker au fil de
    l'écoute. Chaque style a ses propres segments mot à mot (data/segments/). */
 const RECITS = {
@@ -463,9 +463,9 @@ function accueilHtml() {
       donnent les points durs, le tajwid, le tafsir, le vocabulaire et les
       cartes. L'onglet <b>Révision</b> fait revenir les cartes à intervalle
       croissant, et exporte tout pour Anki.</p>
-      <p><b>Qui écrit.</b> Roub' est co-fondée par <b>Anis</b> (docteur en
-      mathématiques, à l'origine de la méthode) et <b>Yusuf</b> (interne en
-      médecine, conception et réalisation) ; <b>Israa</b> (ostéopathe) en est la
+      <p><b>Qui écrit.</b> <b>Anis</b> (co-fondateur, docteur en mathématiques) :
+      à l'origine de la méthode. <b>Yusuf</b> (co-fondateur, interne en
+      médecine) : conception et réalisation. <b>Israa</b> (ostéopathe) :
       conseillère pédagogique. Contact et avis :
       <a href="mailto:dev.yusuf@pm.me">dev.yusuf@pm.me</a>.</p>
       <p><b>Sources.</b> Texte du mushaf de Médine (Complexe du Roi Fahd),
@@ -474,8 +474,7 @@ function accueilHtml() {
       religieux est sourcé et vérifié ; une erreur reste possible, signale-la.
       Détail des sources, licences et réglages : onglet <b>Paramètres</b>.</p>
       <p><b>Gratuit, sans compte, sans collecte</b> : progression et réglages
-      restent dans ce navigateur. <span class="vref" data-accueil-ok>J'ai lu,
-      replier</span></p>
+      restent dans ce navigateur.</p>
     </div></details>`;
 }
 
@@ -1056,7 +1055,8 @@ deux états, en récitant avec {{tartîl}} et {{tajwîd}} ».</p>
 
 <p><b>Le {{taḥqîq}}</b> : la lecture posée, qui donne à chaque lettre
 {{son dû}} : {{madd}} rassasié, {{hamza}} réalisée, voyelles complètes,
-{{gémination}} appuyée, {{ghunna}} tenue, lettres nettement détachées.
+{{izhâr}} et {{gémination}} appuyés, {{ghunna}} pleinement tenue, lettres
+nettement détachées les unes des autres.
 Ibn al-Jazarî précise qu'elle sert « à assouplir les langues et à redresser la
 prononciation », et surtout que c'est <b>l'allure recommandée à celui qui
 apprend</b>, sans tomber dans l'excès inverse.</p>
@@ -1257,12 +1257,8 @@ function pageParams() {
       l'appli (et fonctionne donc aussi depuis une copie locale) ; les autres se
       chargent depuis leur source. Dans tous les cas, ce qui a été écouté reste
       en cache sur cet appareil, et « Tout précharger » met hors-ligne le style
-      choisi ici</span></div>
-    <select data-param="recitation">
-      ${Object.entries(RECITS).map(([k, r]) =>
-        `<option value="${k}" ${recitKey() === k ? "selected" : ""}>${esc(r.nom)}</option>`).join("")}
-    </select></div>
-  <div class="param-row"><div class="lab"><details class="tajcur"><summary>Lequel choisir ?</summary>
+      choisi ici</span>
+      <details class="aide-repli"><summary>Lequel choisir ?</summary>
     <div class="aide-styles">${gloss(`<p>Les quatre enregistrements sont du cheikh <b>Mahmoud Khalil
     al-Husary</b> (Hafs 'an 'Âsim) : ils diffèrent par l'allure, non par le texte.</p>
     <p><b>Murattal</b> — pour mémoriser : lecture mesurée, sans ornementation. Les versions
@@ -1274,7 +1270,11 @@ function pageParams() {
     tenues ; sur un même verset, 13,4 secondes contre 8,0 en murattal.</p>
     <p class="src">Ibn al-Jazarî rappelle que ces allures sont toutes licites.
     <span class="vref" data-tuto="styles">Tout le tutoriel des styles →</span></p>`)}</div>
-    </details></div></div>
+      </details></div>
+    <select data-param="recitation">
+      ${Object.entries(RECITS).map(([k, r]) =>
+        `<option value="${k}" ${recitKey() === k ? "selected" : ""}>${esc(r.nom)}</option>`).join("")}
+    </select></div>
   <div class="param-row"><div class="lab"><b>Surlignage mot à mot</b>
       <span>suit la récitation mot par mot dans le texte arabe</span></div>
     <label class="switch"><input type="checkbox" data-param="karaoke" ${PARAMS.karaoke ? "checked" : ""}><span class="sl"></span></label></div>
@@ -1324,29 +1324,24 @@ function pageParams() {
           <button class="iconbtn" data-preload="${k}" ${("serviceWorker" in navigator) && navigator.serviceWorker.controller ? "" : "disabled title='disponible sur la version en ligne (après un premier chargement)'"}>Précharger</button></div>`).join("")}
       </div></div></div>
   <p style="color:var(--muted);font-size:13px">Version : <b id="appver">${esc(APPVER || "…")}</b><br><br>
-    <b>Roub'</b> est une application co-fondée par <b>Anis</b> (docteur en
-    mathématiques), à l'origine de la méthode : le déroulé roub' par roub', la
-    difficulté étoilée, les cartes façon Anki, les difficultés de mémorisation,
-    les particularités tajwid, les rappels de règles, le tafsir et le
-    vocabulaire ; et par <b>Yusuf</b> (interne en médecine), qui l'a conçue et
-    réalisée en y ajoutant la translittération à double style
-    (scientifique ou hybride), la distribution web et PWA, la synchronisation
-    multi-appareils par code anonyme, l'auto-évaluation et l'affichage de la
-    progression. <b>Israa</b> (ostéopathe), conseillère pédagogique, a donné
-    l'idée du parcours de tajwid progressif : découvrir peu de règles à la
-    fois, sourate après sourate. Avis et contact :
+    <b>Anis</b> (co-fondateur, docteur en mathématiques) : à l'origine de la
+    méthode. <b>Yusuf</b> (co-fondateur, interne en médecine) : conception et
+    réalisation. <b>Israa</b> (ostéopathe) : conseillère pédagogique.
+    Avis et contact :
     <a href="mailto:dev.yusuf@pm.me">dev.yusuf@pm.me</a> · Discord
     <b>@ophtalmologie</b>.<br><br>
     Texte coranique : mushaf de Médine (Hafs), Complexe du Roi Fahd (texte et
     calligraphie des pages via quran.com et les polices QCF du KFGQPC).
     Traduction : Muhammad Hamidullah. Récitation : Mahmoud Khalil Al-Husary :
-    murattal 64 kbps embarqué et murattal 128 kbps / muallim via everyayah.com,
-    mujawwad via le CDN de Tarteel ; segments mot à mot de la Quranic Universal
-    Library (qul.tarteel.ai) ; usage non commercial. Tafsir verset par verset :
-    « French Translation of Al-Mukhtasar in Interpreting the Noble Quran »
-    (Tafsir Center for Quranic Studies, V1.0.0, via QuranEnc.com, texte
-    reproduit sans modification) ; et synthèses sourcées d'Ibn Kathîr et
-    d'As-Sa'dî. Application gratuite et non commerciale, sans
+    murattal 64 kbps fourni avec l'appli, murattal 128 kbps et muallim via
+    everyayah.com, mujawwad via le CDN de Tarteel ; segments mot à mot de la
+    Quranic Universal Library (qul.tarteel.ai) ; usage non commercial. Tafsir
+    verset par verset : « French Translation of Al-Mukhtasar in Interpreting
+    the Noble Quran » (Tafsir Center for Quranic Studies, V1.0.0, via
+    QuranEnc.com, texte reproduit sans modification). Notes, cartes et
+    tutoriels : sources citées au fil du texte (Ibn Kathîr, As-Sa'dî,
+    Ibn al-Jazarî) ; fiches de règles d'après les matns Tuhfat al-Atfal et
+    al-Muqaddima al-Jazariyya. Application gratuite et non commerciale, sans
     compte ni collecte de données : progression et réglages restent dans ce
     navigateur. Tout le contenu religieux est sourcé et vérifié contre ses
     sources ; une erreur restant toujours possible, merci de signaler tout
@@ -1571,10 +1566,10 @@ function bindMain() {
   /* feedback + préchargement */
   $$("[data-fb-export]", main).forEach(el =>
     el.addEventListener("click", () => exportFB()));
-  $$("[data-accueil-ok]", main).forEach(el => el.addEventListener("click", () => {
-    store.set("quran-accueil-vu", true);
-    const d = el.closest("details");
-    if (d) d.open = false;
+  /* le bloc d'accueil se souvient de son état : ouvert la première fois,
+     replié dès qu'on l'a replié soi-même (flèche du dépliant) */
+  $$("details.accueil", main).forEach(el => el.addEventListener("toggle", () => {
+    store.set("quran-accueil-vu", !el.open);
   }));
 
   /* glossaire : la bulle s'ouvre au clic sur le terme, se referme au reclic */
@@ -1790,7 +1785,7 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "1.11.0";   // réécrit par tools/release.py
+const BUILD_VERSION = "1.11.1";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {

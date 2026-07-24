@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.11.1 · 2026-07-25
+- Aide « Lequel choisir ? » fusionnée dans l'encadré du style de récitation
+- Crédits condensés ; documents (README, LISEZMOI, à propos) remis en cohérence, y compris le retrait du tafsir rédigé remplacé par al-Mukhtaṣar
+- Glossaire : « son dû » ne répète plus la phrase et l'izhâr y figure
+
 ## 1.11.0 · 2026-07-25
 - Nouveau tutoriel « Styles de récitation » : d'où viennent taḥqîq, ḥadr et tadwîr (Ibn al-Jazarî), et lequel choisir pour mémoriser
 - Termes techniques cliquables dans les tutoriels : une bulle donne la définition (fiche de règle ou définition sourcée), un second clic la referme

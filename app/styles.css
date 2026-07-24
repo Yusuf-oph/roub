@@ -395,7 +395,11 @@ button { font: inherit; cursor: pointer; }
 
 /* aide contextuelle « Lequel choisir ? » : elle vit dans un .lab de Paramètres,
    dont la règle « .lab b { display:block } » casserait les phrases */
-.aide-styles { font-size: 13.5px; line-height: 1.6; color: var(--text); }
+.param-row .lab .aide-repli { margin-top: 8px; }
+.param-row .lab .aide-repli > summary {
+  cursor: pointer; color: var(--accent); font-size: 13px; font-weight: 600;
+}
+.aide-styles { font-size: 13.5px; line-height: 1.6; color: var(--text); margin-top: 6px; }
 .aide-styles b { display: inline !important; color: var(--text); }
 .aide-styles p { margin: 8px 0; }
 .aide-styles .src { color: var(--muted); font-size: 12.5px; }
