@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.12.3 · 2026-07-25
+- Synchronisation : l'état affiché dit la vérité du moment (hors connexion, échec, ou synchronisé à telle heure, avec le dernier envoi réussi en repère)
+- Un envoi qui échoue est retenté tout seul (délai croissant), au retour du réseau et au retour sur l'onglet
+
 ## 1.12.2 · 2026-07-25
 - Plus d'échec muet : une récitation indisponible hors connexion, ou des pages du mushaf dont les polices manquent, sont désormais signalées avec la marche à suivre
 - Téléchargement des cartes Anki réparé pour la copie locale du dépôt (ouverte en file://), où le navigateur interdit la méthode utilisée en ligne

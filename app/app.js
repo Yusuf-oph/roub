@@ -1429,7 +1429,7 @@ function pageParams() {
   : SYNC ? `
   <div class="param-row"><div class="lab"><b>Synchronisation active</b>
       <span>ce navigateur est associé à un code de synchro.
-      ${esc(syncStatus || "en attente de la première synchro")}</span></div>
+      <span id="sync-status">${esc(syncStatus || "en attente de la première synchro")}</span></span></div>
     <span>
       <button class="fb-send" data-sync-show>Voir le code</button>
       <button class="iconbtn" data-sync-unlink title="dissocier ce navigateur (la progression locale reste)">Dissocier</button>
@@ -1839,6 +1839,7 @@ const SYNC_CFG = window.SYNC_CONFIG || { url: "", anonKey: "" };
 const SYNC_ON = !!(SYNC_CFG.url && SYNC_CFG.anonKey);
 let SYNC = store.get("quran-sync", null);   // {code, hash}
 let syncStatus = "";
+let syncDernier = "";        // heure du dernier envoi réussi (jamais effacée)
 
 function genCode() {
   const AB = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";   // sans I, L, O, 0, 1
@@ -1883,17 +1884,40 @@ function mergeRemote(remote) {
   }
   store.set(EVAL_KEY, EVAL);
 }
+/* état de la synchro : il doit dire la VÉRITÉ du moment. Un « synchronisé
+   14:32 » figé alors que les envois échouent depuis est trompeur : on
+   distingue donc le dernier succès de l'état courant, et un échec le dit. */
+const heure = () => new Date().toLocaleTimeString("fr-FR").slice(0, 5);
+function syncOk() {
+  syncDernier = heure();
+  syncStatus = "synchronisé " + syncDernier;
+  majSyncUI();
+}
+function syncKo(raison) {
+  syncStatus = (navigator.onLine === false || raison === "reseau"
+    ? "hors connexion : la synchro reprendra au retour du réseau"
+    : "échec de la dernière synchro : nouvelle tentative automatique")
+    + (syncDernier ? ` (dernier envoi réussi à ${syncDernier})` : "");
+  majSyncUI();
+  planifierReprise();
+}
+/* mise à jour en place : la page Paramètres est souvent déjà affichée */
+function majSyncUI() {
+  const el = $("#sync-status");
+  if (el) el.textContent = syncStatus;
+}
+
 async function syncPull() {
   if (!SYNC_ON || !SYNC) return false;
   try {
     const r = await fetch(`${SYNC_CFG.url}/rest/v1/progress?id=eq.${SYNC.hash}&select=data`,
       { headers: syncHeaders() });
-    if (!r.ok) return false;
+    if (!r.ok) { syncKo("serveur"); return false; }
     const rows = await r.json();
     if (rows.length) mergeRemote(rows[0].data);
-    syncStatus = "synchronisé " + new Date().toLocaleTimeString("fr-FR").slice(0, 5);
+    syncOk();
     return true;
-  } catch (e) { return false; }
+  } catch (e) { syncKo("reseau"); return false; }
 }
 async function syncPush() {
   if (!SYNC_ON || !SYNC) return false;
@@ -1903,15 +1927,28 @@ async function syncPush() {
       headers: Object.assign(syncHeaders(), { Prefer: "resolution=merge-duplicates" }),
       body: JSON.stringify([{ id: SYNC.hash, data: localPayload() }]),
     });
-    if (r.ok) syncStatus = "synchronisé " + new Date().toLocaleTimeString("fr-FR").slice(0, 5);
+    if (r.ok) syncOk(); else syncKo("serveur");
     return r.ok;
-  } catch (e) { return false; }
+  } catch (e) { syncKo("reseau"); return false; }
 }
 let pushTimer = null;
 function schedulePush() {
   if (!SYNC_ON || !SYNC) return;
   clearTimeout(pushTimer);
   pushTimer = setTimeout(syncPush, 4000);
+}
+
+/* après un échec, on retente tout seul : sinon la progression du moment
+   n'est envoyée qu'au prochain changement, parfois bien plus tard */
+let retryTimer = null, retryDelai = 60000;
+function planifierReprise() {
+  if (!SYNC_ON || !SYNC || retryTimer) return;
+  retryTimer = setTimeout(async () => {
+    retryTimer = null;
+    const ok = await syncPush();
+    retryDelai = ok ? 60000 : Math.min(retryDelai * 2, 15 * 60000);
+    if (!ok) planifierReprise();
+  }, retryDelai);
 }
 async function syncCreate() {
   const ok = confirm(
@@ -1943,7 +1980,7 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "1.12.2";   // réécrit par tools/release.py
+const BUILD_VERSION = "1.12.3";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {
@@ -2074,5 +2111,15 @@ if (navigator.storage && navigator.storage.persist) {
 fetchVersion();
 fetchFB().then(() => { if (route().page === "rub") render(); });
 syncPull().then(ok => { if (ok) render(); });
-window.addEventListener("online", () => { syncPull(); schedulePush(); });
+window.addEventListener("online", () => {
+  clearTimeout(retryTimer); retryTimer = null; retryDelai = 60000;
+  syncPull(); schedulePush();
+});
+window.addEventListener("offline", () => { if (SYNC_ON && SYNC) syncKo("reseau"); });
+/* de retour sur l'onglet : si le dernier envoi a échoué, on retente tout de suite */
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden && SYNC_ON && SYNC && syncStatus && !syncStatus.startsWith("synchronisé")) {
+    syncPush();
+  }
+});
 render();
