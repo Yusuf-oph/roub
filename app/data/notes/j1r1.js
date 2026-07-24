@@ -106,8 +106,8 @@ window.NOTES["j1r1"] = {
     },
     {
       titre: "2:17-20 : les deux paraboles", refs: ["2:17", "2:20"],
-      texte: "Deux images des hypocrites. **Le feu** : ils allument la lumière de la foi (par leur profession extérieure), puis Allah la leur retire ; il reste les ténèbres, et la triade *sourds, muets, aveugles*. **L'averse** : ténèbres, tonnerre et éclairs figurent leurs doutes et leurs frayeurs ; l'éclair, les lueurs de foi qui les traversent par instants ; et ils se bouchent les oreilles de peur. Ibn Kathîr, d'après Ibn 'Abbâs, y voit deux états : l'hypocrisie totale (le feu éteint) et les hésitants de l'averse : satisfaits à chaque victoire de l'islam, prêts à retourner à la mécréance à chaque épreuve ; ils marchent à chaque éclair, s'arrêtent à chaque obscurité.",
-      src: "Ibn Kathîr sur 2:17-20 (d'après Ibn 'Abbâs) ; As-Sa'dî sur 2:19-20.",
+      texte: "Deux images des hypocrites. **Le feu** : ils allument la lumière de la foi (par leur profession extérieure), puis Allah la leur retire ; il reste les ténèbres, et la triade *sourds, muets, aveugles*. **L'averse** : ténèbres, tonnerre et éclairs figurent leurs doutes et leurs frayeurs ; l'éclair, les lueurs de foi qui les traversent par instants ; et ils se bouchent les oreilles de peur. Ibn Kathîr y voit deux catégories d'hypocrites : l'hypocrisie totale (le feu éteint) et les hésitants de l'averse ; pour ces derniers il rapporte d'Ibn 'Abbâs : rassurés tant que l'islam triomphe, prêts à retourner à la mécréance dès qu'un revers le frappe ; ils marchent à chaque éclair, s'arrêtent à chaque obscurité.",
+      src: "Ibn Kathîr sur 2:17-20 (les deux catégories sont sa lecture) et Ibn 'Abbâs rapporté par lui sur 2:20 ; As-Sa'dî sur 2:19-20.",
     },
     {
       titre: "2:21-25 : l'appel, le défi, l'annonce", refs: ["2:21", "2:25"],

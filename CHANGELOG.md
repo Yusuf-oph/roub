@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.6.2 · 2026-07-24
+- Roub' 1 : citations d'Ibn Kathîr re-vérifiées sur son tafsir arabe intégral ; attribution précisée pour les deux paraboles (la lecture en deux catégories est d'Ibn Kathîr, la description des hésitants d'Ibn 'Abbâs)
+
 ## 1.6.1 · 2026-07-24
 - « À propos » de Paramètres aligné sur le README ; thème imposable par URL (?theme=light)
 

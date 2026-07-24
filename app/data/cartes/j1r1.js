@@ -64,7 +64,7 @@ window.CARTES["j1r1"] = [
   {
     id: "j1r1-sn-4", type: "sens",
     q: "Les deux paraboles des hypocrites (2:17-20) : que représentent le feu et l'averse ?",
-    a: "**Le feu** ({2:17-18}) : la foi affichée un instant puis retirée : ténèbres définitives (sourds, muets, aveugles).\n**L'averse** ({2:19-20}) : leurs doutes et frayeurs en ténèbres et tonnerre, les lueurs de foi en éclairs ; ils se bouchent les oreilles. Selon Ibn Kathîr (d'après Ibn 'Abbâs) : deux degrés d'hypocrisie, totale ou hésitante.",
+    a: "**Le feu** ({2:17-18}) : la foi affichée un instant puis retirée : ténèbres définitives (sourds, muets, aveugles).\n**L'averse** ({2:19-20}) : leurs doutes et frayeurs en ténèbres et tonnerre, les lueurs de foi en éclairs ; ils se bouchent les oreilles. Selon Ibn Kathîr : deux degrés d'hypocrisie, totale ou hésitante.",
     refs: ["2:17", "2:19"],
   },
   {
