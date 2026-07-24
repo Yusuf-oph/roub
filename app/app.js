@@ -1174,14 +1174,17 @@ function pageParams() {
       <button class="fb-send" data-sync-create>Générer un code</button>
       <button class="iconbtn" data-sync-join>Saisir un code</button>
     </span></div>`}
-  <div class="param-row"><div class="lab"><b>Tout précharger pour le hors-ligne</b>
-      <span>met en cache les pages du mushaf et la récitation choisie ci-dessus
-      (${esc(RECITS[recitKey()].nom)}) : environ ${recitKey() === "husary64" ? "120" : "250 à 330"} Mo,
-      après quoi l'appli fonctionne sans connexion. Le texte, les notes et
-      l'interface, eux, sont déjà gardés hors-ligne dès la première visite.
+  <div class="param-row"><div class="lab"><b>Précharger pour le hors-ligne</b>
+      <span>le texte, les notes, le tafsir et l'interface sont déjà gardés
+      hors-ligne dès la première visite ; ci-dessous, choisis ce que tu veux
+      ajouter (chaque élément se télécharge séparément, inutile de tout prendre).
       Sur iPhone/iPad, le quota de cache peut limiter le préchargement.
-      <span id="preload-status"></span></span></div>
-    <button class="fb-send" data-preload ${("serviceWorker" in navigator) && navigator.serviceWorker.controller ? "" : "disabled title='disponible sur la version en ligne (après un premier chargement)'"}>Précharger</button></div>
+      <span id="preload-status"></span></span>
+      <div class="preload-list">
+      ${[["pages", "Pages du mushaf"]].concat(Object.entries(RECITS).map(([k, r]) => [k, r.nom]))
+        .map(([k, nom]) => `<div class="preload-item"><span>${esc(nom)} <b>~${PRELOAD_MO[k]} Mo</b></span>
+          <button class="iconbtn" data-preload="${k}" ${("serviceWorker" in navigator) && navigator.serviceWorker.controller ? "" : "disabled title='disponible sur la version en ligne (après un premier chargement)'"}>Précharger</button></div>`).join("")}
+      </div></div></div>
   <p style="color:var(--muted);font-size:13px">Version : <b id="appver">${esc(APPVER || "…")}</b><br><br>
     <b>Roub'</b> est une application co-fondée par <b>Anis</b> (docteur en
     mathématiques), à l'origine de la méthode : le déroulé roub' par roub', la
@@ -1432,7 +1435,9 @@ function bindMain() {
     el.addEventListener("click", () => exportFB()));
   $$("[data-preload]", main).forEach(el => el.addEventListener("click", () => {
     el.disabled = true;
-    preloadAll($("#preload-status", main));
+    el.textContent = "en cours…";
+    preloadAll($("#preload-status", main), el.dataset.preload)
+      .then(() => { el.textContent = "fait ✓"; });
   }));
   $$("[data-sync-create]", main).forEach(el =>
     el.addEventListener("click", () => syncCreate()));
@@ -1624,7 +1629,7 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "1.9.1";   // réécrit par tools/release.py
+const BUILD_VERSION = "1.9.2";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {
@@ -1685,17 +1690,27 @@ async function showUpdateBanner(reg) {
   });
   document.body.appendChild(b);
 }
-async function preloadAll(status) {
+/* préchargement à la carte : « pages » (mushaf) ou la clé d'un style de
+   récitation ; chacun se met en cache séparément, on ne paie que ce qu'on veut */
+function preloadUrls(quoi) {
   const urls = [];
+  if (quoi === "pages") {
+    for (const p of Object.keys(PAGES)) {
+      urls.push("fonts/qcf/QCF_P" + String(p).padStart(3, "0") + ".woff2");
+    }
+    for (const p of Object.keys(PAGES2)) urls.push("fonts/qcf4/p" + p + ".woff2");
+    return urls;
+  }
+  const r = RECITS[quoi];
+  if (!r) return urls;
   for (const rid of Object.keys(QURAN)) {
-    for (const v of QURAN[rid].verses) urls.push(audioUrl(v.audio));
+    for (const v of QURAN[rid].verses) urls.push(r.url(v.audio));
   }
-  for (const p of Object.keys(PAGES)) {
-    urls.push("fonts/qcf/QCF_P" + String(p).padStart(3, "0") + ".woff2");
-  }
-  for (const p of Object.keys(PAGES2)) {
-    urls.push("fonts/qcf4/p" + p + ".woff2");
-  }
+  return urls;
+}
+
+async function preloadAll(status, quoi) {
+  const urls = preloadUrls(quoi);
   let done = 0, fail = 0;
   const q = urls.slice();
   await Promise.all(Array.from({ length: 4 }, async () => {
@@ -1713,8 +1728,11 @@ async function preloadAll(status) {
   }));
   status.textContent = fail
     ? `terminé, ${fail} fichier(s) en échec (réessaie plus tard)`
-    : "tout est disponible hors-ligne ✓";
+    : "disponible hors-ligne ✓";
 }
+
+/* poids indicatifs (mesurés) pour aider à choisir quoi précharger */
+const PRELOAD_MO = { pages: 30, husary64: 117, husary128: 240, muallim: 265, mujawwad: 330 };
 
 /* ---------------- boot ---------------- */
 {

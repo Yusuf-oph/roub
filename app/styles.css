@@ -375,15 +375,25 @@ button { font: inherit; cursor: pointer; }
 
 /* surlignage mot à mot pendant la récitation : ce sont les LETTRES qui
    s'allument (pas de cadre), la couleur tajwid cède la place le temps du mot */
-.wd { transition: color .09s linear, opacity .18s linear; }
-.wd.on, .wd.on [class^="tj-"] {
-  color: var(--accent);
-  text-shadow: 0 0 10px color-mix(in srgb, var(--accent) 45%, transparent);
+/* le mot en cours est SOULIGNÉ en surbrillance : la couleur tajwid des lettres
+   est préservée (c'est elle qui porte l'information pédagogique) */
+/* pas de transition sur le soulignement : il doit tomber pile sur la syllabe */
+.wd { transition: opacity .18s linear; padding-bottom: 2px; }
+.wd.on {
+  box-shadow: inset 0 -3px 0 var(--accent),
+              0 0 12px color-mix(in srgb, var(--accent) 22%, transparent);
 }
 .wd.done { opacity: .5; }
 .wpause { opacity: .7; }
 
 /* tafsir verset par verset (al-Mukhtaṣar, texte tiers verbatim) */
+.preload-list { margin-top: 8px; display: flex; flex-direction: column; gap: 5px; }
+.preload-item {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  font-size: 13px; color: var(--muted);
+}
+.preload-item b { color: var(--text); font-weight: 600; }
+
 .tfr-attr { color: var(--muted); font-size: 12px; margin: 2px 0 10px; }
 .tfr-surah {
   color: var(--accent2); font-weight: 700; font-size: 13px;

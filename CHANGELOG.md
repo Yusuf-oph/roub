@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.9.2 · 2026-07-24
+- Préchargement à la carte : pages du mushaf et chaque style de récitation se téléchargent séparément (poids indiqué), au lieu d'un bloc unique
+- Surlignage mot à mot : soulignement en surbrillance qui préserve les couleurs tajwid des lettres
+- Nouvel outil tools/mirror_audio.py : sauvegarde locale d'un style de récitation, hors dépôt
+
 ## 1.9.1 · 2026-07-24
 - Surlignage mot à mot : ce sont les lettres qui s'allument (plus de cadre), avec 70 ms d'avance et un rafraîchissement plus fin
 - « Tout précharger » met désormais hors-ligne le style de récitation choisi (et non plus seulement celui fourni avec l'appli) ; libellés corrigés : seuls le texte, les notes et l'interface sont hors-ligne dès la première visite
