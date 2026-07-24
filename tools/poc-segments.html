@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>PoC · surlignage mot à mot (Husary) — hors application</title>
+<style>
+  body { background:#0e1320; color:#e8ecf5; font-family:system-ui,sans-serif;
+         margin:0; padding:24px; max-width:900px; }
+  h1 { font-size:18px; } p.note { color:#93a0bb; font-size:13px; }
+  select, button { background:#1d2740; color:#e8ecf5; border:1px solid #2a3550;
+                   border-radius:8px; padding:6px 12px; font-size:14px; cursor:pointer; }
+  .verse { direction:rtl; text-align:right; font-size:34px; line-height:2.1;
+           margin:22px 0; font-family:"Times New Roman",serif; }
+  .w { transition:color .08s, background .08s; padding:0 2px; border-radius:6px; }
+  .w.on { color:#38b489; background:rgba(56,180,137,.13); }
+  .w.done { color:#93a0bb; }
+  code { color:#d9b36c; }
+</style>
+</head>
+<body>
+<h1>PoC · surlignage mot à mot pendant la récitation</h1>
+<p class="note">Page de TEST, hors application (jamais déployée). Audio :
+nos propres fichiers <code>app/audio/</code> (everyayah Husary 64 kbps).
+Segments : <code>api.quran.com</code> récitation 6, mis en cache par
+<code>tools/segments_check.py</code>. Format d'un segment :
+[index, position, début_ms, fin_ms].</p>
+
+<p><select id="pick"></select> <button id="play">▶ écouter</button>
+<button id="stop">⏹</button> <span id="info" class="note"></span></p>
+<div class="verse" id="txt"></div>
+<audio id="au"></audio>
+
+<script>
+const $ = s => document.querySelector(s);
+let VERSES = [], SEGS = {}, raf = null;
+
+const PAUSES = "ۖۗۘۙۚۛۜ۞۩";
+const estPause = w => [...w].every(c => PAUSES.includes(c));
+
+async function boot() {
+  const js = await (await fetch("../app/data/quran/j1r1.js")).text();
+  const obj = JSON.parse(js.match(/window\.QURAN\["[^"]+"\] = (\{[\s\S]*\});/)[1]);
+  VERSES = obj.verses;
+  SEGS = await (await fetch("cache/segments_husary.json")).json();
+  $("#pick").innerHTML = VERSES.map((v, i) =>
+    `<option value="${i}">${v.k}</option>`).join("");
+  charger(0);
+}
+
+function charger(i) {
+  clearInterval(raf);
+  const v = VERSES[i];
+  const mots = v.ar.split(/\s+/).filter(Boolean);
+  let n = -1;
+  $("#txt").innerHTML = mots.map(w => estPause(w)
+    ? `<span class="p">${w}</span>`
+    : `<span class="w" data-i="${++n}">${w}</span>`).join(" ");
+  const [s, a] = v.k.split(":").map(Number);
+  $("#au").src = `../app/audio/${String(s).padStart(3,"0")}${String(a).padStart(3,"0")}.mp3`;
+  const sg = SEGS[v.k] || [];
+  $("#info").textContent = `${sg.length} segments · ${n + 1} mots récités`;
+  $("#au").onplay = () => suivre(sg);
+}
+
+/* timer plutôt que requestAnimationFrame : rAF est bridé dès que l'onglet
+   passe à l'arrière-plan (constaté au test), le surlignage se figerait. */
+function suivre(sg) {
+  const au = $("#au"), mots = [...document.querySelectorAll(".w")];
+  clearInterval(raf);
+  const tick = () => {
+    const t = au.currentTime * 1000;
+    let cur = -1;
+    for (const [i, , d, f] of sg) {
+      if (t >= d && t <= f) { cur = i; break; }
+      if (t > f) cur = i + 1;   // mot fini : le suivant devient courant
+    }
+    mots.forEach((m, i) => {
+      const s = sg[i];
+      m.classList.toggle("on", !!s && t >= s[2] && t <= s[3]);
+      m.classList.toggle("done", !!s && t > s[3]);
+    });
+    if (au.paused && au.ended) clearInterval(raf);
+  };
+  tick();
+  raf = setInterval(tick, 60);
+}
+
+$("#pick").onchange = e => charger(+e.target.value);
+$("#play").onclick = () => $("#au").play();
+$("#stop").onclick = () => { $("#au").pause(); $("#au").currentTime = 0;
+  clearInterval(raf);
+  document.querySelectorAll(".w").forEach(m => m.className = "w"); };
+boot();
+</script>
+</body>
+</html>
