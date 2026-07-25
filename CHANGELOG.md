@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.16.1 · 2026-07-25
+- Paramètres : la dernière adresse de contact qui restait en texte brut est cliquable comme les autres
+
 ## 1.16.0 · 2026-07-25
 - Nouveau tutoriel **« Obligatoire ou perfectionnement ? »** : ce que les savants tiennent pour obligatoire dans le tajwid, ce dont ils discutent, et ce que tous disent de la capacité de chacun. Les deux positions sont exposées avec leurs auteurs et leurs textes, l'application n'arbitre pas entre elles
 
