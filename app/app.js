@@ -358,7 +358,8 @@ function audioIndispo() {
   const msg = local
     ? "audio indisponible : fichier manquant"
     : `récitation « ${RECITS[recitKey()].nom} » indisponible `
-      + (horsLigne ? "hors connexion" : "pour le moment (source injoignable)")
+      + (horsLigne ? "hors connexion"
+         : "(source injoignable, ou bloquée par un bloqueur de publicités)")
       + " · Paramètres → Précharger, ou choisis le murattal 64 kbps";
   const now = $("#audio-now");
   if (now) { now.textContent = msg; now.classList.add("audio-ko"); }
@@ -1428,7 +1429,11 @@ function pageParams() {
       l'appli (et fonctionne donc aussi depuis une copie locale) ; les autres se
       chargent depuis leur source. Dans tous les cas, ce qui a été écouté reste
       en cache sur cet appareil ; pour tout avoir d'avance, chaque style se
-      précharge séparément plus bas dans cette page</span>
+      précharge séparément plus bas dans cette page. Si tu utilises un bloqueur
+      de publicités (uBlock Origin et consorts), autorise-lui
+      <code>mirrors.quranicaudio.com</code> et <code>audio-cdn.tarteel.ai</code> :
+      sinon ces trois styles restent muets, le murattal 64 kbps étant le seul
+      fourni avec l'appli</span>
       <details class="aide-repli"><summary>Lequel choisir ?</summary>
     <div class="aide-styles">${gloss(`<p>Les quatre enregistrements sont du cheikh <b>Mahmoud Khalil
     al-Husary</b> (Hafs 'an 'Âsim) : ils diffèrent par l'allure, non par le texte.</p>
@@ -2020,7 +2025,7 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "1.13.3";   // réécrit par tools/release.py
+const BUILD_VERSION = "1.13.4";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {

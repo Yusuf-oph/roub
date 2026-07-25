@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.13.4 · 2026-07-25
+- Bloqueurs de publicités : les Paramètres indiquent désormais quels domaines autoriser pour les récitations non fournies avec l'appli, et le message d'échec évoque cette cause (cas constaté avec uBlock Origin)
+
 ## 1.13.3 · 2026-07-25
 - Correctif Firefox et dérivés (LibreWolf) : les récitations distantes ne passent plus par le service worker tant qu'elles ne sont pas en cache, car ces navigateurs refusent de lire la réponse qui en résultait ; le préchargement et la lecture hors connexion restent inchangés
 
