@@ -48,6 +48,7 @@ python tools/build_export.py
 | `fetch_tafsir_corpus.py` | constitue le corpus d'audit local (Ibn Kathîr, As-Sa'dî en arabe) |
 | `tafsir_local.py <clé>` | consulte ce corpus hors ligne pendant un audit de contenu |
 | `md2pdf.py <fichier.md>` | met un document de travail au propre en PDF A4 |
+| `md2pdf_ar.py <fichier.md>` | idem, mais pour un document qui CITE DE L'ARABE : passe par HTML + impression Edge, seul moyen d'obtenir des lettres liées et le sens de lecture correct (reportlab ne sait pas le faire) |
 | `translit.py` | moteur de translittération (scientifique + hybride), utilisé par `build_data.py` |
 
 ## Règles de rédaction du contenu (rappels)
