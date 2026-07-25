@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.13.7 · 2026-07-25
+- Soulignage mot à mot et départ au mot double-cliqué recalés dans les récitations 128 kbps, muallim et mujawwad : sur les versets qui contiennent un « yâ » d'appel écrit collé (يَـٰٓأَيُّهَا, يَـٰٓـَٔادَمُ), la source comptait un mot de plus et tout le reste du verset décalait d'un cran
+- Quand le récitateur répète un mot, ce qui est fréquent en muallim, le soulignage revient avec lui au lieu de prendre de l'avance jusqu'à la fin du verset
+
 ## 1.13.6 · 2026-07-25
 - Double-clic sur un mot : la récitation démarre à ce mot précis, puis enchaîne la suite du roub'. En texte continu comme sur les pages du mushaf
 

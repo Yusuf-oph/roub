@@ -230,16 +230,21 @@ const segsOf = key =>
   ((window.SEGMENTS || {})[(player && player.styleAudio) || recitKey()] || {})[key] || null;
 /* départ de lecture au mot visé (double-clic) : les segments donnent l'instant
    d'attaque du mot, on recule d'un cheveu pour ne pas rogner sa première lettre.
-   Alignement mot/segment vérifié verset par verset : exact partout en 64 kbps
-   sauf 2:125 et 2:181, à un mot près sur une trentaine de versets dans les
-   styles distants (leur découpage compte parfois un mot de plus) : d'où le
-   garde-fou sur l'indice plutôt qu'une confiance aveugle. */
+   On cherche le segment par l'index de mot qu'il DÉCLARE (champ 0), jamais par
+   sa position dans la liste : un même mot peut avoir plusieurs segments quand le
+   récitateur le répète (courant en muallim). En cas d'index absent (3 versets
+   connus sur les 4 styles, cf. verifie.py section J), on part du mot connu le
+   plus proche avant celui visé. */
 const MARGE_MOT = 60;
 function motDebutMs(key, mot) {
   if (!(mot > 0)) return 0;
   const sg = segsOf(key);
   if (!sg || !sg.length) return 0;
-  const s = sg[Math.min(mot, sg.length - 1)];
+  let s = null;
+  for (const seg of sg) {
+    if (seg[0] === mot) { s = seg; break; }                 // 1re occurrence du mot
+    if (seg[0] < mot && (!s || seg[0] > s[0])) s = seg;     // repli
+  }
   return s ? Math.max(0, s[2] - MARGE_MOT) : 0;
 }
 /* mot visé par un clic : .wd en mode texte, .qw sur les pages du mushaf */
@@ -378,11 +383,12 @@ function wordTick() {
   /* petite avance : le temps que le mot s'allume et que l'œil le voie, la
      syllabe est déjà commencée ; 70 ms recale le ressenti sans anticiper */
   const t = player.el.currentTime * 1000 + KARAOKE_LEAD;
-  /* mot courant = dernier mot commencé : les silences entre deux mots ne sont
-     pas couverts par les segments (surtout en 128k/muallim/mujawwad), garder
-     le mot précédent évite un clignotement à chaque blanc */
+  /* mot courant = dernier mot commencé, désigné par l'index que le segment
+     DÉCLARE : si le récitateur revient en arrière pour répéter (muallim), le
+     soulignage le suit. Les silences entre deux mots ne sont pas couverts par
+     les segments : garder le mot précédent évite un clignotement à chaque blanc */
   let cur = -1;
-  for (let i = 0; i < sg.length; i++) if (t >= sg[i][2]) cur = i;
+  for (let i = 0; i < sg.length; i++) if (t >= sg[i][2]) cur = sg[i][0];
   const els = $$(`.verse[data-k="${player.curKey}"] .wd, .mver[data-k="${player.curKey}"] .wd`);
   els.forEach(el => {
     const w = +el.dataset.w;
@@ -2090,7 +2096,7 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "1.13.6";   // réécrit par tools/release.py
+const BUILD_VERSION = "1.13.7";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {

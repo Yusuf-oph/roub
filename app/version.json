@@ -1,7 +1,8 @@
 {
-  "version": "1.13.6",
+  "version": "1.13.7",
   "date": "2026-07-25",
   "notes": [
-    "Double-clic sur un mot : la récitation démarre à ce mot précis, puis enchaîne la suite du roub' (texte continu et pages du mushaf)"
+    "Soulignage et départ au mot recalés dans les récitations 128 kbps, muallim et mujawwad : les versets contenant un « yâ » d'appel collé (يَـٰٓأَيُّهَا) décalaient d'un mot",
+    "Le soulignage suit désormais les répétitions du récitateur, fréquentes en muallim"
   ]
 }

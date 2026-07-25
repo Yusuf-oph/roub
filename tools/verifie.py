@@ -19,7 +19,8 @@ Vérifie :
   I. tafsirfr/ : tafsir français (al-Mukhtaṣar) verset par verset, couverture
      complète, textes non vides, attribution présente (appli + docs)
   J. segments/ : segments mot à mot des 4 styles de récitation (couverture,
-     temps cohérents, index de mots plausibles, câblage index.html/SW/release)
+     temps cohérents, CALAGE index de mot déclaré ↔ mots du texte sur les 823
+     versets, câblage index.html/SW/release)
 """
 import json
 import os
@@ -330,6 +331,11 @@ def main():
     # J. segments mot à mot (karaoké) : un jeu complet par style de récitation
     SEG = data.get("SEGMENTS") or {}
     STYLES = ("husary64", "husary128", "muallim", "mujawwad")
+    # écarts de découpage propres à la source, non corrigeables sans inventer un
+    # instant (il faudrait couper un segment en deux) : tolérés, le départ au mot
+    # se replie alors sur le mot connu le plus proche avant celui visé
+    CALAGE_CONNU = {("husary64", "2:125"), ("husary64", "2:181"),
+                    ("muallim", "2:143")}
     if not SEG:
         err("segments : window.SEGMENTS absent (lancer tools/fetch_segments.py)")
     else:
@@ -349,14 +355,23 @@ def main():
                     continue
                 if any(s[2] < 0 or s[3] < s[2] for s in sg):
                     err(f"segments {st} {k} : temps incohérents")
-            # le nombre de mots ne doit pas dépasser les mots récités du verset
-            for k, sg in list(d.items())[:200]:
+            # CALAGE : les index de mots déclarés par les segments (champ 0)
+            # doivent couvrir exactement les mots récités du verset. Un index
+            # peut revenir (répétition du récitateur), aucun ne doit manquer ni
+            # dépasser : c'est ce qui garantit que le soulignage et le départ au
+            # mot double-cliqué tombent juste. tools/fetch_segments.py recale le
+            # yâ vocatif, que QUL compte comme un mot séparé.
+            for k, sg in d.items():
                 v = vidx[k][1] if k in vidx else None
-                if not v:
+                if not v or not sg:
                     continue
                 mots = [w for w in v["ar"].split() if not all(c in "ۖۗۘۙۚۛۜ۞۩" for c in w)]
-                if sg and max(s[0] for s in sg) >= len(mots) + 2:
-                    err(f"segments {st} {k} : index de mot hors texte")
+                if set(s[0] for s in sg) != set(range(len(mots))) \
+                        and (st, k) not in CALAGE_CONNU:
+                    err(f"segments {st} {k} : calage mot/segment faux "
+                        f"({len(mots)} mots, index déclarés {min(s[0] for s in sg)}"
+                        f"-{max(s[0] for s in sg)}) ; lancer "
+                        f"python tools/fetch_segments.py --renormaliser")
             if f"data/segments/{st}.js" not in idx_html:
                 err(f"segments {st} : absent d'index.html")
             if st not in app_js:
