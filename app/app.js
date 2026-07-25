@@ -228,31 +228,56 @@ const audioUrl = f => RECITS[recitKey()].url(f);
    récitation fournie avec l'appli, ce n'est pas le style choisi */
 const segsOf = key =>
   ((window.SEGMENTS || {})[(player && player.styleAudio) || recitKey()] || {})[key] || null;
+/* départ de lecture au mot visé (double-clic) : les segments donnent l'instant
+   d'attaque du mot, on recule d'un cheveu pour ne pas rogner sa première lettre.
+   Alignement mot/segment vérifié verset par verset : exact partout en 64 kbps
+   sauf 2:125 et 2:181, à un mot près sur une trentaine de versets dans les
+   styles distants (leur découpage compte parfois un mot de plus) : d'où le
+   garde-fou sur l'indice plutôt qu'une confiance aveugle. */
+const MARGE_MOT = 60;
+function motDebutMs(key, mot) {
+  if (!(mot > 0)) return 0;
+  const sg = segsOf(key);
+  if (!sg || !sg.length) return 0;
+  const s = sg[Math.min(mot, sg.length - 1)];
+  return s ? Math.max(0, s[2] - MARGE_MOT) : 0;
+}
+/* mot visé par un clic : .wd en mode texte, .qw sur les pages du mushaf */
+function motDe(cible) {
+  const el = cible && cible.closest ? cible.closest("[data-w]") : null;
+  return el ? +el.dataset.w : 0;
+}
 
 const player = {
   el: new Audio(),
   queue: [], qi: 0, rep: 1, repLeft: 1, loopRange: false, playing: false,
+  mot: 0, depart: 0,          // départ au milieu d'un verset (double-clic sur un mot)
   /* defiler = false quand la lecture part d'un clic sur le verset lui-même :
      il est déjà sous les yeux, et le recentrer ferait fuir la cible entre les
      deux clics d'un double-clic (le second tombait à côté, d'où « ne lit qu'un
      verset »). L'enchaînement automatique, lui, défile toujours. */
-  play(list, start, defiler = true) {
+  play(list, start, defiler = true, mot = 0) {
     this.queue = list; this.qi = start || 0;
     this.repLeft = this.rep; this.playing = true;
-    this._launch(defiler);
+    this._launch(defiler, mot);
   },
-  /* second clic sur un verset : enchaîner à partir de lui. S'il est déjà en
-     cours (le premier clic vient de le lancer), on remplace la file sans
-     toucher à l'élément audio : aucun redémarrage audible. */
-  enchaine(list, i) {
+  /* second clic sur un mot : enchaîner à partir de CE MOT, puis dérouler la
+     suite du roub'. Si le verset est déjà en cours (le premier clic vient de le
+     lancer), on remplace la file et on déplace la tête de lecture sans toucher
+     à la source : aucun rechargement, aucun redémarrage audible. */
+  enchaine(list, i, mot) {
     if (this.playing && this.curKey === list[i].k && !this.el.paused) {
       this.queue = list; this.qi = i; this.repLeft = this.rep;
+      this.mot = mot | 0;
+      const ms = motDebutMs(list[i].k, this.mot);
+      this.depart = ms / 1000;
+      if (ms) this.el.currentTime = this.depart;
       updateAudioBar();
       return;
     }
-    this.play(list, i, false);
+    this.play(list, i, false, mot);
   },
-  _launch(defiler = true) {
+  _launch(defiler = true, mot = 0) {
     if (!this.queue.length || this.qi >= this.queue.length) { this.stop(); return; }
     const item = this.queue[this.qi];
     this.curKey = item.k;
@@ -260,6 +285,12 @@ const player = {
     this.styleAudio = null;
     this.el.src = audioUrl(item.audio);
     this.el.playbackRate = PARAMS.speed;
+    /* départ au milieu du verset : tant que les métadonnées ne sont pas là,
+       currentTime fixe la position de départ par défaut ; loadedmetadata la
+       réapplique si le navigateur ne l'a pas retenue */
+    this.mot = mot | 0;
+    this.depart = motDebutMs(item.k, this.mot) / 1000;
+    if (this.depart) this.el.currentTime = this.depart;
     // stop() d'abord : il repeint la barre, le message doit venir après
     this.el.play().catch(err => this.echecLecture(err));
     highlightVerse(item.k, defiler);
@@ -299,6 +330,9 @@ const player = {
       this.repli = true;
       this.styleAudio = "husary64";        // le soulignage suit le fichier joué
       this.el.src = RECITS.husary64.url(item.audio);
+      /* le repli change de découpage : recalculer le départ sur ces segments */
+      this.depart = motDebutMs(item.k, this.mot) / 1000;
+      if (this.depart) this.el.currentTime = this.depart;
       this.el.play().then(() => {
         const now = $("#audio-now");
         if (now) {
@@ -316,6 +350,7 @@ const player = {
     this.curKey = null;
     this.repli = false;
     this.styleAudio = null;
+    this.mot = 0; this.depart = 0;
     this.el.pause();
     highlightVerse(null);
     clearWords();
@@ -323,6 +358,11 @@ const player = {
   },
 };
 player.el.addEventListener("ended", () => player.next());
+/* certains navigateurs oublient la position demandée avant le chargement */
+player.el.addEventListener("loadedmetadata", () => {
+  if (player.depart && player.el.currentTime < player.depart - 0.15)
+    player.el.currentTime = player.depart;
+});
 
 /* soulignage mot à mot : les segments donnent [i_mot, i_fin, début_ms, fin_ms] ;
    un timer plutôt que timeupdate (déclenché trop rarement : ~4 fois/seconde) */
@@ -739,12 +779,12 @@ function secMemoriser(R) {
   } else if (mode === "continu") {
     h += `<button class="chip ${PARAMS.taj ? "on" : ""}" data-opt="taj">Couleurs tajwid</button>
     <button class="chip ${PARAMS.silentMarks ? "on" : ""}" data-opt="silentMarks" title="les ronds ۟ au-dessus des lettres écrites mais non prononcées">Ronds muets</button>
-    <span class="fb-note">clic sur un verset : l'écouter ; double-clic : lecture à partir de là</span>`;
+    <span class="fb-note">clic sur un verset : l'écouter ; double-clic sur un mot : lecture à partir de ce mot</span>`;
   } else {
     h += `<button class="chip ${memoState.pagesColor ? "on" : ""}" data-pgcolor
       title="calligraphie colorée tajwid (édition officielle v4) ou noir et blanc classique">Couleurs tajwid</button>
     <span class="fb-note">mise en page exacte du mushaf de Médine ·
-      clic sur un mot : écouter le verset ; double-clic : lecture à partir de là ;
+      clic sur un mot : écouter le verset ; double-clic : lecture à partir de ce mot ;
       les versets hors de ce roub' sont estompés</span>`;
   }
   h += `</div>`;
@@ -815,6 +855,14 @@ function pagesHtml(R) {
   const pnums = Object.keys(DATA).map(Number).sort((a, b) => a - b)
     .filter(p => Object.values(DATA[p]).some(line => line.some(w => inRub.has(w.k))));
   if (!pnums.length) return `<div class="empty">Pagination indisponible.</div>`;
+  /* indice du mot dans son verset (= indice du segment audio, pour démarrer la
+     lecture au mot double-cliqué) : les glyphes d'un verset se suivent dans
+     l'ordre et le dernier est la marque de fin de verset, qui n'est pas récitée.
+     Vérifié sur les 823 versets : glyphes = mots + 1 (seule exception 2:125). */
+  const nGlyphes = {}, vus = {};
+  for (const p of pnums)
+    for (const ln of Object.keys(DATA[p]))
+      for (const w of DATA[p][ln]) nGlyphes[w.k] = (nGlyphes[w.k] || 0) + 1;
   let h = "";
   for (const p of pnums) {
     const lines = DATA[p];
@@ -835,7 +883,9 @@ function pagesHtml(R) {
     for (const ln of Object.keys(lines).map(Number).sort((a, b) => a - b)) {
       h += `<div class="qline" style="font-family:'${fpfx}${p}'">`;
       for (const w of lines[ln]) {
-        h += `<span class="qw${inRub.has(w.k) ? "" : " dim"}" data-k="${w.k}" title="${w.k}">${w.g}</span>`;
+        const wi = (vus[w.k] = (vus[w.k] || 0) + 1) - 1;
+        const dw = wi < nGlyphes[w.k] - 1 ? ` data-w="${wi}"` : "";   // pas la marque de fin
+        h += `<span class="qw${inRub.has(w.k) ? "" : " dim"}" data-k="${w.k}"${dw} title="${w.k}">${w.g}</span>`;
       }
       h += `</div>`;
     }
@@ -1663,14 +1713,14 @@ function bindMain() {
     }));
     $$(".mver", main).forEach(el => el.addEventListener("click", ev => {
       const i = +el.dataset.i;
-      if (ev.detail >= 2) player.enchaine(queue, i);   // double-clic : à partir d'ici
-      else player.play([queue[i]], 0, false);           // simple : ce verset seul
+      if (ev.detail >= 2) player.enchaine(queue, i, motDe(ev.target));  // double-clic : à partir de ce mot
+      else player.play([queue[i]], 0, false);                           // simple : ce verset seul
     }));
     const rubIdx = {};
     R.verses.forEach((v, i) => { rubIdx[v.k] = i; });
     $$(".qw", main).forEach(el => el.addEventListener("click", ev => {
       const k = el.dataset.k;
-      if (ev.detail >= 2 && k in rubIdx) { player.enchaine(queue, rubIdx[k]); return; }
+      if (ev.detail >= 2 && k in rubIdx) { player.enchaine(queue, rubIdx[k], motDe(ev.target)); return; }
       const hit = VIDX[k];
       if (hit) {
         player.loopRange = false;
@@ -2040,7 +2090,7 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "1.13.5";   // réécrit par tools/release.py
+const BUILD_VERSION = "1.13.6";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {
