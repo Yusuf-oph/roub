@@ -224,7 +224,10 @@ const RECITS = {
 };
 const recitKey = () => RECITS[PARAMS.recitation] ? PARAMS.recitation : "husary64";
 const audioUrl = f => RECITS[recitKey()].url(f);
-const segsOf = key => ((window.SEGMENTS || {})[recitKey()] || {})[key] || null;
+/* le surlignage suit le fichier RÉELLEMENT joué : en cas de repli sur la
+   récitation fournie avec l'appli, ce n'est pas le style choisi */
+const segsOf = key =>
+  ((window.SEGMENTS || {})[(player && player.styleAudio) || recitKey()] || {})[key] || null;
 
 const player = {
   el: new Audio(),
@@ -238,6 +241,8 @@ const player = {
     if (!this.queue.length || this.qi >= this.queue.length) { this.stop(); return; }
     const item = this.queue[this.qi];
     this.curKey = item.k;
+    this.repli = false;              // chaque verset retente le style choisi
+    this.styleAudio = null;
     this.el.src = audioUrl(item.audio);
     this.el.playbackRate = PARAMS.speed;
     // stop() d'abord : il repeint la barre, le message doit venir après
@@ -265,17 +270,37 @@ const player = {
      Seule une vraie panne de chargement mérite un message. */
   echecLecture(err) {
     if (err && err.name === "AbortError") return;
-    this.stop();
     if (err && err.name === "NotAllowedError") {
+      this.stop();
       const now = $("#audio-now");
       if (now) now.textContent = "touche « ▶ » pour lancer la lecture";
       return;
     }
+    /* un style distant peut manquer à l'appel (réseau capricieux, source
+       momentanément injoignable) : plutôt que d'arrêter, on bascule sur la
+       récitation fournie avec l'appli, qui est toujours là */
+    const item = this.queue[this.qi];
+    if (item && !this.repli && !RECITS[recitKey()].local) {
+      this.repli = true;
+      this.styleAudio = "husary64";        // le surlignage suit le fichier joué
+      this.el.src = RECITS.husary64.url(item.audio);
+      this.el.play().then(() => {
+        const now = $("#audio-now");
+        if (now) {
+          now.textContent = `${item.k} · source injoignable : lecture avec le murattal 64 kbps`;
+          now.classList.add("audio-repli");
+        }
+      }).catch(e2 => { this.stop(); audioIndispo(); });
+      return;
+    }
+    this.stop();
     audioIndispo();
   },
   stop() {
     this.playing = false;
     this.curKey = null;
+    this.repli = false;
+    this.styleAudio = null;
     this.el.pause();
     highlightVerse(null);
     clearWords();
@@ -1995,7 +2020,7 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "1.13.1";   // réécrit par tools/release.py
+const BUILD_VERSION = "1.13.2";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {
@@ -2003,7 +2028,10 @@ async function fetchVersion() {
     try {
       const v = await (await fetch("version.json", { cache: "no-store" })).json();
       APPVER = `${v.version} · ${v.date}`;
-    } catch (e) { APPVER = "hors-ligne"; }
+    } catch (e) {
+      // la version installée est connue : ne pas afficher « hors-ligne » à sa place
+      APPVER = BUILD_VERSION + " (vérification des mises à jour impossible)";
+    }
   } else {
     // copie locale (file://) : version embarquée + comparaison avec le site
     APPVER = BUILD_VERSION + " · copie locale";

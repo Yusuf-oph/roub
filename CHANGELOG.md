@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.13.2 · 2026-07-25
+- Si une récitation distante ne répond pas, la lecture continue automatiquement avec le murattal fourni avec l'appli (le verset suivant retente le style choisi)
+- Le numéro de version reste affiché même quand la vérification des mises à jour échoue
+
 ## 1.13.1 · 2026-07-25
 - Correctif : plus de fausse alerte « récitation indisponible » quand une lecture est simplement interrompue (changement de verset ou de réglage) ; le message ne s'affiche qu'en cas de vraie panne, et distingue hors connexion et source injoignable
 
