@@ -25,3 +25,8 @@ jobs:
           path: app
       - id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          # le site pèse ~130 Mo (823 mp3 embarqués) : le délai par défaut de
+          # 10 minutes ne suffit plus quand Pages est lent, l'action abandonne
+          # sur « Timeout reached, aborting! » alors que rien n'est cassé
+          timeout: 1800000
