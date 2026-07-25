@@ -241,7 +241,7 @@ const player = {
     this.el.src = audioUrl(item.audio);
     this.el.playbackRate = PARAMS.speed;
     // stop() d'abord : il repeint la barre, le message doit venir après
-    this.el.play().catch(() => { this.stop(); audioIndispo(); });
+    this.el.play().catch(err => this.echecLecture(err));
     highlightVerse(item.k);
     updateAudioBar();
   },
@@ -259,6 +259,19 @@ const player = {
     if (!this.playing) return;
     if (this.el.paused) this.el.play(); else this.el.pause();
     updateAudioBar();
+  },
+  /* play() est rejeté dans des cas parfaitement normaux : lecture interrompue
+     par un autre verset, un changement de réglage ou un re-rendu (AbortError).
+     Seule une vraie panne de chargement mérite un message. */
+  echecLecture(err) {
+    if (err && err.name === "AbortError") return;
+    this.stop();
+    if (err && err.name === "NotAllowedError") {
+      const now = $("#audio-now");
+      if (now) now.textContent = "touche « ▶ » pour lancer la lecture";
+      return;
+    }
+    audioIndispo();
   },
   stop() {
     this.playing = false;
@@ -316,9 +329,11 @@ function highlightVerse(key) {
    indisponible) : le dire, au lieu de s'arrêter sans explication */
 function audioIndispo() {
   const local = RECITS[recitKey()].local;
+  const horsLigne = navigator.onLine === false;
   const msg = local
     ? "audio indisponible : fichier manquant"
-    : `récitation « ${RECITS[recitKey()].nom} » indisponible hors connexion`
+    : `récitation « ${RECITS[recitKey()].nom} » indisponible `
+      + (horsLigne ? "hors connexion" : "pour le moment (source injoignable)")
       + " · Paramètres → Précharger, ou choisis le murattal 64 kbps";
   const now = $("#audio-now");
   if (now) { now.textContent = msg; now.classList.add("audio-ko"); }
@@ -331,7 +346,7 @@ function playOneShot(audio, key) {
   player.curKey = key || null;
   player.el.src = audioUrl(audio);
   player.el.playbackRate = PARAMS.speed;
-  player.el.play().catch(() => audioIndispo());
+  player.el.play().catch(err => player.echecLecture(err));
   player.playing = false;
   if (key) highlightVerse(key);
 }
@@ -1980,7 +1995,7 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "1.13.0";   // réécrit par tools/release.py
+const BUILD_VERSION = "1.13.1";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {

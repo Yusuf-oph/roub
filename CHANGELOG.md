@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.13.1 · 2026-07-25
+- Correctif : plus de fausse alerte « récitation indisponible » quand une lecture est simplement interrompue (changement de verset ou de réglage) ; le message ne s'affiche qu'en cas de vraie panne, et distingue hors connexion et source injoignable
+
 ## 1.13.0 · 2026-07-25
 - Les 24 roub' sont désormais accessibles : texte, tafsir verset par verset, audio, pages du mushaf et cartes d'enchaînement partout ; les notes rédigées restent signalées « notes à venir » là où elles manquent
 
