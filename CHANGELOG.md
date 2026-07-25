@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.14.0 · 2026-07-25
+- Les listes de sources sont désormais des bibliographies normalisées ISO 690 : la page Sources reçoit une section « Bibliographie » qui reprend toutes les références en notices complètes, et le tutoriel des styles cite ses sources de la même façon. La prose qui explique la provenance et les conditions d'usage est conservée, la norme ne sachant pas les porter
+
 ## 1.13.10 · 2026-07-25
 - Page Sources : l'année de décès du cheikh al-Husary est retirée, elle n'apprend rien au lecteur
 

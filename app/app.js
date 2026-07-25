@@ -1292,6 +1292,76 @@ points durs, l'ordre du parcours de tajwid progressif, la formulation des
 cartes et le moteur de révision espacée sont le travail propre de Roub' : des
 choix pédagogiques, pas des positions savantes.</p>
 
+<h3>Bibliographie</h3>
+<p>Les mêmes sources, en notices normalisées (ISO 690), classées par auteur.
+L'article arabe (<i>al-</i>, <i>as-</i>, <i>at-</i>) n'entre pas dans le
+classement, selon l'usage des bibliographies d'études arabes. Les dates de
+consultation sont celles des relevés qui ont servi à l'application.</p>
+
+<p class="biblio">COMPLEXE DU ROI FAHD POUR L'IMPRESSION DU NOBLE CORAN
+(KFGQPC). <i>Al-Muṣḥaf al-sharīf</i>, riwāyat Ḥafṣ ʿan ʿĀṣim [en ligne]. Médine.
+Texte obtenu par l'API quran.com v4, champs <i>text_uthmani</i>,
+<i>text_uthmani_tajweed</i>, <i>text_imlaei</i>. [Consulté le 25 juillet 2026].
+Disponible à l'adresse : https://api.quran.com/api/v4/</p>
+
+<p class="biblio">COMPLEXE DU ROI FAHD POUR L'IMPRESSION DU NOBLE CORAN
+(KFGQPC). <i>Polices QCF, versions 1 et 4</i>, et <i>police UthmanicHafs</i>
+[polices numériques]. Médine.</p>
+
+<p class="biblio">AL-GHAZĀLĪ, Abū Ḥāmid. <i>Iḥyāʾ ʿulūm ad-dīn</i>, kitāb al-amr
+bi-l-maʿrūf wa-n-nahy ʿan al-munkar, bāb 3 [en ligne]. [Consulté le 25 juillet
+2026]. Disponible à l'adresse : https://ar.wikisource.org/</p>
+
+<p class="biblio">HAMIDULLAH, Muhammad. <i>Le Noble Coran et la traduction en
+langue française de ses sens</i> [en ligne]. Servie par l'API quran.com,
+identifiant 31. Diffusion non commerciale. [Consulté le 25 juillet 2026].
+Disponible à l'adresse : https://api.quran.com/api/v4/</p>
+
+<p class="biblio">AL-ḤUṢARĪ, Maḥmūd Khalīl. <i>Al-Muṣḥaf al-murattal</i>, riwāyat
+Ḥafṣ ʿan ʿĀṣim [enregistrement sonore en ligne]. Murattal 64 kbps :
+everyayah.com ; murattal 128 kbps et muʿallim : mirrors.quranicaudio.com ;
+mujawwad : audio-cdn.tarteel.ai. [Consulté le 25 juillet 2026].</p>
+
+<p class="biblio">IBN AL-JAZARĪ, Muḥammad ibn Muḥammad (m. 833 H).
+<i>Al-Muqaddima al-Jazariyya</i> [en ligne]. [Consulté le 25 juillet 2026].
+Disponible à l'adresse : https://ar.wikisource.org/</p>
+
+<p class="biblio">IBN AL-JAZARĪ, Muḥammad ibn Muḥammad (m. 833 H). <i>An-Nashr
+fī l-qirāʾāt al-ʿashr</i>, t. I, chapitre « wa ammā kayfa yuqraʾu l-Qurʾān »
+[en ligne]. [Consulté le 24 juillet 2026]. Disponible à l'adresse :
+https://ar.wikisource.org/</p>
+
+<p class="biblio">IBN KATHĪR, Ismāʿīl ibn ʿUmar. <i>Tafsīr al-Qurʾān
+al-ʿaẓīm</i> [en ligne]. Texte arabe intégral servi par l'API quran.com,
+tafsir n° 14. [Consulté le 24 juillet 2026]. Disponible à l'adresse :
+https://api.quran.com/api/v4/</p>
+
+<p class="biblio">AL-JAMZŪRĪ, Sulaymān. <i>Tuḥfat al-aṭfāl wa-l-ghilmān fī
+tajwīd al-Qurʾān</i> [matn].</p>
+
+<p class="biblio">MUSLIM IBN AL-ḤAJJĀJ. <i>Ṣaḥīḥ Muslim</i>, hadith 395
+[en ligne]. [Consulté le 23 juillet 2026]. Disponible à l'adresse :
+https://sunnah.com/</p>
+
+<p class="biblio">AS-SAʿDĪ, ʿAbd ar-Raḥmān ibn Nāṣir. <i>Taysīr al-Karīm
+ar-Raḥmān fī tafsīr kalām al-Mannān</i> [en ligne]. API quran.com, tafsir n° 91.
+[Consulté le 24 juillet 2026]. Disponible à l'adresse :
+https://api.quran.com/api/v4/</p>
+
+<p class="biblio">TAFSIR CENTER FOR QURANIC STUDIES. <i>French Translation of
+Al-Mukhtasar in Interpreting the Noble Quran</i>, traduction française
+d'<i>al-Mukhtaṣar fī tafsīr al-Qurʾān al-karīm</i> [en ligne]. Version 1.0.0,
+3 octobre 2019. Distribuée par QuranEnc.com, clé <i>french_mokhtasar</i>.
+[Consulté le 24 juillet 2026]. Disponible à l'adresse : https://quranenc.com/</p>
+
+<p class="biblio">TARTEEL AI. <i>Quranic Universal Library : segments mot à mot
+des récitations</i> [jeu de données en ligne]. [Consulté le 25 juillet 2026].
+Disponible à l'adresse : https://qul.tarteel.ai/</p>
+
+<p class="biblio">AT-TIRMIDHĪ, Muḥammad ibn ʿĪsā. <i>Sunan at-Tirmidhī</i>,
+hadith 2954 [en ligne]. [Consulté le 23 juillet 2026]. Disponible à l'adresse :
+https://sunnah.com/</p>
+
 <h3>Licences</h3>
 <p>Code sous <b>AGPL-3.0</b> ; contenu éditorial de Roub' sous
 <b>CC BY-NC-SA 4.0</b> (attribution « Roub', Anis &amp; Yusuf »). Chaque
@@ -1358,11 +1428,22 @@ passage résiste et qu'on veut répéter derrière le cheikh. Le <b>mujawwad</b>
 se réserve à l'écoute. Le soulignage mot à mot est calé séparément sur chaque
 style, et le choix se fait dans Paramètres.</p>
 
-<p class="src">Sources : Ibn al-Jazarî, <i>an-Nashr fî l-qirâ'ât al-'ashr</i>,
-t. I, chapitre « wa ammâ kayfa yuqra'u l-Qur'ân » (citations traduites de
-l'arabe) ; premières mondiales d'enregistrement d'al-Husary : notice
-biographique du cheikh ; durées comparées : mesures faites sur les fichiers
-audio de l'application. Texte rédigé pour Roub' d'après ces sources.</p>`);
+<h3>Sources</h3>
+<p class="biblio">IBN AL-JAZARĪ, Muḥammad ibn Muḥammad (m. 833 H). <i>An-Nashr
+fī l-qirāʾāt al-ʿashr</i>, t. I, chapitre « wa ammā kayfa yuqraʾu l-Qurʾān »
+[en ligne]. [Consulté le 24 juillet 2026]. Disponible à l'adresse :
+https://ar.wikisource.org/</p>
+
+<p class="biblio">AL-ḤUṢARĪ, Maḥmūd Khalīl. <i>Al-Muṣḥaf al-murattal</i> et
+<i>al-muṣḥaf al-muʿallim</i>, riwāyat Ḥafṣ ʿan ʿĀṣim [enregistrements sonores
+en ligne]. everyayah.com, mirrors.quranicaudio.com, audio-cdn.tarteel.ai.
+[Consulté le 25 juillet 2026].</p>
+
+<p class="src">Les citations d'an-Nashr sont traduites de l'arabe pour Roub'.
+Les durées comparées entre styles sont des mesures faites sur les fichiers audio
+de l'application. Les premières mondiales d'enregistrement attribuées au cheikh
+reposent sur sa notice biographique et restent à consolider par une source
+institutionnelle.</p>`);
 }
 
 const TL_TABLE = [
@@ -2112,7 +2193,7 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "1.13.10";   // réécrit par tools/release.py
+const BUILD_VERSION = "1.14.0";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {

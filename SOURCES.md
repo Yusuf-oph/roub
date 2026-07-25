@@ -55,7 +55,7 @@ propre et n'est pas présenté comme une position savante.
 
 ## 5. Récitations
 
-Toutes du cheikh **Mahmoud Khalil al-Husary** (m. 1980), riwâya Hafs 'an 'Âsim.
+Toutes du cheikh **Mahmoud Khalil al-Husary**, riwâya Hafs 'an 'Âsim.
 
 | Style | Fichiers | Provenance |
 |---|---|---|
@@ -120,6 +120,79 @@ choix des points durs à signaler, l'ordre du parcours de tajwid progressif, la
 formulation des cartes et le moteur de révision espacée sont le travail propre
 de Roub'. Ce sont des choix pédagogiques, pas des positions savantes, et ils
 n'engagent que nous.
+
+---
+
+## 11. Bibliographie
+
+Les mêmes sources, en notices normalisées selon **ISO 690**, classées par
+auteur. Les sections ci-dessus disent la provenance exacte et les conditions
+d'usage, que la norme ne sait pas porter ; cette liste-ci donne la référence
+elle-même. Les dates de consultation sont celles des relevés qui ont servi à
+l'application.
+
+Conventions retenues pour ce qui échappe à la norme : classement par auteur,
+**l'article arabe (*al-*, *as-*, *at-*) n'entrant pas dans l'ordre alphabétique**
+selon l'usage des bibliographies d'études arabes ; date de décès en hégire entre
+parenthèses pour les auteurs classiques quand elle est établie ; translittération
+scientifique pour les titres arabes ; nom du *muḥaqqiq* quand l'édition en a un.
+
+COMPLEXE DU ROI FAHD POUR L'IMPRESSION DU NOBLE CORAN (KFGQPC).
+*Al-Muṣḥaf al-sharīf*, riwāyat Ḥafṣ ʿan ʿĀṣim [en ligne]. Médine. Texte obtenu
+par l'API quran.com v4, champs `text_uthmani`, `text_uthmani_tajweed`,
+`text_imlaei`. [Consulté le 25 juillet 2026]. Disponible à l'adresse :
+https://api.quran.com/api/v4/
+
+COMPLEXE DU ROI FAHD POUR L'IMPRESSION DU NOBLE CORAN (KFGQPC). *Polices QCF,
+versions 1 et 4*, et *police UthmanicHafs* [polices numériques]. Médine.
+
+AL-GHAZĀLĪ, Abū Ḥāmid. *Iḥyāʾ ʿulūm ad-dīn*, kitāb al-amr bi-l-maʿrūf
+wa-n-nahy ʿan al-munkar, bāb 3 [en ligne]. [Consulté le 25 juillet 2026].
+Disponible à l'adresse : https://ar.wikisource.org/
+
+HAMIDULLAH, Muhammad. *Le Noble Coran et la traduction en langue française de
+ses sens* [en ligne]. Servie par l'API quran.com, identifiant 31. Diffusion non
+commerciale. [Consulté le 25 juillet 2026]. Disponible à l'adresse :
+https://api.quran.com/api/v4/
+
+AL-ḤUṢARĪ, Maḥmūd Khalīl. *Al-Muṣḥaf al-murattal*, riwāyat Ḥafṣ ʿan ʿĀṣim
+[enregistrement sonore en ligne]. Murattal 64 kbps : everyayah.com ; murattal
+128 kbps et muʿallim : mirrors.quranicaudio.com ; mujawwad : audio-cdn.tarteel.ai.
+[Consulté le 25 juillet 2026].
+
+IBN AL-JAZARĪ, Muḥammad ibn Muḥammad (m. 833 H). *Al-Muqaddima al-Jazariyya*
+[en ligne]. [Consulté le 25 juillet 2026]. Disponible à l'adresse :
+https://ar.wikisource.org/
+
+IBN AL-JAZARĪ, Muḥammad ibn Muḥammad (m. 833 H). *An-Nashr fī l-qirāʾāt
+al-ʿashr*, t. I, chapitre « wa ammā kayfa yuqraʾu l-Qurʾān » [en ligne].
+[Consulté le 24 juillet 2026]. Disponible à l'adresse : https://ar.wikisource.org/
+
+IBN KATHĪR, Ismāʿīl ibn ʿUmar. *Tafsīr al-Qurʾān al-ʿaẓīm* [en ligne]. Texte
+arabe intégral servi par l'API quran.com, tafsir n° 14. [Consulté le 24 juillet
+2026]. Disponible à l'adresse : https://api.quran.com/api/v4/
+
+AL-JAMZŪRĪ, Sulaymān. *Tuḥfat al-aṭfāl wa-l-ghilmān fī tajwīd al-Qurʾān* [matn].
+
+MUSLIM IBN AL-ḤAJJĀJ. *Ṣaḥīḥ Muslim*, hadith 395 [en ligne]. [Consulté le
+23 juillet 2026]. Disponible à l'adresse : https://sunnah.com/
+
+AS-SAʿDĪ, ʿAbd ar-Raḥmān ibn Nāṣir. *Taysīr al-Karīm ar-Raḥmān fī tafsīr kalām
+al-Mannān* [en ligne]. API quran.com, tafsir n° 91. [Consulté le 24 juillet
+2026]. Disponible à l'adresse : https://api.quran.com/api/v4/
+
+TAFSIR CENTER FOR QURANIC STUDIES. *French Translation of Al-Mukhtasar in
+Interpreting the Noble Quran*, traduction française d'*al-Mukhtaṣar fī tafsīr
+al-Qurʾān al-karīm* [en ligne]. Version 1.0.0, 3 octobre 2019. Distribuée par
+QuranEnc.com, clé `french_mokhtasar`. [Consulté le 24 juillet 2026]. Disponible
+à l'adresse : https://quranenc.com/
+
+TARTEEL AI. *Quranic Universal Library : segments mot à mot des récitations*
+[jeu de données en ligne]. [Consulté le 25 juillet 2026]. Disponible à
+l'adresse : https://qul.tarteel.ai/
+
+AT-TIRMIDHĪ, Muḥammad ibn ʿĪsā. *Sunan at-Tirmidhī*, hadith 2954 [en ligne].
+[Consulté le 23 juillet 2026]. Disponible à l'adresse : https://sunnah.com/
 
 ---
 

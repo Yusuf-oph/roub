@@ -512,6 +512,13 @@ h2.sec { font-size: 18px; margin: 22px 0 8px; }
 .prose h3 { margin: 20px 0 8px; }
 /* pas de justification sur les tableaux, légendes et exemples courts */
 .prose table, .prose .legend-item, .prose .src { text-align: initial; }
+/* notices bibliographiques ISO 690 : retrait négatif de première ligne, comme
+   dans une bibliographie imprimée, pour que l'auteur ressorte à l'œil */
+.prose .biblio {
+  text-align: initial; font-size: 13.5px; line-height: 1.6;
+  margin: 6px 0; padding-left: 22px; text-indent: -22px; color: var(--muted);
+}
+.prose .biblio i { color: var(--fg); }
 
 /* ---------- paramètres ---------- */
 .param-row {
