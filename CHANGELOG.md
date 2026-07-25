@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.13.0 · 2026-07-25
+- Les 24 roub' sont désormais accessibles : texte, tafsir verset par verset, audio, pages du mushaf et cartes d'enchaînement partout ; les notes rédigées restent signalées « notes à venir » là où elles manquent
+
 ## 1.12.3 · 2026-07-25
 - Synchronisation : l'état affiché dit la vérité du moment (hors connexion, échec, ou synchronisé à telle heure, avec le dernier envoi réussi en repère)
 - Un envoi qui échoue est retenté tout seul (délai croissant), au retour du réseau et au retour sur l'onglet
