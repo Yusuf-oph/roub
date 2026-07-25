@@ -67,6 +67,7 @@ def en_ligne(t):
     espace manquante.)"""
     t = html.escape(t)
     t = re.sub(r"`([^`]+)`", r"<code>\1</code>", t)
+    t = re.sub(r"~~([^~]+)~~", r"<s>\1</s>", t)
     t = re.sub(r"\*\*([^*]+)\*\*", r"<b>\1</b>", t)
     t = re.sub(r"(?<![*\w])\*([^*]+)\*", r"<i>\1</i>", t)
     t = re.sub(r"\[([^\]]+)\]\(([^)]+)\)", r"\1", t)
