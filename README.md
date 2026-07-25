@@ -16,10 +16,11 @@ mot**, difficulté notée sur 5 étoiles, **tafsir verset par verset**
 (al-Mukhtaṣar, traduction française), cartes d'enchaînement, progression
 visible et auto-évaluation des lacunes.
 
-Le **contenu rédigé** (points durs de mémorisation, particularités tajwid,
-vocabulaire, cartes mutashabihat et de sens) existe pour le **roub' 1** ;
-les autres roub' portent la mention « notes à venir » et s'ouvriront à
-mesure de leur rédaction. Le juz 'Amma est accessible en entier.
+Les **24 roub' sont tous accessibles** : texte, pages du mushaf, audio, tafsir
+et cartes d'enchaînement partout. Le **contenu rédigé** (points durs de
+mémorisation, particularités tajwid, vocabulaire, cartes mutashabihat et de
+sens) existe pour le **roub' 1** ; les autres portent la mention « notes à
+venir », qui disparaîtra roub' par roub' à mesure de leur rédaction.
 
 Également : **révision espacée** intégrée avec export des cartes pour Anki
 (planificateur FSRS) et **synchronisation multi-appareils par code
@@ -75,7 +76,7 @@ l'export d'avis intégré à l'application, dans Paramètres).
 
 **Bibliographie détaillée : [SOURCES.md](SOURCES.md)** (éditions, versions,
 provenance exacte, conditions d'usage) ; résumé ci-dessous. Dans l'application :
-onglet Tutoriels → **Sources**.
+onglet **Sources**.
 
 - **Code : AGPL-3.0** (fichier `LICENSE`) · **Contenu éditorial :
   CC BY-NC-SA 4.0** : détails (français et anglais) dans
@@ -93,9 +94,10 @@ onglet Tutoriels → **Sources**.
 - Tafsir : « French Translation of Al-Mukhtasar in Interpreting the Noble
   Quran », Tafsir Center for Quranic Studies, V1.0.0, via QuranEnc.com,
   reproduit sans modification (conditions de QuranEnc.com).
-- Cartes et tutoriels : sources citées au fil du texte (Ibn Kathîr,
-  As-Sa'dî, Ibn al-Jazarî) ; fiches de règles d'après les matns Tuhfat
-  al-Atfal et al-Muqaddima al-Jazariyya.
+- Cartes et tutoriels : sources citées au fil du texte (Ibn Kathîr, As-Sa'dî,
+  Ibn al-Jazarî, et pour le tutoriel « Obligatoire ou perfectionnement ? »
+  Mullâ 'Alî al-Qârî, al-Marṣafî, Makkî Naṣr et al-Ghazâlî) ; fiches de règles
+  d'après les matns Tuhfat al-Atfal et al-Muqaddima al-Jazariyya.
 
 Application gratuite et non commerciale, sans compte ni collecte de
 données personnelles ; la synchronisation optionnelle repose sur un code

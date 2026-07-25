@@ -615,11 +615,12 @@ function accueilHtml() {
       <p><b>Comment ça marche.</b> Choisis un roub' ci-dessous : l'onglet
       <b>Mémoriser</b> affiche le texte (versets, texte continu ou pages exactes
       du mushaf) avec l'audio et le soulignage mot à mot, et l'onglet
-      <b>Tafsir</b> le commentaire verset par verset. Les notes rédigées
-      (points durs, particularités tajwid, vocabulaire, cartes) existent pour le
-      roub' 1 ; ailleurs, ces onglets affichent « contenu à venir », et les
-      roub' marqués <i>notes à venir</i> sur l'accueil s'ouvriront à mesure
-      qu'ils seront rédigés. L'onglet <b>Révision</b> fait revenir les cartes à
+      <b>Tafsir</b> le commentaire verset par verset. Les 24 roub' sont tous
+      ouverts ; les notes rédigées (points durs, particularités tajwid,
+      vocabulaire, cartes) existent pour le roub' 1, et ailleurs ces onglets
+      affichent « contenu à venir » : c'est ce que signale le badge
+      <i>notes à venir</i> de l'accueil, qui disparaîtra roub' par roub' à
+      mesure de leur rédaction. L'onglet <b>Révision</b> fait revenir les cartes à
       intervalle croissant, et exporte tout pour Anki.</p>
       <p><b>Qui écrit.</b> <b>Anis</b> (co-fondateur, docteur en mathématiques) :
       à l'origine de la méthode. <b>Yusuf</b> (co-fondateur, interne en
@@ -654,7 +655,10 @@ function pageHome() {
     for (const r of rubs) {
       const cards = (DECKS[r.id] || []).map(c => c.id);
       const st = deckStats(cards);
-      const dispo = r.dispo !== false;
+      /* le badge signale l'absence de NOTES RÉDIGÉES, pas un roub' fermé :
+         les 24 sont ouverts depuis la 1.13.0 (`dispo` ne sert plus qu'à la
+         navigation), et se fier à lui rendait le badge invisible partout */
+      const notesRedigees = !!(NOTES[r.id] && NOTES[r.id].difficultes);
       const pg = progressOf(DECKS[r.id] || []);
       const pctSeen = pg.total ? Math.round(100 * pg.seen / pg.total) : 0;
       const pctMature = pg.total ? Math.round(100 * pg.mature / pg.total) : 0;
@@ -669,7 +673,7 @@ function pageHome() {
         <div class="foot">
           ${st.due ? `<span class="badge due">${st.due} carte${st.due > 1 ? "s" : ""} à revoir</span>`
                    : `<span class="badge">${cards.length} cartes</span>`}
-          ${dispo ? "" : `<span class="badge">notes à venir</span>`}
+          ${notesRedigees ? "" : `<span class="badge">notes à venir</span>`}
         </div></div>`;
     }
     h += `</div>`;
@@ -1217,11 +1221,11 @@ function glossBulle(cle) {
     <div class="src">${esc(g.src || "")} · cliquer le terme pour refermer</div></div>`;
 }
 
-/* bibliographie complète : c'est LA page de référence des sources ; les
-   mentions courtes ailleurs (accueil, à propos, README) y renvoient.
-   Doit rester synchronisée avec SOURCES.md à la racine du dépôt. */
 /* page Sources : onglet à part depuis la 1.15.0, elle n'est pas un tutoriel
-   mais la référence de tout ce que l'application reprend à d'autres */
+   mais LA référence de tout ce que l'application reprend à d'autres ; les
+   mentions courtes ailleurs (accueil, à propos, README) y renvoient.
+   Doit rester synchronisée avec SOURCES.md à la racine du dépôt : toute
+   source citée dans un tutoriel doit avoir sa notice ici. */
 function pageSources() {
   return `<div class="hero"><h1>Sources</h1></div><div class="prose">
 <p>Le détail de tout ce que l'application reprend à d'autres : édition,
@@ -1233,9 +1237,11 @@ présenté comme une position savante.</p>
 <h3>Texte coranique</h3>
 <p>Mushaf de Médine, riwâya Hafs 'an 'Âsim, texte de référence du <b>Complexe
 du Roi Fahd</b> (KFGQPC), obtenu par l'API quran.com v4. Le texte n'est jamais
-modifié : les seules transformations sont d'affichage (graphie du soukoun
-propre au mushaf de Médine) et sont réversibles. Un contrôle automatique
-compare, verset par verset, le texte publié à celui de la source.</p>
+modifié : les seules transformations sont d'affichage, et elles sont
+réversibles. Elles sont deux : la graphie du soukoun propre au mushaf de
+Médine, et celle de l'iqlâb, où le petit mîm remplace le second trait du
+tanwin comme sur la page imprimée. Un contrôle automatique compare, verset par
+verset, le texte publié à celui de la source.</p>
 
 <h3>Calligraphie et pages du mushaf</h3>
 <p>Polices <b>QCF</b> du KFGQPC, un glyphe par mot (version 1 en noir et blanc,
@@ -1278,6 +1284,15 @@ tome I, chapitre « Comment lit-on le Qur'an ? » : définitions du taḥqîq, d
 ḥadr, du tadwîr et du tartîl, et entrées du glossaire. Qur'an 73:4 pour le
 tartîl, avec les gloses d'<b>Ibn 'Abbâs</b> et de <b>Mujâhid</b> rapportées par
 Ibn al-Jazarî au même endroit.</p>
+<p>Le tutoriel « Obligatoire ou perfectionnement ? » repose sur le vers
+d'ouverture de la <i>Jazariyya</i> et sur ses commentateurs : <b>Mullâ ʿAlî
+al-Qârî</b> et <b>al-Marṣafî</b>, qui s'opposent sur le statut du <i>laḥn
+khafî</i>, <b>Makkî Naṣr</b> pour la distinction entre obligation religieuse et
+obligation de métier (il rapporte aussi <b>al-Barkawî</b>), <b>Ibn al-Jazarî</b>
+dans <i>an-Nashr</i> et <b>al-Ghazâlî</b> pour l'excuse de celui qui atteint le
+bout de sa capacité. Les traductions françaises de ces passages sont les
+nôtres, signalées comme telles, l'arabe donné en regard : aucune traduction
+française libre de droit de ces ouvrages n'existe.</p>
 
 <h3>Notes et cartes des roub'</h3>
 <p><b>Ibn Kathîr</b>, <i>Tafsîr al-Qur'ân al-'aẓîm</i>, consulté dans son texte
@@ -1299,7 +1314,12 @@ choix pédagogiques, pas des positions savantes.</p>
 <p>Les mêmes sources, en notices normalisées (ISO 690), classées par auteur.
 L'article arabe (<i>al-</i>, <i>as-</i>, <i>at-</i>) n'entre pas dans le
 classement, selon l'usage des bibliographies d'études arabes. Les dates de
-consultation sont celles des relevés qui ont servi à l'application.</p>
+consultation sont celles des relevés qui ont servi à l'application. Les liens
+mènent en priorité à la Bibliothèque numérique Shamela, la plus consultée pour
+les textes classiques ; une autre adresse ne subsiste que là où Shamela n'a pas
+l'ouvrage (<i>Nihâyat al-qawl al-mufîd</i>, <i>al-Minaḥ al-fikriyya</i>) ou
+n'en sert pas le texte (<i>Hidâyat al-qârî</i>, dont les pages du chapitre 7
+reviennent vides).</p>
 
 <p class="biblio">COMPLEXE DU ROI FAHD POUR L'IMPRESSION DU NOBLE CORAN
 (KFGQPC). <i>Al-Muṣḥaf al-sharīf</i>, riwāyat Ḥafṣ ʿan ʿĀṣim [en ligne]. Médine.
@@ -1344,11 +1364,26 @@ tafsir n° 14. [Consulté le 24 juillet 2026]. Disponible à l'adresse :
 https://api.quran.com/api/v4/</p>
 
 <p class="biblio">AL-JAMZŪRĪ, Sulaymān. <i>Tuḥfat al-aṭfāl wa-l-ghilmān fī
-tajwīd al-Qurʾān</i> [matn].</p>
+tajwīd al-Qurʾān</i> [matn en ligne]. [Consulté le 25 juillet 2026]. Disponible
+à l'adresse : https://shamela.ws/book/9632</p>
+
+<p class="biblio">AL-MARṢAFĪ, ʿAbd al-Fattāḥ. <i>Hidāyat al-qārī ilā tajwīd
+kalām al-Bārī</i>, chapitre 7 [en ligne]. [Consulté le 25 juillet 2026].
+Disponible à l'adresse : https://www.islamweb.net/ar/library/content/231/9/</p>
 
 <p class="biblio">MUSLIM IBN AL-ḤAJJĀJ. <i>Ṣaḥīḥ Muslim</i>, hadith 395
 [en ligne]. [Consulté le 23 juillet 2026]. Disponible à l'adresse :
 https://sunnah.com/</p>
+
+<p class="biblio">NAṢR AL-JURAYSĪ, Muḥammad Makkī. <i>Nihāyat al-qawl al-mufīd
+fī ʿilm at-tajwīd</i>, p. 26 [en ligne]. Rapporte également al-Barkawī,
+<i>Sharḥ ad-Durr al-yatīm</i>. [Consulté le 25 juillet 2026]. Disponible à
+l'adresse : https://ketabonline.com/ar/books/55066/</p>
+
+<p class="biblio">AL-QĀRĪ, Mullā ʿAlī (m. 1014 H). <i>Al-Minaḥ al-fikriyya fī
+sharḥ al-Muqaddima al-Jazariyya</i>, p. 29-30. Exemplaire numérisé [en ligne].
+[Consulté le 25 juillet 2026]. Disponible à l'adresse :
+https://archive.org/details/0743Pdf_201804</p>
 
 <p class="biblio">AS-SAʿDĪ, ʿAbd ar-Raḥmān ibn Nāṣir. <i>Taysīr al-Karīm
 ar-Raḥmān fī tafsīr kalām al-Mannān</i> [en ligne]. API quran.com, tafsir n° 91.
@@ -2336,7 +2371,7 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "1.16.1";   // réécrit par tools/release.py
+const BUILD_VERSION = "1.16.2";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {

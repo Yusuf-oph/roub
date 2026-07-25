@@ -24,7 +24,13 @@ python tools/build_pages.py 1 2 3
 #    <script> de data/quran, data/notes, data/cartes ET data/tafsirfr
 
 # 5. segments mot à mot des 4 styles de récitation (soulignage)
-python tools/fetch_segments.py
+python tools/fetch_segments.py                 # récupère tout, puis normalise
+python tools/fetch_segments.py --renormaliser  # rejoue la normalisation seule,
+#    sans réseau ni curl_cffi, sur les fichiers déjà générés. La normalisation
+#    fusionne le yâ vocatif (يَـٰٓأَيُّهَا...), que les jeux distants comptent comme un
+#    mot à part alors que le rasm l'écrit collé : sans elle, tout le reste du
+#    verset est décalé d'un cran (soulignage en avance, double-clic un mot trop
+#    tôt). À relancer si l'on touche à la règle de fusion.
 
 # 6. tafsir français verset par verset (base QuranEnc déjà en cache)
 python tools/build_tafsirfr.py
@@ -58,11 +64,50 @@ python tools/build_export.py
   exacte du texte uthmani), puis `verifie.py`.
 - Renvois : `{2:15}` (verset) ou `{2:21-22}` (plage : le clic mène au
   premier verset). Arabe inline : `[[...]]`. Gras `**`, italique `*`.
-- L'affichage transforme le soukoun U+0652 en U+06E1 (graphie de Médine) et
-  peut masquer les ronds muets U+06DF : ne PAS modifier les données pour ça.
+- L'affichage applique DEUX graphies du mushaf sans jamais toucher aux données :
+  le soukoun U+0652 rendu en U+06E1 (graphie de Médine), et l'iqlâb, où un
+  tanwîn suivi d'un petit mîm devient voyelle simple + U+06E2 (le mîm remplace
+  le second trait du tanwin). Il peut en plus masquer les ronds muets U+06DF.
+  Ne PAS modifier les données pour ça : `arDisplay()` (app.js) et
+  `ar_display()` (build_apkg.py) portent la même règle et `verifie.py`
+  (section B) refuse une release si l'une des deux perd le marqueur.
 - Fichiers par rub : `app/data/notes/<roub'>.js` (difficultes/tajwid/vocab :
   la clé `tafsir` a disparu en v1.8.0, le tafsir vient d'al-Mukhtaṣar) et `app/data/cartes/<roub'>.js` (mutash/sens uniquement : les cartes
   d'enchaînement et de vocabulaire sont dérivées automatiquement).
+
+## Refaire les captures du README (mainteneur)
+
+Les quatre images de `docs/img/` sont prises en **thème clair**, en **1280×1100**
+et **sans barre de défilement**. Démarrer le serveur local et vérifier qu'il
+répond (sinon on photographie la page d'erreur, et les quatre fichiers sortent
+de taille identique : signal d'alerte), puis, pour chacune :
+
+```bash
+msedge --headless --disable-gpu --hide-scrollbars --window-size=1280,1100 \
+  --user-data-dir=<profil NEUF> --virtual-time-budget=8000 \
+  --screenshot=<chemin ABSOLU>.png \
+  "http://localhost:8768/app/index.html?theme=light#<route>"
+```
+
+| Image | route |
+|---|---|
+| `accueil-clair.png` | `home` |
+| `memoriser-clair.png` | `rub/j1r1/memoriser/versets` |
+| `pages-mushaf-clair.png` | `rub/j1r1/memoriser/pagescouleur` |
+| `revision-clair.png` | `revision` |
+
+Pièges, tous rencontrés :
+
+- **Un `--user-data-dir` neuf par capture.** Deux Edge lancés sur le même profil :
+  le second ne fait rien, sans message, et l'ancienne image reste en place.
+  Contrôler la date de chaque fichier après coup.
+- `--headless` seul, **pas** `--headless=new`, qui échoue ici.
+- Chemin de sortie **absolu** (un chemin relatif donne « Access is denied »).
+- L'écriture est asynchrone : attendre la ligne « bytes written to file ».
+- Profil neuf = bloc d'accueil déplié, comme sur les captures publiées.
+- **Regarder les images avant de les livrer** : elles ne déclenchent aucun test,
+  et une capture périmée vieillit sans bruit (barre de navigation d'une version
+  passée, libellés renommés depuis, badges qui n'existent plus).
 
 ## Publier une mise à jour (mainteneur)
 

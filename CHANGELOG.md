@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.16.2 · 2026-07-25
+- Le badge « notes à venir » réapparaît sur l'accueil : il suivait un verrou d'accès levé en 1.13.0, il suit maintenant la présence de notes rédigées
+- Page Sources : les auteurs du tutoriel « Obligatoire ou perfectionnement ? » (Mullâ 'Alî al-Qârî, al-Marṣafî, Makkî Naṣr) rejoignent la bibliographie, qui dit aussi pourquoi trois liens ne passent pas par Shamela
+- Page Sources : les transformations d'affichage du texte sont énoncées toutes les deux, la graphie du soukoun et celle de l'iqlâb
+- Captures et documents remis en accord avec l'application (onglet Sources, cinq tutoriels, roub' tous ouverts)
+
 ## 1.16.1 · 2026-07-25
 - Paramètres : la dernière adresse de contact qui restait en texte brut est cliquable comme les autres
 
@@ -119,10 +125,10 @@
 - Présentation du projet enrichie : captures d'écran, crédits à jour, licences bilingues
 
 ## 1.5.8 · 2026-07-23
-- Mention ajoutée : contenu sourcé et vérifié, toute erreur peut être signalée via les avis
+- La même mention rejoint l'« à propos » des Paramètres
 
 ## 1.5.7 · 2026-07-23
-- Mention ajoutée : contenu sourcé et vérifié, toute erreur peut être signalée via les avis
+- Mention ajoutée dans le widget d'avis, le README et le LISEZMOI : contenu sourcé et vérifié, toute erreur peut être signalée
 
 ## 1.5.6 · 2026-07-23
 - Audit sourcé étendu à tout le contenu : fiches tajwid vérifiées contre Tuhfat al-Atfal et la Jazariyya (et sourcées), exception d'idghâm dans un même mot ajoutée, formulation du triplet de la qibla précisée, vocabulaire confronté à la traduction
@@ -166,10 +172,6 @@
 
 ## 1.1.1 · 2026-07-23
 - Rond des lettres muettes désormais attaché à sa lettre (correctif typographique)
-- Soukoun à la graphie du mushaf de Médine (petite tête de khâ') et option pour masquer les ronds des lettres muettes
-- Pages du mushaf : mise en page exacte de Médine (calligraphie officielle)
-- Progression visible (barres, versets acquis, série de jours) et auto-évaluation des lacunes
-- Application installable (PWA) avec mode hors-ligne
 
 ## 1.1.0 · 2026-07-23
 - Soukoun à la graphie du mushaf de Médine (petite tête de khâ') et option pour masquer les ronds des lettres muettes

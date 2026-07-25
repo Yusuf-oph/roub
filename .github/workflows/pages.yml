@@ -18,13 +18,15 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+      # majors tenus à jour : les v4/v5/v3/v4 précédentes tournaient en node20,
+      # que GitHub signale comme périmé ; ces quatre-là sont en node24
+      - uses: actions/checkout@v7
+      - uses: actions/configure-pages@v6
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: app
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
         with:
           # le site pèse ~130 Mo (823 mp3 embarqués) : le délai par défaut de
           # 10 minutes ne suffit plus quand Pages est lent, l'action abandonne

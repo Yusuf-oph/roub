@@ -20,8 +20,9 @@ propre et n'est pas présenté comme une position savante.
   `text_uthmani` (texte affiché), `text_uthmani_tajweed` (annotations de
   règles), `text_imlaei` (base de la translittération).
 - Le texte n'est **jamais modifié** : les seules transformations sont
-  d'affichage (graphie du soukoun propre au mushaf de Médine) et sont
-  réversibles.
+  d'affichage, et elles sont réversibles. Elles sont deux : la **graphie du
+  soukoun** propre au mushaf de Médine, et la **graphie de l'iqlâb**, où le
+  petit mîm remplace le second trait du tanwin, comme sur la page imprimée.
 - Contrôle : `tools/verifie.py` compare, verset par verset, le texte publié au
   texte de l'API.
 
@@ -96,6 +97,19 @@ mu'allim* enregistré au monde (1969).
   la riwâya). Texte arabe consulté et archivé le 24/07/2026.
 - Qur'an 73:4 pour le tartîl, avec les gloses d'**Ibn 'Abbâs** et de
   **Mujâhid** rapportées par Ibn al-Jazarî au même endroit.
+- Tutoriel « Obligatoire ou perfectionnement ? » : le vers d'ouverture du
+  chapitre de tajwid de la *Jazariyya* et ses commentateurs. **Mullâ 'Alî
+  al-Qârî** (*al-Minaḥ al-fikriyya*) et **al-Marṣafî** (*Hidâyat al-qârî*)
+  soutiennent deux positions opposées sur le statut du *laḥn khafî*, et le
+  second nomme le premier pour le contredire ; **Makkî Naṣr** (*Nihâyat
+  al-qawl al-mufîd*) donne la distinction entre obligation religieuse et
+  obligation de métier, et rapporte **al-Barkawî** ; **Ibn al-Jazarî**
+  (*an-Nashr*) et **al-Ghazâlî** (*Iḥyâ'*) pour l'excuse de celui qui atteint
+  le bout de sa capacité. Les deux positions sont exposées avec leurs auteurs
+  et leurs textes, l'application n'arbitre pas entre elles.
+- Les traductions françaises de ces passages sont les **nôtres**, signalées
+  comme telles dans le tutoriel, avec l'arabe en regard : aucune traduction
+  française libre de droit de ces ouvrages n'existe.
 - Éléments biographiques sur al-Husary (premières mondiales d'enregistrement) :
   notice biographique du cheikh ; à consolider par une source institutionnelle.
 
@@ -134,7 +148,14 @@ l'application.
 Choix de la source en ligne : **priorité à la Bibliothèque numérique Shamela**
 (`shamela.ws`), la plus connue et la plus consultée pour les textes classiques
 (suggestion d'Anis, 25/07). Les autres adresses ne subsistent que là où Shamela
-n'a pas l'ouvrage ou n'en sert pas le texte, et c'est alors signalé.
+n'a pas l'ouvrage ou n'en sert pas le texte. Les trois cas, vérifiés le 25/07 :
+
+- *Hidâyat al-qârî* d'al-Marṣafî **est** sur Shamela (livre 22869), mais les
+  pages du chapitre 7 y reviennent vides : le lien reste sur islamweb, qui sert
+  le texte vocalisé.
+- *Nihâyat al-qawl al-mufîd* de Makkî Naṣr n'y est pas : ketabonline.
+- *Al-Minaḥ al-fikriyya* de Mullâ 'Alî al-Qârî n'y est pas : exemplaire
+  numérisé sur archive.org.
 
 Conventions retenues pour ce qui échappe à la norme : classement par auteur,
 **l'article arabe (*al-*, *as-*, *at-*) n'entrant pas dans l'ordre alphabétique**
@@ -182,10 +203,26 @@ IBN KATHĪR, Ismāʿīl ibn ʿUmar. *Tafsīr al-Qurʾān al-ʿaẓīm* [en ligne
 arabe intégral servi par l'API quran.com, tafsir n° 14. [Consulté le 24 juillet
 2026]. Disponible à l'adresse : https://api.quran.com/api/v4/
 
-AL-JAMZŪRĪ, Sulaymān. *Tuḥfat al-aṭfāl wa-l-ghilmān fī tajwīd al-Qurʾān* [matn].
+AL-JAMZŪRĪ, Sulaymān. *Tuḥfat al-aṭfāl wa-l-ghilmān fī tajwīd al-Qurʾān*
+[matn en ligne]. [Consulté le 25 juillet 2026]. Disponible à l'adresse :
+https://shamela.ws/book/9632
+
+AL-MARṢAFĪ, ʿAbd al-Fattāḥ. *Hidāyat al-qārī ilā tajwīd kalām al-Bārī*,
+chapitre 7 [en ligne]. [Consulté le 25 juillet 2026]. Disponible à l'adresse :
+https://www.islamweb.net/ar/library/content/231/9/
 
 MUSLIM IBN AL-ḤAJJĀJ. *Ṣaḥīḥ Muslim*, hadith 395 [en ligne]. [Consulté le
 23 juillet 2026]. Disponible à l'adresse : https://sunnah.com/
+
+NAṢR AL-JURAYSĪ, Muḥammad Makkī. *Nihāyat al-qawl al-mufīd fī ʿilm at-tajwīd*,
+p. 26 [en ligne]. Rapporte également al-Barkawī, *Sharḥ ad-Durr al-yatīm*.
+[Consulté le 25 juillet 2026]. Disponible à l'adresse :
+https://ketabonline.com/ar/books/55066/
+
+AL-QĀRĪ, Mullā ʿAlī (m. 1014 H). *Al-Minaḥ al-fikriyya fī sharḥ al-Muqaddima
+al-Jazariyya*, p. 29-30. Exemplaire numérisé [en ligne]. [Consulté le
+25 juillet 2026]. Disponible à l'adresse :
+https://archive.org/details/0743Pdf_201804
 
 AS-SAʿDĪ, ʿAbd ar-Raḥmān ibn Nāṣir. *Taysīr al-Karīm ar-Raḥmān fī tafsīr kalām
 al-Mannān* [en ligne]. API quran.com, tafsir n° 91. [Consulté le 24 juillet

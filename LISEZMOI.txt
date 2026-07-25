@@ -41,8 +41,10 @@ UTILISER
   « Télécharger les cartes pour Anki » exporte les 804 cartes (24 sous-
   paquets, sans audio). Un paquet avec audio (roub' 1) est dans  apkg\
 - Tutoriels : lire la translittération, légende des couleurs tajwid, fiches
-  de règles, styles de récitation. À lire en premier si tu ne lis pas l'arabe.
-  Les termes techniques y sont cliquables : leur définition s'affiche.
+  de règles, « Obligatoire ou perfectionnement ? » (ce que les savants
+  tiennent pour obligatoire dans le tajwid et ce dont ils discutent), styles
+  de récitation. À lire en premier si tu ne lis pas l'arabe. Les termes
+  techniques y sont cliquables : leur définition s'affiche.
 
 DONNER TON AVIS (important !)
 -----------------------------
@@ -59,8 +61,8 @@ QUI SOMMES-NOUS
   Discord : @ophtalmologie
 - Israa (ostéopathe) : conseillère pédagogique.
 
-Bibliographie détaillée : fichier SOURCES.md (et, dans l'appli,
-Tutoriels -> Sources).
+Bibliographie détaillée : fichier SOURCES.md (et, dans l'appli, l'onglet
+Sources, à côté de Paramètres).
 
 Sources : texte du mushaf de Médine (Complexe du Roi Fahd, via quran.com),
 traduction Muhammad Hamidullah, récitation Mahmoud Khalil Al-Husary en

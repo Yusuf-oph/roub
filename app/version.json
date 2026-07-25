@@ -1,7 +1,10 @@
 {
-  "version": "1.16.1",
+  "version": "1.16.2",
   "date": "2026-07-25",
   "notes": [
-    "Paramètres : la dernière adresse de contact qui restait en texte brut est cliquable comme les autres"
+    "Le badge « notes à venir » réapparaît sur l'accueil : il suivait un verrou d'accès levé en 1.13.0, il suit maintenant la présence de notes rédigées",
+    "Page Sources : les auteurs du tutoriel « Obligatoire ou perfectionnement ? » (Mullâ 'Alî al-Qârî, al-Marṣafî, Makkî Naṣr) rejoignent la bibliographie, qui dit aussi pourquoi trois liens ne passent pas par Shamela",
+    "Page Sources : les transformations d'affichage du texte sont énoncées toutes les deux, la graphie du soukoun et celle de l'iqlâb",
+    "Captures et documents remis en accord avec l'application (onglet Sources, cinq tutoriels, roub' tous ouverts)"
   ]
 }
