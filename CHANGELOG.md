@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.13.10 · 2026-07-25
+- Page Sources : l'année de décès du cheikh al-Husary est retirée, elle n'apprend rien au lecteur
+
 ## 1.13.9 · 2026-07-25
 - Iqlâb, graphie reprise après vérification sur la calligraphie officielle : le mushaf ne complète pas le tanwin par le petit mîm, il en remplace le second trait. Le tanwin s'affiche donc avec un seul trait, et le mîm se place du côté de la voyelle, en dessous pour une kasra, au-dessus pour une fatha ou une damma
 - Corrige du même coup les deux défauts de la version précédente : un trait de trop, et le signe qui venait croiser la queue de la lettre

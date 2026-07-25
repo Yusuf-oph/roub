@@ -1252,7 +1252,7 @@ modification</b>, conformément aux conditions de QuranEnc.com : attribution de
 l'éditeur et de la source, numéro de version affiché, contenu inchangé.</p>
 
 <h3>Récitations</h3>
-<p>Toutes du cheikh <b>Mahmoud Khalil al-Husary</b> (m. 1980), riwâya Hafs 'an
+<p>Toutes du cheikh <b>Mahmoud Khalil al-Husary</b>, riwâya Hafs 'an
 'Âsim : murattal 64 kbps (fourni avec l'appli) et 128 kbps, mu'allim, via
 everyayah.com et quranicaudio.com ; mujawwad via le CDN de Tarteel. Usage non
 commercial. Les murattal 64 et 128 kbps sont le <b>même enregistrement</b> à
@@ -2112,7 +2112,7 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "1.13.9";   // réécrit par tools/release.py
+const BUILD_VERSION = "1.13.10";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {
