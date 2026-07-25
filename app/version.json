@@ -1,8 +1,8 @@
 {
-  "version": "1.14.1",
+  "version": "1.15.0",
   "date": "2026-07-25",
   "notes": [
-    "Les crédits des Paramètres ne répètent plus la page Sources : ils y renvoient par un lien cliquable",
-    "Les renvois cliquables se voient enfin partout : hors des fiches, ils n'avaient ni couleur ni curseur de lien"
+    "« Sources » devient un onglet à part entière, après Paramètres : ce n'est pas un tutoriel mais la référence de tout ce que l'application reprend à d'autres",
+    "Bibliographie : liens vers la Bibliothèque numérique Shamela en priorité, et notices complétées de leur édition scientifique et de leur tomaison"
   ]
 }

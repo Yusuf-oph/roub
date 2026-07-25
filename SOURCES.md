@@ -131,6 +131,11 @@ d'usage, que la norme ne sait pas porter ; cette liste-ci donne la référence
 elle-même. Les dates de consultation sont celles des relevés qui ont servi à
 l'application.
 
+Choix de la source en ligne : **priorité à la Bibliothèque numérique Shamela**
+(`shamela.ws`), la plus connue et la plus consultée pour les textes classiques
+(suggestion d'Anis, 25/07). Les autres adresses ne subsistent que là où Shamela
+n'a pas l'ouvrage ou n'en sert pas le texte, et c'est alors signalé.
+
 Conventions retenues pour ce qui échappe à la norme : classement par auteur,
 **l'article arabe (*al-*, *as-*, *at-*) n'entrant pas dans l'ordre alphabétique**
 selon l'usage des bibliographies d'études arabes ; date de décès en hégire entre
@@ -146,9 +151,10 @@ https://api.quran.com/api/v4/
 COMPLEXE DU ROI FAHD POUR L'IMPRESSION DU NOBLE CORAN (KFGQPC). *Polices QCF,
 versions 1 et 4*, et *police UthmanicHafs* [polices numériques]. Médine.
 
-AL-GHAZĀLĪ, Abū Ḥāmid. *Iḥyāʾ ʿulūm ad-dīn*, kitāb al-amr bi-l-maʿrūf
-wa-n-nahy ʿan al-munkar, bāb 3 [en ligne]. [Consulté le 25 juillet 2026].
-Disponible à l'adresse : https://ar.wikisource.org/
+AL-GHAZĀLĪ, Abū Ḥāmid Muḥammad ibn Muḥammad aṭ-Ṭūsī (m. 505 H). *Iḥyāʾ ʿulūm
+ad-dīn*. Beyrouth : Dār al-Maʿrifa, 4 vol. T. II, p. 336, kitāb al-amr
+bi-l-maʿrūf wa-n-nahy ʿan al-munkar [en ligne]. [Consulté le 25 juillet 2026].
+Disponible à l'adresse : https://shamela.ws/book/9472/696
 
 HAMIDULLAH, Muhammad. *Le Noble Coran et la traduction en langue française de
 ses sens* [en ligne]. Servie par l'API quran.com, identifiant 31. Diffusion non
@@ -160,13 +166,17 @@ AL-ḤUṢARĪ, Maḥmūd Khalīl. *Al-Muṣḥaf al-murattal*, riwāyat Ḥaf�
 128 kbps et muʿallim : mirrors.quranicaudio.com ; mujawwad : audio-cdn.tarteel.ai.
 [Consulté le 25 juillet 2026].
 
-IBN AL-JAZARĪ, Muḥammad ibn Muḥammad (m. 833 H). *Al-Muqaddima al-Jazariyya*
-[en ligne]. [Consulté le 25 juillet 2026]. Disponible à l'adresse :
-https://ar.wikisource.org/
+IBN AL-JAZARĪ, Muḥammad ibn Muḥammad (m. 833 H). *Al-Muqaddima fī-mā ʿalā qāriʾ
+al-Qurʾān an yaʿlamah*, dite *al-Jazariyya*. Édition ʿAbd al-Muḥsin ibn Muḥammad
+al-Qāsim. 2e éd., 1441 H / 2020, 102 p. Bāb at-tajwīd, p. 62 [en ligne].
+[Consulté le 25 juillet 2026]. Disponible à l'adresse :
+https://shamela.ws/book/581/60
 
-IBN AL-JAZARĪ, Muḥammad ibn Muḥammad (m. 833 H). *An-Nashr fī l-qirāʾāt
-al-ʿashr*, t. I, chapitre « wa ammā kayfa yuqraʾu l-Qurʾān » [en ligne].
-[Consulté le 24 juillet 2026]. Disponible à l'adresse : https://ar.wikisource.org/
+IBN AL-JAZARĪ, Shams ad-Dīn Abū l-Khayr Muḥammad ibn Muḥammad ibn Yūsuf
+(m. 833 H). *An-Nashr fī l-qirāʾāt al-ʿashr*. Édition ʿAlī Muḥammad aḍ-Ḍabbāʿ
+(m. 1380 H). Al-Maṭbaʿa at-tijāriyya al-kubrā, 2 vol. T. I, faṣl fī t-tajwīd,
+p. 210, et chapitre « wa ammā kayfa yuqraʾu l-Qurʾān » [en ligne]. [Consulté le
+25 juillet 2026]. Disponible à l'adresse : https://shamela.ws/book/22642/218
 
 IBN KATHĪR, Ismāʿīl ibn ʿUmar. *Tafsīr al-Qurʾān al-ʿaẓīm* [en ligne]. Texte
 arabe intégral servi par l'API quran.com, tafsir n° 14. [Consulté le 24 juillet

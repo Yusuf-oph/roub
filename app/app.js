@@ -576,6 +576,7 @@ function render() {
   else if (page === "revision") main.innerHTML = pageRevision();
   else if (page === "tutoriels") main.innerHTML = pageTutoriels(a || "translit");
   else if (page === "params") main.innerHTML = pageParams();
+  else if (page === "sources") main.innerHTML = pageSources();
   else main.innerHTML = pageHome();
   bindMain();
   verifierPolicesPages();
@@ -630,7 +631,7 @@ function accueilHtml() {
       <i>al-Mukhtaṣar</i> (Tafsir Center, via QuranEnc.com), règles de tajwid
       d'après Tuhfat al-Atfâl et al-Muqaddima al-Jazariyya. Tout le contenu
       religieux est sourcé et vérifié ; une erreur reste possible, signale-la.
-      <span class="vref" data-tuto="sources">Bibliographie complète →</span></p>
+      <span class="vref" data-goto-page="sources">Bibliographie complète →</span></p>
       <p><b>Gratuit et sans compte</b> : progression et réglages restent dans ce
       navigateur. Rien n'est envoyé ailleurs, sauf si tu actives toi-même la
       synchronisation multi-appareils, qui repose sur un code secret anonyme.</p>
@@ -1179,15 +1180,13 @@ function cardHtml(c, shown) {
 /* ---------------- tutoriels ---------------- */
 function pageTutoriels(sub) {
   const pages = [["translit", "Lire la translittération"], ["tajwid", "Légende tajwid"],
-    ["regles", "Fiches de règles"], ["styles", "Styles de récitation"],
-    ["sources", "Sources"]];
+    ["regles", "Fiches de règles"], ["styles", "Styles de récitation"]];
   let h = `<div class="hero"><h1>Tutoriels</h1></div><div class="tabs">` +
     pages.map(([id, lab]) => `<button data-tuto="${id}" class="${id === sub ? "on" : ""}">${lab}</button>`).join("") +
     `</div><div class="prose">`;
   if (sub === "translit") h += tutoTranslit();
   else if (sub === "tajwid") h += tutoTajwid();
   else if (sub === "styles") h += tutoStyles();
-  else if (sub === "sources") h += tutoSources();
   else h += tutoRegles();
   return h + `</div><div class="footer-pad"></div>`;
 }
@@ -1219,8 +1218,10 @@ function glossBulle(cle) {
 /* bibliographie complète : c'est LA page de référence des sources ; les
    mentions courtes ailleurs (accueil, à propos, README) y renvoient.
    Doit rester synchronisée avec SOURCES.md à la racine du dépôt. */
-function tutoSources() {
-  return `<h2>Sources</h2>
+/* page Sources : onglet à part depuis la 1.15.0, elle n'est pas un tutoriel
+   mais la référence de tout ce que l'application reprend à d'autres */
+function pageSources() {
+  return `<div class="hero"><h1>Sources</h1></div><div class="prose">
 <p>Le détail de tout ce que l'application reprend à d'autres : édition,
 version, provenance, conditions d'usage. Règle de travail : <b>rien de ce qui
 touche à la religion n'est écrit sans source nommée et vérifiable</b> ; ce qui
@@ -1308,9 +1309,10 @@ Disponible à l'adresse : https://api.quran.com/api/v4/</p>
 (KFGQPC). <i>Polices QCF, versions 1 et 4</i>, et <i>police UthmanicHafs</i>
 [polices numériques]. Médine.</p>
 
-<p class="biblio">AL-GHAZĀLĪ, Abū Ḥāmid. <i>Iḥyāʾ ʿulūm ad-dīn</i>, kitāb al-amr
-bi-l-maʿrūf wa-n-nahy ʿan al-munkar, bāb 3 [en ligne]. [Consulté le 25 juillet
-2026]. Disponible à l'adresse : https://ar.wikisource.org/</p>
+<p class="biblio">AL-GHAZĀLĪ, Abū Ḥāmid Muḥammad ibn Muḥammad aṭ-Ṭūsī
+(m. 505 H). <i>Iḥyāʾ ʿulūm ad-dīn</i>. Beyrouth : Dār al-Maʿrifa, 4 vol. T. II,
+p. 336, kitāb al-amr bi-l-maʿrūf wa-n-nahy ʿan al-munkar [en ligne]. [Consulté
+le 25 juillet 2026]. Disponible à l'adresse : https://shamela.ws/book/9472/696</p>
 
 <p class="biblio">HAMIDULLAH, Muhammad. <i>Le Noble Coran et la traduction en
 langue française de ses sens</i> [en ligne]. Servie par l'API quran.com,
@@ -1323,13 +1325,16 @@ everyayah.com ; murattal 128 kbps et muʿallim : mirrors.quranicaudio.com ;
 mujawwad : audio-cdn.tarteel.ai. [Consulté le 25 juillet 2026].</p>
 
 <p class="biblio">IBN AL-JAZARĪ, Muḥammad ibn Muḥammad (m. 833 H).
-<i>Al-Muqaddima al-Jazariyya</i> [en ligne]. [Consulté le 25 juillet 2026].
-Disponible à l'adresse : https://ar.wikisource.org/</p>
+<i>Al-Muqaddima fī-mā ʿalā qāriʾ al-Qurʾān an yaʿlamah</i>, dite <i>al-Jazariyya</i>.
+Édition ʿAbd al-Muḥsin ibn Muḥammad al-Qāsim. 2<sup>e</sup> éd., 1441 H / 2020,
+102 p. Bāb at-tajwīd, p. 62 [en ligne]. [Consulté le 25 juillet 2026].
+Disponible à l'adresse : https://shamela.ws/book/581/60</p>
 
-<p class="biblio">IBN AL-JAZARĪ, Muḥammad ibn Muḥammad (m. 833 H). <i>An-Nashr
-fī l-qirāʾāt al-ʿashr</i>, t. I, chapitre « wa ammā kayfa yuqraʾu l-Qurʾān »
-[en ligne]. [Consulté le 24 juillet 2026]. Disponible à l'adresse :
-https://ar.wikisource.org/</p>
+<p class="biblio">IBN AL-JAZARĪ, Shams ad-Dīn Abū l-Khayr Muḥammad ibn
+Muḥammad ibn Yūsuf (m. 833 H). <i>An-Nashr fī l-qirāʾāt al-ʿashr</i>. Édition
+ʿAlī Muḥammad aḍ-Ḍabbāʿ (m. 1380 H). Al-Maṭbaʿa at-tijāriyya al-kubrā,
+2 vol. T. I, faṣl fī t-tajwīd, p. 210 [en ligne]. [Consulté le 25 juillet 2026].
+Disponible à l'adresse : https://shamela.ws/book/22642/218</p>
 
 <p class="biblio">IBN KATHĪR, Ismāʿīl ibn ʿUmar. <i>Tafsīr al-Qurʾān
 al-ʿaẓīm</i> [en ligne]. Texte arabe intégral servi par l'API quran.com,
@@ -1370,7 +1375,7 @@ est et doit rester gratuite et non commerciale.</p>
 
 <p class="src">Une erreur, une source mal citée, un doute :
 <a href="mailto:dev.yusuf@pm.me">dev.yusuf@pm.me</a>. Cette page correspond au
-fichier SOURCES.md du dépôt.</p>`;
+fichier SOURCES.md du dépôt.</p></div><div class="footer-pad"></div>`;
 }
 
 function tutoStyles() {
@@ -1429,10 +1434,11 @@ se réserve à l'écoute. Le soulignage mot à mot est calé séparément sur ch
 style, et le choix se fait dans Paramètres.</p>
 
 <h3>Sources</h3>
-<p class="biblio">IBN AL-JAZARĪ, Muḥammad ibn Muḥammad (m. 833 H). <i>An-Nashr
-fī l-qirāʾāt al-ʿashr</i>, t. I, chapitre « wa ammā kayfa yuqraʾu l-Qurʾān »
-[en ligne]. [Consulté le 24 juillet 2026]. Disponible à l'adresse :
-https://ar.wikisource.org/</p>
+<p class="biblio">IBN AL-JAZARĪ, Shams ad-Dīn Abū l-Khayr Muḥammad ibn
+Muḥammad ibn Yūsuf (m. 833 H). <i>An-Nashr fī l-qirāʾāt al-ʿashr</i>. Édition
+ʿAlī Muḥammad aḍ-Ḍabbāʿ (m. 1380 H). Al-Maṭbaʿa at-tijāriyya al-kubrā,
+2 vol. T. I, faṣl fī t-tajwīd, p. 210 [en ligne]. [Consulté le 25 juillet 2026].
+Disponible à l'adresse : https://shamela.ws/book/22642/218</p>
 
 <p class="biblio">AL-ḤUṢARĪ, Maḥmūd Khalīl. <i>Al-Muṣḥaf al-murattal</i> et
 <i>al-muṣḥaf al-muʿallim</i>, riwāyat Ḥafṣ ʿan ʿĀṣim [enregistrements sonores
@@ -1677,7 +1683,7 @@ function pageParams() {
     Texte coranique, calligraphie, traduction, récitations, segments mot à mot
     et tafsir viennent de sources tierces, en usage non commercial : chacune est
     nommée avec son édition, sa version, sa provenance et ses conditions sur la
-    <span class="vref" data-tuto="sources">page Sources</span>, qui donne aussi la
+    <span class="vref" data-goto-page="sources">page Sources</span>, qui donne aussi la
     bibliographie normalisée et correspond au fichier SOURCES.md du dépôt. Application gratuite et non commerciale,
     sans compte : progression et réglages restent dans ce navigateur, et rien
     n'est envoyé ailleurs sauf si la synchronisation multi-appareils est activée
@@ -1731,6 +1737,8 @@ function bindMain() {
   }));
   $$("[data-goto-home]", main).forEach(el =>
     el.addEventListener("click", () => nav("home")));
+  $$("[data-goto-page]", main).forEach(el =>
+    el.addEventListener("click", () => nav(el.dataset.gotoPage)));
   $$("[data-tab]", main).forEach(el => el.addEventListener("click", () => {
     const { a } = route();
     nav(`rub/${a}/${el.dataset.tab}`);
@@ -2185,7 +2193,7 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "1.14.1";   // réécrit par tools/release.py
+const BUILD_VERSION = "1.15.0";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {

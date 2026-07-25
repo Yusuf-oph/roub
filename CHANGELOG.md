@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.15.0 · 2026-07-25
+- **Sources** devient un onglet à part entière, après Paramètres : ce n'est pas un tutoriel mais la référence de tout ce que l'application reprend à d'autres
+- Bibliographie : les liens renvoient en priorité vers la Bibliothèque numérique Shamela, la plus consultée pour les textes classiques, et les notices gagnent leur édition scientifique, leur éditeur et leur tomaison. Les autres adresses ne subsistent que là où Shamela n'a pas l'ouvrage ou n'en sert pas le texte
+
 ## 1.14.1 · 2026-07-25
 - Les crédits des Paramètres ne répètent plus la page Sources : ils y renvoient par un lien cliquable, et gardent ce qui leur est propre (équipe, confidentialité, licences)
 - Les renvois cliquables se voient enfin partout : hors des fiches, ils avaient la couleur du texte et pas de curseur de lien
