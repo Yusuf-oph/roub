@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.13.3 · 2026-07-25
+- Correctif Firefox et dérivés (LibreWolf) : les récitations distantes ne passent plus par le service worker tant qu'elles ne sont pas en cache, car ces navigateurs refusent de lire la réponse qui en résultait ; le préchargement et la lecture hors connexion restent inchangés
+
 ## 1.13.2 · 2026-07-25
 - Si une récitation distante ne répond pas, la lecture continue automatiquement avec le murattal fourni avec l'appli (le verset suivant retente le style choisi)
 - Le numéro de version reste affiché même quand la vérification des mises à jour échoue

@@ -3,7 +3,7 @@
    - coquille (html/css/js/données/police de texte) : precache versionné ;
    - audio Husary + polices de pages QCF : cache à la demande, immuable ;
    - version.json : réseau d'abord (détection de mise à jour). */
-const VERSION = "1.13.2+2026-07-25";
+const VERSION = "1.13.3+2026-07-25";
 const SHELL_CACHE = "roub-shell-" + VERSION;
 const MEDIA_CACHE = "roub-media-v1";
 
@@ -141,6 +141,7 @@ self.addEventListener("activate", e => {
         await caches.delete(k);
       }
     }
+    await indexAudio;              // index des récitations déjà en cache
     await self.clients.claim();
   })());
 });
@@ -153,19 +154,46 @@ self.addEventListener("message", e => {
    l'écoute (ils autorisent CORS, la réponse est donc réutilisable hors-ligne) */
 const AUDIO_HOSTS = ["mirrors.quranicaudio.com", "audio-cdn.tarteel.ai"];
 
+/* index des récitations distantes déjà en cache : permet de décider, sans
+   attendre, si l'on doit s'interposer (voir le gestionnaire fetch) */
+const AUDIO_EN_CACHE = new Set();
+const indexAudio = caches.open(MEDIA_CACHE)
+  .then(c => c.keys())
+  .then(reqs => reqs.forEach(r => AUDIO_EN_CACHE.add(r.url)))
+  .catch(() => {});
+
 self.addEventListener("fetch", e => {
   const url = new URL(e.request.url);
   if (e.request.method !== "GET") return;
 
   if (url.origin !== location.origin) {
     if (!AUDIO_HOSTS.includes(url.hostname)) return;
+
+    /* Lecture par un élément <audio> : on ne s'interpose QUE si le fichier est
+       déjà en cache (décision SYNCHRONE, d'où l'index en mémoire). Sinon on ne
+       répond pas du tout : le navigateur va chercher le fichier lui-même.
+       Raison : une requête média cross-origin passée par le service worker
+       revient en réponse « opaque », que Firefox et ses dérivés (LibreWolf)
+       refusent de lire, là où Chrome l'accepte. Le préchargement, lui, est une
+       requête ordinaire de la page : interceptable et mise en cache. */
+    if (e.request.destination === "audio") {
+      if (!AUDIO_EN_CACHE.has(url.href)) return;
+      e.respondWith(caches.open(MEDIA_CACHE)
+        .then(c => c.match(url.href))
+        .then(hit => hit || fetch(e.request)));
+      return;
+    }
+
     e.respondWith((async () => {
       const cache = await caches.open(MEDIA_CACHE);
-      const hit = await cache.match(e.request);
+      const hit = await cache.match(url.href);
       if (hit) return hit;
       const resp = await fetch(e.request);
       // 206 (lecture partielle) : jamais mis en cache, il serait tronqué
-      if (resp.status === 200) cache.put(e.request, resp.clone());
+      if (resp.status === 200) {
+        await cache.put(url.href, resp.clone());
+        AUDIO_EN_CACHE.add(url.href);
+      }
       return resp;
     })());
     return;
