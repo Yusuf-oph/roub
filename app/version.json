@@ -1,7 +1,8 @@
 {
-  "version": "1.13.4",
+  "version": "1.13.5",
   "date": "2026-07-25",
   "notes": [
-    "Bloqueurs de publicités : les Paramètres indiquent désormais quels domaines autoriser pour les récitations non fournies avec l'appli, et le message d'échec évoque cette cause (cas constaté avec uBlock Origin)"
+    "Double-clic sur un verset : la lecture enchaîne de nouveau à partir de ce verset, en mode texte continu comme sur les pages du mushaf",
+    "Le réglage « surlignage mot à mot » devient « soulignage mot à mot », conforme à ce qu'il affiche"
   ]
 }

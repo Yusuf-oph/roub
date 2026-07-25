@@ -66,7 +66,7 @@ Sources : texte du mushaf de Médine (Complexe du Roi Fahd, via quran.com),
 traduction Muhammad Hamidullah, récitation Mahmoud Khalil Al-Husary en
 quatre styles au choix (murattal 64 kbps fourni avec l'appli ; murattal 128 kbps et
 muallim via everyayah.com/quranicaudio.com ; mujawwad via le CDN de Tarteel), segments du
-surlignage mot à mot : Quranic Universal Library (qul.tarteel.ai).
+soulignage mot à mot : Quranic Universal Library (qul.tarteel.ai).
 Tafsir verset par verset : « French Translation of Al-Mukhtasar in
 Interpreting the Noble Quran » (Tafsir Center for Quranic Studies, V1.0.0,
 via QuranEnc.com, texte reproduit sans modification). Les cartes, tutoriels et

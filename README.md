@@ -11,7 +11,7 @@ Pour **chaque** roub' : texte du mushaf de Médine colorié tajwid,
 **pagination exacte du mushaf** (calligraphie officielle QCF, en noir et
 blanc ou en édition colorée tajwid), translittération à double style
 (hybride française / scientifique), traduction Hamidullah, audio Al-Husary
-verset par verset dans **quatre styles au choix** avec **surlignage mot à
+verset par verset dans **quatre styles au choix** avec **soulignage mot à
 mot**, difficulté notée sur 5 étoiles, **tafsir verset par verset**
 (al-Mukhtaṣar, traduction française), cartes d'enchaînement, progression
 visible et auto-évaluation des lacunes.
@@ -88,7 +88,7 @@ onglet Tutoriels → **Sources**.
   everyayah.com (miroir quranicaudio.com), mujawwad via le CDN de Tarteel ;
   les styles non fournis avec l'appli
   se mettent en cache au fil de l'écoute. Usage non commercial.
-- Surlignage mot à mot : segments de la Quranic Universal Library
+- Soulignage mot à mot : segments de la Quranic Universal Library
   (qul.tarteel.ai), un jeu par style.
 - Tafsir : « French Translation of Al-Mukhtasar in Interpreting the Noble
   Quran », Tafsir Center for Quranic Studies, V1.0.0, via QuranEnc.com,

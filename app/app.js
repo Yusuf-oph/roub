@@ -224,7 +224,7 @@ const RECITS = {
 };
 const recitKey = () => RECITS[PARAMS.recitation] ? PARAMS.recitation : "husary64";
 const audioUrl = f => RECITS[recitKey()].url(f);
-/* le surlignage suit le fichier RÉELLEMENT joué : en cas de repli sur la
+/* le soulignage suit le fichier RÉELLEMENT joué : en cas de repli sur la
    récitation fournie avec l'appli, ce n'est pas le style choisi */
 const segsOf = key =>
   ((window.SEGMENTS || {})[(player && player.styleAudio) || recitKey()] || {})[key] || null;
@@ -232,12 +232,27 @@ const segsOf = key =>
 const player = {
   el: new Audio(),
   queue: [], qi: 0, rep: 1, repLeft: 1, loopRange: false, playing: false,
-  play(list, start) {
+  /* defiler = false quand la lecture part d'un clic sur le verset lui-même :
+     il est déjà sous les yeux, et le recentrer ferait fuir la cible entre les
+     deux clics d'un double-clic (le second tombait à côté, d'où « ne lit qu'un
+     verset »). L'enchaînement automatique, lui, défile toujours. */
+  play(list, start, defiler = true) {
     this.queue = list; this.qi = start || 0;
     this.repLeft = this.rep; this.playing = true;
-    this._launch();
+    this._launch(defiler);
   },
-  _launch() {
+  /* second clic sur un verset : enchaîner à partir de lui. S'il est déjà en
+     cours (le premier clic vient de le lancer), on remplace la file sans
+     toucher à l'élément audio : aucun redémarrage audible. */
+  enchaine(list, i) {
+    if (this.playing && this.curKey === list[i].k && !this.el.paused) {
+      this.queue = list; this.qi = i; this.repLeft = this.rep;
+      updateAudioBar();
+      return;
+    }
+    this.play(list, i, false);
+  },
+  _launch(defiler = true) {
     if (!this.queue.length || this.qi >= this.queue.length) { this.stop(); return; }
     const item = this.queue[this.qi];
     this.curKey = item.k;
@@ -247,7 +262,7 @@ const player = {
     this.el.playbackRate = PARAMS.speed;
     // stop() d'abord : il repeint la barre, le message doit venir après
     this.el.play().catch(err => this.echecLecture(err));
-    highlightVerse(item.k);
+    highlightVerse(item.k, defiler);
     updateAudioBar();
   },
   next() {
@@ -282,7 +297,7 @@ const player = {
     const item = this.queue[this.qi];
     if (item && !this.repli && !RECITS[recitKey()].local) {
       this.repli = true;
-      this.styleAudio = "husary64";        // le surlignage suit le fichier joué
+      this.styleAudio = "husary64";        // le soulignage suit le fichier joué
       this.el.src = RECITS.husary64.url(item.audio);
       this.el.play().then(() => {
         const now = $("#audio-now");
@@ -309,7 +324,7 @@ const player = {
 };
 player.el.addEventListener("ended", () => player.next());
 
-/* surlignage mot à mot : les segments donnent [i_mot, i_fin, début_ms, fin_ms] ;
+/* soulignage mot à mot : les segments donnent [i_mot, i_fin, début_ms, fin_ms] ;
    un timer plutôt que timeupdate (déclenché trop rarement : ~4 fois/seconde) */
 let wordTimer = null;
 const KARAOKE_LEAD = 70;   // ms d'avance sur le temps audio (voir wordTick)
@@ -342,13 +357,13 @@ player.el.addEventListener("play", () => {
 player.el.addEventListener("pause", () => clearInterval(wordTimer));
 player.el.addEventListener("ended", () => { clearInterval(wordTimer); clearWords(); });
 
-function highlightVerse(key) {
+function highlightVerse(key, defiler = true) {
   $$(".verse.playing, .mver.playing, .qw.playing").forEach(el => el.classList.remove("playing"));
   clearWords();
   if (!key) return;
   const els = $$(`.verse[data-k="${key}"], .mver[data-k="${key}"], .qw[data-k="${key}"]`);
   els.forEach(el => el.classList.add("playing"));
-  if (els[0]) els[0].scrollIntoView({ block: "center", behavior: "smooth" });
+  if (els[0] && defiler) els[0].scrollIntoView({ block: "center", behavior: "smooth" });
 }
 /* un style de récitation non embarqué peut manquer (hors connexion, source
    indisponible) : le dire, au lieu de s'arrêter sans explication */
@@ -447,7 +462,7 @@ function tajChunk(s, from, to, cls) {
 }
 
 /* chaque mot récité est encapsulé (data-w = index dans les segments audio) :
-   c'est le support du surlignage mot à mot pendant la récitation */
+   c'est le support du soulignage mot à mot pendant la récitation */
 function arHtml(v) {
   const taj = PARAMS.taj && v.taj && v.taj.length ? v.taj : null;
   let cls = null;
@@ -536,7 +551,7 @@ function accueilHtml() {
     <div class="accueil-corps">
       <p><b>Comment ça marche.</b> Choisis un roub' ci-dessous : l'onglet
       <b>Mémoriser</b> affiche le texte (versets, texte continu ou pages exactes
-      du mushaf) avec l'audio et le surlignage mot à mot, et l'onglet
+      du mushaf) avec l'audio et le soulignage mot à mot, et l'onglet
       <b>Tafsir</b> le commentaire verset par verset. Les notes rédigées
       (points durs, particularités tajwid, vocabulaire, cartes) existent pour le
       roub' 1 ; ailleurs, ces onglets affichent « contenu à venir », et les
@@ -1172,7 +1187,7 @@ commercial. Les murattal 64 et 128 kbps sont le <b>même enregistrement</b> à
 deux qualités d'encodage ; le mu'allim est le premier <i>muṣḥaf mu'allim</i>
 enregistré au monde (1969).</p>
 
-<h3>Surlignage mot à mot</h3>
+<h3>Soulignage mot à mot</h3>
 <p>Segments temporels de la <b>Quranic Universal Library</b> (qul.tarteel.ai) :
 pour chaque verset, le début et la fin de chaque mot récité, un jeu par style.</p>
 
@@ -1268,7 +1283,7 @@ mémorisation.</li>
 <h3>En pratique</h3>
 <p>Pour apprendre par cœur : <b>murattal</b>, et <b>mu'allim</b> quand un
 passage résiste et qu'on veut répéter derrière le cheikh. Le <b>mujawwad</b>
-se réserve à l'écoute. Le surlignage mot à mot est calé séparément sur chaque
+se réserve à l'écoute. Le soulignage mot à mot est calé séparément sur chaque
 style, et le choix se fait dans Paramètres.</p>
 
 <p class="src">Sources : Ibn al-Jazarî, <i>an-Nashr fî l-qirâ'ât al-'ashr</i>,
@@ -1451,8 +1466,8 @@ function pageParams() {
       ${Object.entries(RECITS).map(([k, r]) =>
         `<option value="${k}" ${recitKey() === k ? "selected" : ""}>${esc(r.nom)}</option>`).join("")}
     </select></div>
-  <div class="param-row"><div class="lab"><b>Surlignage mot à mot</b>
-      <span>suit la récitation mot par mot dans le texte arabe</span></div>
+  <div class="param-row"><div class="lab"><b>Soulignage mot à mot</b>
+      <span>souligne le mot en cours de récitation dans le texte arabe</span></div>
     <label class="switch"><input type="checkbox" data-param="karaoke" ${PARAMS.karaoke ? "checked" : ""}><span class="sl"></span></label></div>
   <div class="param-row"><div class="lab"><b>Vitesse audio</b><span>récitation Husary</span></div>
     <select data-param="speed">
@@ -1648,18 +1663,18 @@ function bindMain() {
     }));
     $$(".mver", main).forEach(el => el.addEventListener("click", ev => {
       const i = +el.dataset.i;
-      if (ev.detail >= 2) player.play(queue, i);   // double-clic : à partir d'ici
-      else player.play([queue[i]], 0);             // simple : ce verset seul
+      if (ev.detail >= 2) player.enchaine(queue, i);   // double-clic : à partir d'ici
+      else player.play([queue[i]], 0, false);           // simple : ce verset seul
     }));
     const rubIdx = {};
     R.verses.forEach((v, i) => { rubIdx[v.k] = i; });
     $$(".qw", main).forEach(el => el.addEventListener("click", ev => {
       const k = el.dataset.k;
-      if (ev.detail >= 2 && k in rubIdx) { player.play(queue, rubIdx[k]); return; }
+      if (ev.detail >= 2 && k in rubIdx) { player.enchaine(queue, rubIdx[k]); return; }
       const hit = VIDX[k];
       if (hit) {
         player.loopRange = false;
-        player.play([{ k, audio: hit.v.audio }], 0);
+        player.play([{ k, audio: hit.v.audio }], 0, false);
       }
     }));
     $$("[data-audio]", main).forEach(el => el.addEventListener("click", () => {
@@ -2025,7 +2040,7 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "1.13.4";   // réécrit par tools/release.py
+const BUILD_VERSION = "1.13.5";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {

@@ -69,7 +69,7 @@ enregistrement** à deux qualités d'encodage (vérifié : durées identiques à
 0,10 s près sur huit versets témoins). Le mu'allim est le premier *muṣḥaf
 mu'allim* enregistré au monde (1969).
 
-## 6. Surlignage mot à mot
+## 6. Soulignage mot à mot
 
 - **Segments temporels de la Quranic Universal Library** (QUL,
   `qul.tarteel.ai`, projet de Tarteel AI), un jeu par style de récitation :

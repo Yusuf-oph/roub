@@ -23,7 +23,7 @@ python tools/build_pages.py 1 2 3
 #    créer les placeholders notes/cartes, ajouter dans app/index.html les
 #    <script> de data/quran, data/notes, data/cartes ET data/tafsirfr
 
-# 5. segments mot à mot des 4 styles de récitation (surlignage)
+# 5. segments mot à mot des 4 styles de récitation (soulignage)
 python tools/fetch_segments.py
 
 # 6. tafsir français verset par verset (base QuranEnc déjà en cache)

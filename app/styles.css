@@ -373,10 +373,9 @@ button { font: inherit; cursor: pointer; }
   text-transform: uppercase; letter-spacing: .4px;
 }
 
-/* surlignage mot à mot pendant la récitation : ce sont les LETTRES qui
-   s'allument (pas de cadre), la couleur tajwid cède la place le temps du mot */
-/* le mot en cours est SOULIGNÉ en surbrillance : la couleur tajwid des lettres
-   est préservée (c'est elle qui porte l'information pédagogique) */
+/* soulignage mot à mot pendant la récitation : le mot en cours est SOULIGNÉ
+   (pas de cadre, pas de halo), la couleur tajwid des lettres est préservée
+   (c'est elle qui porte l'information pédagogique) */
 /* pas de transition sur le soulignement : il doit tomber pile sur la syllabe */
 .wd { transition: opacity .18s linear; padding-bottom: 2px; }
 .wd.on { box-shadow: inset 0 -3px 0 var(--accent); }

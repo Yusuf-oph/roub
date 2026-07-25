@@ -39,7 +39,7 @@ dev.yusuf@pm.me.
   par notre licence CC BY-NC-SA.
 - Récitation : Mahmoud Khalil Al-Husary, quatre styles : murattal 64 kbps
   (embarqué) et murattal 128 kbps / muallim via everyayah.com, mujawwad via
-  le CDN de Tarteel ; usage non commercial. Segments mot à mot (surlignage) :
+  le CDN de Tarteel ; usage non commercial. Segments mot à mot (soulignage) :
   Quranic Universal Library, qul.tarteel.ai.
 
 Du fait de ces conditions, l'application dans son ensemble est et doit

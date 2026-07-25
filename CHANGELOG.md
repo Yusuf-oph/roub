@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.13.5 · 2026-07-25
+- Double-clic sur un verset : la lecture enchaîne de nouveau à partir de ce verset, en mode texte continu comme sur les pages du mushaf. Le texte ne se recentre plus quand la lecture part d'un clic, ce qui faisait tomber le second clic à côté
+- Le réglage « surlignage mot à mot » devient « soulignage mot à mot », conforme à ce qu'il affiche
+
 ## 1.13.4 · 2026-07-25
 - Bloqueurs de publicités : les Paramètres indiquent désormais quels domaines autoriser pour les récitations non fournies avec l'appli, et le message d'échec évoque cette cause (cas constaté avec uBlock Origin)
 
