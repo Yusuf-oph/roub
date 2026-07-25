@@ -59,11 +59,17 @@ process.stdout.write(JSON.stringify({
     return json.loads(r.stdout.decode("utf-8"))
 
 
+TANWIN_OUVERT = {"ً": "ࣰ", "ٌ": "ࣱ", "ٍ": "ࣲ"}
+
+
 def ar_display(s):
     """Même transformation d'affichage que app.js : soukoun à la médinoise
-    (U+0652 -> U+06E1) puis rond muet U+06DF rendu via le glyphe attachable
-    U+0652 (la police n'attache pas U+06DF)."""
-    return s.replace("ْ", "ۡ").replace("۟", "ْ")
+    (U+0652 -> U+06E1), rond muet U+06DF rendu via le glyphe attachable
+    U+0652 (la police n'attache pas U+06DF), et tanwîn OUVERT devant un petit
+    mîm d'iqlâb (sinon le mîm bas U+06ED sort en cercle pointillé autonome)."""
+    s = s.replace("ْ", "ۡ").replace("۟", "ْ")
+    return re.sub("([ً-ٍ])([ۭۢ])",
+                  lambda m: TANWIN_OUVERT[m.group(1)] + m.group(2), s)
 
 
 def fmt_html(txt):

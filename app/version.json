@@ -1,8 +1,8 @@
 {
-  "version": "1.13.7",
+  "version": "1.13.8",
   "date": "2026-07-25",
   "notes": [
-    "Soulignage et départ au mot recalés dans les récitations 128 kbps, muallim et mujawwad : les versets contenant un « yâ » d'appel collé (يَـٰٓأَيُّهَا) décalaient d'un mot",
-    "Le soulignage suit désormais les répétitions du récitateur, fréquentes en muallim"
+    "Le petit mîm de l'iqlâb ne sort plus en cercle autonome au milieu de la ligne (13 versets, dont 2:41) : le texte reprend la graphie du mushaf, tanwin ouvert et mîm niché entre ses deux traits",
+    "Fiche « Iqlâb » complétée : le petit mîm passe en dessous quand le tanwin est une kasratan"
   ]
 }

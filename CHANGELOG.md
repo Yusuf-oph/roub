@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.13.8 · 2026-07-25
+- Correction d'affichage signalée par Yusuf : le petit mîm de l'iqlâb sortait en cercle autonome au milieu de la ligne dans 13 versets, dont 2:41. Le texte reprend la graphie du mushaf, tanwin aux deux traits écartés et mîm niché entre eux, dans les 46 versets concernés
+- Fiche « Iqlâb » : le petit mîm est au-dessus pour un noûn sakina, une fathatan ou une dammatan, mais en dessous pour une kasratan ; la fiche ne mentionnait que le premier cas
+
 ## 1.13.7 · 2026-07-25
 - Soulignage mot à mot et départ au mot double-cliqué recalés dans les récitations 128 kbps, muallim et mujawwad : sur les versets qui contiennent un « yâ » d'appel écrit collé (يَـٰٓأَيُّهَا, يَـٰٓـَٔادَمُ), la source comptait un mot de plus et tout le reste du verset décalait d'un cran
 - Quand le récitateur répète un mot, ce qui est fréquent en muallim, le soulignage revient avec lui au lieu de prendre de l'avance jusqu'à la fin du verset

@@ -20,7 +20,7 @@ window.REGLES = [
   },
   {
     id: "iqlab", nom: "Iqlâb (transformation en mîm)", cat: "Noûn sakina et tanwin",
-    texte: "Devant **ب**, le noûn sakina ou le tanwin se prononce comme un **mîm léger** avec nasalisation, lèvres à peine fermées. Le mushaf le signale par un petit م au-dessus de la lettre.",
+    texte: "Devant **ب**, le noûn sakina ou le tanwin se prononce comme un **mîm léger** avec nasalisation, lèvres à peine fermées. Le mushaf le signale par un petit م, placé du côté du signe concerné : au-dessus pour un noûn sakina, une fathatan ou une dammatan, en dessous pour une kasratan ({2:41}). Le tanwin est alors écrit avec ses deux traits écartés, le mîm niché entre eux.",
     exemple: "صُمٌّۢ بُكْمٌ", exempleNote: "2:18 : « soummoum-boukmoun » : le tanwin devient m devant le bâ'.",
   },
   {

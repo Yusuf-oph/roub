@@ -120,7 +120,31 @@ def main():
                 err(f"{rid} {v['k']} : translit/trad vide")
     if len(QURAN) != 24:
         err(f"{len(QURAN)} rubs au lieu de 24")
-    print(f"B. quran : {len(vidx)} versets, textes conformes")
+    # petit mîm d'iqlâb : arDisplay() ouvre le tanwîn qui le précède, sinon la
+    # police n'attache pas le mîm BAS U+06ED (cercle pointillé autonome). La
+    # substitution se fait par tranche de classe tajwid : si un span coupait la
+    # paire tanwîn + mîm, elle ne s'appliquerait pas.
+    n_mim = 0
+    for rid, v in vidx.values():
+        ar, cls = v["ar"], {}
+        for st, en, c in v["taj"]:
+            for i in range(st, en):
+                cls[i] = c
+        for i, ch in enumerate(ar):
+            if ch not in "ۭۢ":
+                continue
+            n_mim += 1
+            if i == 0:
+                err(f"{v['k']} : petit mîm en tête de verset")
+            elif ar[i - 1] in "ًٌٍ" and cls.get(i) != cls.get(i - 1):
+                err(f"{v['k']} : paire tanwîn + petit mîm coupée par un span "
+                    f"tajwid ({cls.get(i-1)} / {cls.get(i)}) : le tanwîn ouvert "
+                    f"d'arDisplay ne s'appliquera pas")
+            elif ar[i - 1] not in "ًٌٍن":
+                err(f"{v['k']} : petit mîm après U+{ord(ar[i-1]):04X}, "
+                    f"ni tanwîn ni noûn : vérifier l'affichage")
+    print(f"B. quran : {len(vidx)} versets, textes conformes "
+          f"({n_mim} petits mîms d'iqlâb contrôlés)")
 
     # C. meta
     if len(META["rubs"]) != 24:
