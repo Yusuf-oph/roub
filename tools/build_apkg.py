@@ -59,17 +59,19 @@ process.stdout.write(JSON.stringify({
     return json.loads(r.stdout.decode("utf-8"))
 
 
-TANWIN_OUVERT = {"ً": "ࣰ", "ٌ": "ࣱ", "ٍ": "ࣲ"}
+VOYELLE_SIMPLE = {"ً": "َ", "ٌ": "ُ", "ٍ": "ِ"}
+MIM_IQLAB = "ۢ"
 
 
 def ar_display(s):
     """Même transformation d'affichage que app.js : soukoun à la médinoise
     (U+0652 -> U+06E1), rond muet U+06DF rendu via le glyphe attachable
-    U+0652 (la police n'attache pas U+06DF), et tanwîn OUVERT devant un petit
-    mîm d'iqlâb (sinon le mîm bas U+06ED sort en cercle pointillé autonome)."""
+    U+0652 (la police n'attache pas U+06DF), et iqlâb à la façon du mushaf :
+    voyelle SIMPLE plus petit mîm, le mîm REMPLAÇANT le second élément du
+    tanwîn au lieu de s'y ajouter."""
     s = s.replace("ْ", "ۡ").replace("۟", "ْ")
-    return re.sub("([ً-ٍ])([ۭۢ])",
-                  lambda m: TANWIN_OUVERT[m.group(1)] + m.group(2), s)
+    return re.sub("([ً-ٍ])[ۭۢ]",
+                  lambda m: VOYELLE_SIMPLE[m.group(1)] + MIM_IQLAB, s)
 
 
 def fmt_html(txt):

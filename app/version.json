@@ -1,8 +1,8 @@
 {
-  "version": "1.13.8",
+  "version": "1.13.9",
   "date": "2026-07-25",
   "notes": [
-    "Le petit mîm de l'iqlâb ne sort plus en cercle autonome au milieu de la ligne (13 versets, dont 2:41) : le texte reprend la graphie du mushaf, tanwin ouvert et mîm niché entre ses deux traits",
-    "Fiche « Iqlâb » complétée : le petit mîm passe en dessous quand le tanwin est une kasratan"
+    "Iqlâb : le petit mîm remplace le second trait du tanwin, comme dans le mushaf, au lieu de s'y ajouter ; il se place du côté de la voyelle, en dessous pour une kasra, au-dessus pour une fatha ou une damma",
+    "Fiche « Iqlâb » complétée en conséquence"
   ]
 }

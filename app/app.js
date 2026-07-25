@@ -37,15 +37,20 @@ const PARAMS = Object.assign({
      reste réservé aux lettres muettes (relevé par Anis, 2026-07-23) ;
    - option silentMarks : masquer les ronds des lettres muettes (redondants
      avec le gris tajwid) ;
-   - iqlâb : quand un petit mîm suit un tanwîn, le mushaf écrit le tanwîn
-     OUVERT (ses deux traits écartés) et niche le mîm entre les deux. Vérifié
-     le 2026-07-25 sur la calligraphie officielle : 2:10 أَلِيمٌۢ (tanwîn ouvert)
-     contre 2:6 سَوَآءٌ (tanwîn ordinaire fermé). Sans cette forme, la police
-     n'attache pas le mîm BAS U+06ED, qui sort en cercle pointillé autonome au
-     milieu de la ligne (13 versets, dont 2:41 : signalé par Yusuf).
+   - iqlâb : le mushaf n'AJOUTE pas le petit mîm au tanwîn, il REMPLACE le
+     second élément du tanwîn par lui. Vérifié le 2026-07-25 sur la calligraphie
+     officielle : 2:41 كَافِرٍۭ porte un seul trait sous le rā' (pas deux) et le
+     mîm à côté, 2:10 أَلِيمٌۢ un seul waw (pas deux) et le mîm au-dessus. On
+     affiche donc la voyelle SIMPLE plus le mîm, et le mîm prend le côté de la
+     voyelle : dessous pour une kasra, dessus pour une fatha ou une damma.
+     Bénéfice second : le mîm s'attache enfin. La police n'attache ni le mîm BAS
+     U+06ED (qui sortait en cercle pointillé autonome, 13 versets, signalé par
+     Yusuf sur 2:41) ni le mîm après un tanwîn, mais bien U+06E2 après une
+     voyelle simple.
    Transformation au rendu uniquement : les données et les index de spans
    restent canoniques. */
-const TANWIN_OUVERT = { "ً": "ࣰ", "ٌ": "ࣱ", "ٍ": "ࣲ" };   // U+064B-064D -> U+08F0-08F2
+const VOYELLE_SIMPLE = { "ً": "َ", "ٌ": "ُ", "ٍ": "ِ" };   // U+064B-064D -> U+064E-0650
+const MIM_IQLAB = "ۢ";                                    // U+06E2, le seul qui s'attache
 function arDisplay(s) {
   s = String(s).replace(/ْ/g, "ۡ");   // vrai soukoun -> chevron médinois (U+06E1)
   // rond muet : la police n'attache pas U+06DF (cercle pointillé de repli),
@@ -53,9 +58,9 @@ function arDisplay(s) {
   // on l'utilise comme rond muet d'affichage (le vrai soukoun est déjà parti
   // en chevron à la ligne précédente, aucune collision)
   s = PARAMS.silentMarks ? s.replace(/۟/g, "ْ") : s.replace(/۟/g, "");
-  // tanwîn suivi d'un petit mîm (iqlâb) -> tanwîn ouvert, seule forme que la
-  // police sait composer avec le mîm, et celle du mushaf
-  s = s.replace(/([ًٌٍ])([ۭۢ])/g, (m, t, mim) => TANWIN_OUVERT[t] + mim);
+  // iqlâb : voyelle simple + mîm, comme le mushaf (le mîm tient la place du
+  // second élément du tanwîn), et le mîm s'attache du bon côté tout seul
+  s = s.replace(/([ًٌٍ])[ۭۢ]/g, (m, t) => VOYELLE_SIMPLE[t] + MIM_IQLAB);
   return s;
 }
 const arEsc = s => esc(arDisplay(s));
@@ -2107,7 +2112,7 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "1.13.8";   // réécrit par tools/release.py
+const BUILD_VERSION = "1.13.9";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {

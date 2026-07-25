@@ -120,10 +120,11 @@ def main():
                 err(f"{rid} {v['k']} : translit/trad vide")
     if len(QURAN) != 24:
         err(f"{len(QURAN)} rubs au lieu de 24")
-    # petit mîm d'iqlâb : arDisplay() ouvre le tanwîn qui le précède, sinon la
-    # police n'attache pas le mîm BAS U+06ED (cercle pointillé autonome). La
-    # substitution se fait par tranche de classe tajwid : si un span coupait la
-    # paire tanwîn + mîm, elle ne s'appliquerait pas.
+    # petit mîm d'iqlâb : arDisplay() remplace le tanwîn qui le précède par la
+    # voyelle simple, comme le mushaf (le mîm tient la place du second trait) ;
+    # au passage le mîm s'attache enfin. La substitution se fait par tranche de
+    # classe tajwid : si un span coupait la paire tanwîn + mîm, elle ne
+    # s'appliquerait pas et le mîm BAS ressortirait en cercle pointillé.
     n_mim = 0
     for rid, v in vidx.values():
         ar, cls = v["ar"], {}
@@ -143,6 +144,12 @@ def main():
             elif ar[i - 1] not in "ًٌٍن":
                 err(f"{v['k']} : petit mîm après U+{ord(ar[i-1]):04X}, "
                     f"ni tanwîn ni noûn : vérifier l'affichage")
+    # les deux implémentations de la graphie d'affichage doivent rester en phase
+    for chemin, quoi in ((os.path.join(APP, "app.js"), "app.js"),
+                         (os.path.join(HERE, "build_apkg.py"), "build_apkg.py")):
+        if "MIM_IQLAB" not in open(chemin, encoding="utf-8").read():
+            err(f"{quoi} : règle d'affichage du mîm d'iqlâb absente "
+                f"(arDisplay et ar_display doivent rester identiques)")
     print(f"B. quran : {len(vidx)} versets, textes conformes "
           f"({n_mim} petits mîms d'iqlâb contrôlés)")
 
