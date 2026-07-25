@@ -281,6 +281,10 @@ button { font: inherit; cursor: pointer; }
 .vend.e1 { border-color: var(--danger); color: var(--danger); }
 .vend.e2 { border-color: var(--accent2); color: var(--accent2); }
 .vend.e3 { border-color: var(--ok); color: var(--ok); }
+/* renvoi cliquable : apparence de lien PARTOUT, y compris hors des fiches où il
+   n'avait ni couleur ni curseur et ne se voyait pas ; la mise en pastille des
+   fiches (.note-card .vref) et les couleurs de faiblesse restent prioritaires */
+.vref { color: var(--accent); cursor: pointer; }
 .vref.weak1 { color: var(--danger); }
 .vref.weak2 { color: var(--accent2); }
 

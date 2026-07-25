@@ -1,7 +1,8 @@
 {
-  "version": "1.14.0",
+  "version": "1.14.1",
   "date": "2026-07-25",
   "notes": [
-    "Les listes de sources sont désormais des bibliographies normalisées ISO 690 : la page Sources reçoit une section « Bibliographie » complète, et le tutoriel des styles cite ses sources de la même façon"
+    "Les crédits des Paramètres ne répètent plus la page Sources : ils y renvoient par un lien cliquable",
+    "Les renvois cliquables se voient enfin partout : hors des fiches, ils n'avaient ni couleur ni curseur de lien"
   ]
 }

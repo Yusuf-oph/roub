@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.14.1 · 2026-07-25
+- Les crédits des Paramètres ne répètent plus la page Sources : ils y renvoient par un lien cliquable, et gardent ce qui leur est propre (équipe, confidentialité, licences)
+- Les renvois cliquables se voient enfin partout : hors des fiches, ils avaient la couleur du texte et pas de curseur de lien
+
 ## 1.14.0 · 2026-07-25
 - Les listes de sources sont désormais des bibliographies normalisées ISO 690 : la page Sources reçoit une section « Bibliographie » qui reprend toutes les références en notices complètes, et le tutoriel des styles cite ses sources de la même façon. La prose qui explique la provenance et les conditions d'usage est conservée, la norme ne sachant pas les porter
 

@@ -1674,19 +1674,11 @@ function pageParams() {
     Avis et contact :
     <a href="mailto:dev.yusuf@pm.me">dev.yusuf@pm.me</a> · Discord
     <b>@ophtalmologie</b>.<br><br>
-    Texte coranique : mushaf de Médine (Hafs), Complexe du Roi Fahd (texte et
-    calligraphie des pages via quran.com et les polices QCF du KFGQPC).
-    Traduction : Muhammad Hamidullah. Récitation : Mahmoud Khalil Al-Husary :
-    murattal 64 kbps fourni avec l'appli, murattal 128 kbps et muallim via
-    everyayah.com, mujawwad via le CDN de Tarteel ; segments mot à mot de la
-    Quranic Universal Library (qul.tarteel.ai) ; usage non commercial. Tafsir
-    verset par verset : « French Translation of Al-Mukhtasar in Interpreting
-    the Noble Quran » (Tafsir Center for Quranic Studies, V1.0.0, via
-    QuranEnc.com, texte reproduit sans modification). Cartes et tutoriels :
-    sources citées au fil du texte (Ibn Kathîr, As-Sa'dî, Ibn al-Jazarî) ;
-    fiches de règles d'après les matns Tuhfat al-Atfal et
-    al-Muqaddima al-Jazariyya. <b>Détail complet : Tutoriels → Sources</b>
-    (fichier SOURCES.md sur le dépôt). Application gratuite et non commerciale,
+    Texte coranique, calligraphie, traduction, récitations, segments mot à mot
+    et tafsir viennent de sources tierces, en usage non commercial : chacune est
+    nommée avec son édition, sa version, sa provenance et ses conditions sur la
+    <span class="vref" data-tuto="sources">page Sources</span>, qui donne aussi la
+    bibliographie normalisée et correspond au fichier SOURCES.md du dépôt. Application gratuite et non commerciale,
     sans compte : progression et réglages restent dans ce navigateur, et rien
     n'est envoyé ailleurs sauf si la synchronisation multi-appareils est activée
     (code secret anonyme, aucune donnée personnelle). Tout le contenu religieux est sourcé et vérifié contre ses
@@ -2193,7 +2185,7 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "1.14.0";   // réécrit par tools/release.py
+const BUILD_VERSION = "1.14.1";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {
