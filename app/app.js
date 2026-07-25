@@ -1180,12 +1180,14 @@ function cardHtml(c, shown) {
 /* ---------------- tutoriels ---------------- */
 function pageTutoriels(sub) {
   const pages = [["translit", "Lire la translittération"], ["tajwid", "Légende tajwid"],
-    ["regles", "Fiches de règles"], ["styles", "Styles de récitation"]];
+    ["regles", "Fiches de règles"], ["obligation", "Obligatoire ou perfectionnement ?"],
+    ["styles", "Styles de récitation"]];
   let h = `<div class="hero"><h1>Tutoriels</h1></div><div class="tabs">` +
     pages.map(([id, lab]) => `<button data-tuto="${id}" class="${id === sub ? "on" : ""}">${lab}</button>`).join("") +
     `</div><div class="prose">`;
   if (sub === "translit") h += tutoTranslit();
   else if (sub === "tajwid") h += tutoTajwid();
+  else if (sub === "obligation") h += tutoObligation();
   else if (sub === "styles") h += tutoStyles();
   else h += tutoRegles();
   return h + `</div><div class="footer-pad"></div>`;
@@ -1376,6 +1378,146 @@ est et doit rester gratuite et non commerciale.</p>
 <p class="src">Une erreur, une source mal citée, un doute :
 <a href="mailto:dev.yusuf@pm.me">dev.yusuf@pm.me</a>. Cette page correspond au
 fichier SOURCES.md du dépôt.</p></div><div class="footer-pad"></div>`;
+}
+
+/* Page validée par Yusuf et Anis le 2026-07-25 (option (b) de la fiche F).
+   Toutes les citations ont été vérifiées à leur source, aucune de seconde main ;
+   les traductions françaises sont les nôtres, signalées comme telles, l'arabe
+   donné en regard, faute de traduction française libre de droit de ces
+   ouvrages. Les deux versets cités par al-Qârî sont des renvois : ils viennent
+   du texte de l'application, avec la traduction Hamidullah. */
+function tutoObligation() {
+  const cite = (ar, fr) => `<p class="ar-cite">${arEsc(ar)}</p>` +
+    `<p class="ar-trad">${fr} <span style="font-style:normal">(traduction Roub')</span></p>`;
+  return gloss(`<h2>Obligatoire ou perfectionnement ?</h2>
+<p>Le premier vers que rencontre celui qui apprend le {{tajwîd}} est aussi le
+plus sévère. <b>Ibn al-Jazarî</b> ouvre son chapitre par :</p>
+${cite("وَالأَخْذُ بِالتَّجْوِيدِ حَتْمٌ لَازِمُ … مَنْ لَمْ يُجَوِّدِ القُرْآنَ آثِمُ", "Prendre le tajwid est une obligation impérative : qui ne fait pas le tajwid du Qur'an est pécheur.")}
+<p>Lu seul, ce vers donne l'impression que la moindre {{ghunna}} écourtée est une
+faute grave. Les savants qui l'ont commenté, à commencer par son auteur,
+distinguent en réalité trois étages, et le deuxième fait l'objet d'un désaccord
+ancien entre eux. Le connaître évite deux excès symétriques : croire que rien
+n'est obligatoire, ou croire que tout l'est également.</p>
+
+<h3>Premier étage : ce qui ne se discute pas</h3>
+<p>Les savants appellent <i>laḥn jalî</i>, erreur manifeste, ce qui touche à la
+lettre elle-même ou à sa voyelle. <b>Al-Marṣafî</b> en donne la définition la
+plus nette :</p>
+${cite("فَالْجَلِيُّ: هُوَ خَلَلٌ يَطْرَأُ عَلَى الْأَلْفَاظِ فَيُخِلُّ بِعُرْفِ الْقِرَاءَةِ، سَوَاءٌ أَخَلَّ بِالْمَعْنَى أَمْ لَمْ يُخِلَّ", "Le manifeste : un défaut qui affecte les mots et rompt avec la norme de la lecture, qu'il altère le sens ou non.")}
+<p>Changer une voyelle, vocaliser une lettre qui porte un {{soukoun}}, remplacer
+une lettre par une autre, alléger une {{chadda}} : c'est de cela qu'il s'agit. Le
+nom même le dit, ce sont des fautes que tout le monde entend, y compris qui n'a
+jamais ouvert un livre de tajwid. Al-Marṣafî conclut que <b>son statut est
+l'interdiction, par consensus</b>. C'est le socle, et il ne dépend d'aucune école
+ni d'aucun niveau.</p>
+
+<h3>Deuxième étage : ce dont les savants discutent</h3>
+<p>Vient ensuite le <i>laḥn khafî</i>, l'erreur cachée, celle que seuls les
+spécialistes de la lecture repèrent : laisser l'{{idghâm}} là où il est dû,
+l'{{izhâr}}, l'{{iqlâb}}, l'{{ikhfâ'}}, alléger une lettre emphatique ou
+emphatiser une lettre légère, écourter un {{madd}}, abandonner la {{ghunna}} ou
+en fausser la mesure.</p>
+<p><b>C'est exactement la matière des dix-neuf fiches de règles de
+l'application.</b> Et c'est là que les savants ne disent pas la même chose.</p>
+<p><b>Mullâ ʿAlî al-Qârî</b>, dans son commentaire de la Jazariyya, tient que cet
+étage n'est pas une obligation individuelle dont l'abandon serait puni :</p>
+${cite("وَلَا شَكَّ أَنَّ هَذَا النَّوْعَ مِمَّا لَيْسَ بِفَرْضِ عَيْنٍ يَتَرَتَّبُ عَلَيْهِ الْعِقَابُ الشَّدِيدُ، وَإِنَّمَا فِيهِ خَوْفُ الْعِقَابِ وَالتَّهْدِيدِ", "Nul doute que ce degré n'est pas une obligation individuelle entraînant un châtiment sévère ; il n'y a là que la crainte du châtiment et la menace.")}
+<p>Il en tire la règle qui répond le plus directement à la question de cette
+page :</p>
+${cite("فَيَنْبَغِي أَنْ يُرَاعَى جَمِيعُ قَوَاعِدِهِمْ وُجُوبًا فِيمَا يَتَغَيَّرُ بِهِ الْمَبْنَى وَيَفْسُدُ بِهِ الْمَعْنَى، وَاسْتِحْبَابًا فِيمَا يَحْسُنُ بِهِ اللَّفْظُ وَيُسْتَحْسَنُ بِهِ النُّطْقُ حَالَ الْأَدَاءِ", "Il convient d'observer toutes leurs règles : à titre obligatoire dans ce qui change la structure du mot et corrompt le sens, à titre recommandé dans ce qui embellit le mot et rend la prononciation meilleure lors de l'exécution.")}
+<p>Ce n'est pas un avis lâché en passant : il l'appuie sur deux versets,
+« et Il ne vous a imposé aucune gêne dans la religion » (sourate al-Ḥajj,
+verset 78) et « Allah n'impose à aucune âme une charge supérieure à sa
+capacité » (sourate al-Baqara, verset 286), traduction Hamidullah, et conclut
+que c'est la position qu'il faut mordre de ses molaires.</p>
+<p><b>Al-Marṣafî</b>, référence majeure de la tradition égyptienne, dit
+exactement le contraire, et le dit en le nommant :</p>
+${cite("وَالْحُكْمُ فِي هَذَا اللَّحْنِ بِنَوْعَيْهِ التَّحْرِيمُ أَيْضًا، خِلَافًا لِمَا ذَكَرَهُ مُلَّا عَلِيٍّ الْقَارِي", "Le statut de ce laḥn, dans ses deux degrés, est aussi l'interdiction, contre ce qu'a dit Mullâ ʿAlî al-Qârî.")}
+<p>Son argument mérite d'être entendu : si l'on retire l'izhâr, l'idghâm,
+l'iqlâb, l'ikhfâ' et les madd, que reste-t-il des règles du tajwid, et de quel
+droit appellerait-on encore la lecture correcte ? Il s'appuie aussi sur
+<b>al-Barkawî</b>, pour qui ces altérations sont toutes interdites parce que,
+sans toucher au sens, elles atteignent le mot, en gâtent l'éclat et en font
+disparaître la beauté.</p>
+
+<h3>Le vocabulaire des spécialistes</h3>
+<p>La discipline a un mot pour ce partage, et il vaut mieux que nos
+approximations. <b>Makkî Naṣr</b> le rapporte ainsi :</p>
+${cite("اعْلَمْ أَنَّ الْوَاجِبَ فِي عِلْمِ التَّجْوِيدِ يَنْقَسِمُ إِلَى وَاجِبٍ شَرْعِيٍّ وَهُوَ مَا يُثَابُ عَلَى فِعْلِهِ وَيُعَاقَبُ عَلَى تَرْكِهِ، أَوْ صِنَاعِيٍّ وَهُوَ مَا يَحْسُنُ فِعْلُهُ وَيَقْبُحُ تَرْكُهُ", "Sache que l'obligatoire, dans la science du tajwid, se divise en obligation religieuse, celle dont l'accomplissement est récompensé et l'abandon puni, et en obligation de métier, celle dont l'accomplissement est beau et l'abandon laid.")}
+<p>La première préserve les lettres d'un changement de structure et d'une
+corruption du sens, et <b>celui qui l'abandonne pèche</b>. La seconde, ce sont
+l'idghâm, l'ikhfâ', l'iqlâb, le {{tarqîq}}, le {{tafkhîm}}, et <b>celui qui
+l'abandonne ne pèche pas, selon le choix des savants tardifs</b>. Le même auteur
+précise que les savants anciens, eux, tenaient l'ensemble pour une obligation
+religieuse.</p>
+<p>Le désaccord du deuxième étage a donc un nom, deux camps et une histoire. Ce
+n'est pas une zone floue, c'est une question tranchée différemment par des gens
+qui savaient de quoi ils parlaient.</p>
+
+<h3>Ce que tous disent, en revanche</h3>
+<p>Aucun des deux camps ne demande l'impossible. Ibn al-Jazarî, dans
+<i>an-Nashr</i>, répartit les lecteurs en trois :</p>
+${cite("وَالنَّاسُ فِي ذَلِكَ بَيْنَ مُحْسِنٍ مَأْجُورٍ، وَمُسِيءٍ آثِمٍ، أَوْ مَعْذُورٍ", "Les gens s'y répartissent entre celui qui fait bien et en est récompensé, celui qui fait mal et pèche, et celui qui est excusé.")}
+<p>Et il dit qui est excusé : celui dont la langue ne suit pas, ou qui ne trouve
+personne pour le guider vers la prononciation juste, car Dieu n'impose à une âme
+que ce qu'elle peut porter.</p>
+<p><b>Al-Ghazâlî</b> va dans le même sens, et sa formulation est la plus douce de
+toutes. Après avoir rappelé qu'il faut corriger celui qui lit mal, il ajoute que
+si l'essentiel de la lecture est juste sans qu'on parvienne à tout égaliser, il
+n'y a pas de mal à lire, à voix basse ; puis :</p>
+${cite("وَلَكِنْ إِذَا كَانَ ذَلِكَ مُنْتَهَى قُدْرَتِهِ وَكَانَ لَهُ أُنْسٌ بِالْقِرَاءَةِ وَحِرْصٌ عَلَيْهَا فَلَسْتُ أَرَى بِهِ بَأْسًا", "Si c'est là le bout de sa capacité et qu'il trouve dans la lecture une intimité et un attachement, je n'y vois aucun mal.")}
+<p>La ligne commune est celle-là : <b>c'est la capacité et l'accès à un
+enseignant qui déterminent la responsabilité</b>, pas un barème de règles.</p>
+
+<h3>Ce que cela change quand on mémorise</h3>
+<p>Rien de ce qui précède ne dispense d'apprendre, et rien n'autorise à repousser
+la mémorisation en attendant d'être parfait.</p>
+<p>Les fautes du premier étage se corrigent tout de suite, parce qu'elles ne se
+discutent pas et qu'elles s'entendent. C'est le premier travail.</p>
+<p>Les règles des fiches s'acquièrent par l'oreille et la répétition plus que par
+la théorie. Le meilleur chemin reste d'imiter la récitation, verset par verset,
+plutôt que de réciter en récitant mentalement une liste de règles.</p>
+<p>Une faute du deuxième étage ne vous met pas en faute grave, et ne doit pas
+interrompre votre mémorisation. Elle indique un point à travailler, pas un péché
+à expier.</p>
+<p>Enfin, la question de savoir laquelle des deux positions suivre n'est pas
+tranchée par cette application. Ce qui précède les expose, avec leurs auteurs et
+leurs textes, et laisse à chacun le soin de suivre l'avis de savants auxquels il
+se réfère.</p>
+
+<h3>Sources</h3>
+<p class="biblio">AL-GHAZĀLĪ, Abū Ḥāmid Muḥammad ibn Muḥammad aṭ-Ṭūsī (m. 505 H).
+<i>Iḥyāʾ ʿulūm ad-dīn</i>. Beyrouth : Dār al-Maʿrifa, 4 vol. T. II, p. 336,
+kitāb al-amr bi-l-maʿrūf wa-n-nahy ʿan al-munkar [en ligne]. [Consulté le
+25 juillet 2026]. Disponible à l'adresse : https://shamela.ws/book/9472/696</p>
+<p class="biblio">IBN AL-JAZARĪ, Muḥammad ibn Muḥammad (m. 833 H).
+<i>Al-Muqaddima fī-mā ʿalā qāriʾ al-Qurʾān an yaʿlamah</i>, dite
+<i>al-Jazariyya</i>. Édition ʿAbd al-Muḥsin ibn Muḥammad al-Qāsim.
+2<sup>e</sup> éd., 1441 H / 2020, 102 p. Bāb at-tajwīd, p. 62 [en ligne].
+[Consulté le 25 juillet 2026]. Disponible à l'adresse :
+https://shamela.ws/book/581/60</p>
+<p class="biblio">IBN AL-JAZARĪ, Shams ad-Dīn Abū l-Khayr Muḥammad ibn Muḥammad
+ibn Yūsuf (m. 833 H). <i>An-Nashr fī l-qirāʾāt al-ʿashr</i>. Édition ʿAlī
+Muḥammad aḍ-Ḍabbāʿ (m. 1380 H). Al-Maṭbaʿa at-tijāriyya al-kubrā, 2 vol. T. I,
+faṣl fī t-tajwīd, p. 210 [en ligne]. [Consulté le 25 juillet 2026]. Disponible à
+l'adresse : https://shamela.ws/book/22642/218</p>
+<p class="biblio">AL-MARṢAFĪ, ʿAbd al-Fattāḥ. <i>Hidāyat al-qārī ilā tajwīd kalām
+al-Bārī</i>, chapitre 7 [en ligne]. [Consulté le 25 juillet 2026]. Disponible à
+l'adresse : https://www.islamweb.net/ar/library/content/231/9/</p>
+<p class="biblio">NAṢR AL-JURAYSĪ, Muḥammad Makkī. <i>Nihāyat al-qawl al-mufīd fī
+ʿilm at-tajwīd</i>, p. 26 [en ligne]. Rapporte également al-Barkawī,
+<i>Sharḥ ad-Durr al-yatīm</i>. [Consulté le 25 juillet 2026]. Disponible à
+l'adresse : https://ketabonline.com/ar/books/55066/</p>
+<p class="biblio">AL-QĀRĪ, Mullā ʿAlī (m. 1014 H). <i>Al-Minaḥ al-fikriyya fī
+sharḥ al-Muqaddima al-Jazariyya</i>, p. 29-30. Exemplaire numérisé [en ligne],
+[consulté le 25 juillet 2026], disponible à l'adresse :
+https://archive.org/details/0743Pdf_201804</p>
+<p class="src">Les traductions françaises de ces passages ont été faites pour
+Roub' : aucune traduction française libre de droit de ces ouvrages n'existe.
+L'arabe est donné en regard pour que chacun puisse vérifier. Le matn de la
+Jazariyya, lui, a été traduit et commenté en français par Farid Ouyalize
+(éditions Sana) : c'est la lecture de référence pour aller plus loin.
+<span class="vref" data-goto-page="sources">Toutes les sources de Roub' &rarr;</span></p>`);
 }
 
 function tutoStyles() {
@@ -2193,7 +2335,7 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "1.15.0";   // réécrit par tools/release.py
+const BUILD_VERSION = "1.16.0";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {

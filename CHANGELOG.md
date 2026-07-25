@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.16.0 · 2026-07-25
+- Nouveau tutoriel **« Obligatoire ou perfectionnement ? »** : ce que les savants tiennent pour obligatoire dans le tajwid, ce dont ils discutent, et ce que tous disent de la capacité de chacun. Les deux positions sont exposées avec leurs auteurs et leurs textes, l'application n'arbitre pas entre elles
+
 ## 1.15.0 · 2026-07-25
 - **Sources** devient un onglet à part entière, après Paramètres : ce n'est pas un tutoriel mais la référence de tout ce que l'application reprend à d'autres
 - Bibliographie : les liens renvoient en priorité vers la Bibliothèque numérique Shamela, la plus consultée pour les textes classiques, et les notices gagnent leur édition scientifique, leur éditeur et leur tomaison. Les autres adresses ne subsistent que là où Shamela n'a pas l'ouvrage ou n'en sert pas le texte

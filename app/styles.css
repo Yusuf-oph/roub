@@ -516,6 +516,15 @@ h2.sec { font-size: 18px; margin: 22px 0 8px; }
 .prose h3 { margin: 20px 0 8px; }
 /* pas de justification sur les tableaux, légendes et exemples courts */
 .prose table, .prose .legend-item, .prose .src { text-align: initial; }
+/* citation arabe en bloc dans un tutoriel : filet du côté du début de ligne,
+   donc à droite puisque le texte est composé de droite à gauche */
+.prose .ar-cite {
+  font-family: "UthmanicHafs", serif; font-size: 21px; line-height: 2.15;
+  direction: rtl; text-align: right; unicode-bidi: isolate;
+  border-inline-start: 3px solid var(--accent); padding-inline-start: 14px;
+  margin: 12px 0;
+}
+.prose .ar-trad { font-style: italic; color: var(--muted); margin: 0 0 14px; }
 /* notices bibliographiques ISO 690 : retrait négatif de première ligne, comme
    dans une bibliographie imprimée, pour que l'auteur ressorte à l'œil */
 .prose .biblio {
