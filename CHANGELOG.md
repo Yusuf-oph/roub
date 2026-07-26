@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.16.3 · 2026-07-26
+- Ménage interne avant la refonte graphique à venir : une règle de style et une fonction JavaScript devenues inutiles sont retirées, rien ne change à l'usage
+- Le prototype de découpage audio, mis de côté depuis longtemps, ne fait plus partie du dépôt public
+
 ## 1.16.2 · 2026-07-25
 - Le badge « notes à venir » réapparaît sur l'accueil : il suivait un verrou d'accès levé en 1.13.0, il suit maintenant la présence de notes rédigées
 - Page Sources : les auteurs du tutoriel « Obligatoire ou perfectionnement ? » (Mullâ 'Alî al-Qârî, al-Marṣafî, Makkî Naṣr) rejoignent la bibliographie, qui dit aussi pourquoi trois liens ne passent pas par Shamela

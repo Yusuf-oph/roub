@@ -204,7 +204,6 @@ button { font: inherit; cursor: pointer; }
 .ar.masked.revealed, .tl.masked.revealed, .tr.masked.revealed { filter: none; }
 .tl { margin-top: 6px; font-size: 15.5px; line-height: 1.7; }
 .tr { margin-top: 6px; color: var(--muted); font-size: 13.5px; font-style: italic; }
-.notaj .ar span { color: var(--text) !important; }
 
 /* mode mushaf : texte continu justifié, rosaces de fin de verset */
 .mushaf {

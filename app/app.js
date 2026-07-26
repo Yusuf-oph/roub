@@ -548,7 +548,6 @@ function tlOf(v) { return PARAMS.translit === "sci" ? v.sci : v.fr; }
 function vrefBtn(key) {
   return `<span class="vref" data-goto="${key}">${key}</span>`;
 }
-function rubOf(key) { return VIDX[key] ? VIDX[key].rid : null; }
 
 /* ---------------- navigation ---------------- */
 function nav(hash) { location.hash = hash; }
@@ -2371,7 +2370,7 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "1.16.2";   // réécrit par tools/release.py
+const BUILD_VERSION = "1.16.3";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {
