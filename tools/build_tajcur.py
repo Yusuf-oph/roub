@@ -103,7 +103,16 @@ def main():
     if len(ordre) != len(set(ordre)) or set(ordre) != attendu:
         raise SystemExit(f"curriculum invalide : attendu une permutation de {sorted(attendu)}")
     par = compute(quran, ordre, regles_ids)
-    obj = {"ordre": ordre, "parSourate": par}
+    # La table classe de portée -> fiche vivait ICI seulement, donc l'appli ne
+    # pouvait ni colorer le nom d'une règle ni retrouver un verset qui la
+    # contient. On l'émet dans le fichier généré : une seule source de vérité,
+    # et le JS n'a rien à recopier. `spanFiche` va de la classe vers la fiche,
+    # `ficheSpan` fait le chemin inverse, celui dont l'affichage a besoin.
+    fiche_span = {}
+    for classe, f in SPAN2FICHE.items():
+        fiche_span.setdefault(f, classe)
+    obj = {"ordre": ordre, "parSourate": par,
+           "spanFiche": SPAN2FICHE, "ficheSpan": fiche_span}
     out = os.path.join(APP, "data", "tajcur.js")
     with open(out, "w", encoding="utf-8", newline="\n") as f:
         f.write("/* Généré par tools/build_tajcur.py (ordre : tools/curriculum.json)"

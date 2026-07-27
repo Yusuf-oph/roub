@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.17.2 · 2026-07-27
+- L'écran Paramètres est réorganisé en sections, et les habillages se choisissent sur un aperçu de leurs couleurs au lieu d'un nom dans une liste
+- Deux nouveaux réglages : la taille du texte et la largeur de page, en trois crans chacun. Le réglage de police de votre navigateur reste respecté
+- Les pages de lecture suivie, tutoriels et sources, resserrent leur cadre autour du texte : moins de vide à droite et des lignes plus longues, donc moins de retours à la ligne
+- La largeur de lecture est recalée pour chaque habillage : elle était très inégale d'un habillage à l'autre, à cause de la largeur des lettres de chaque police
+- En mode sombre, la barre du haut se détache du fond au lieu de s'y fondre
+- Changer un réglage ne remonte plus la page et ne la déplace plus sous le curseur
+
 ## 1.17.1 · 2026-07-27
 - La police choisie s'applique désormais à tout le texte de l'application, et plus seulement aux passages de lecture. Le réglage s'appelle simplement « Police »
 - Les cartes, encadrés et blocs prennent le relief de leur habillage, et les commandes cliquables une élévation plus courte : Vélin la donne douce, Colophon nette, Ardoise presque plate

@@ -34,7 +34,7 @@ const store = {
    pour les réglages déjà enregistrés : il ne faut perdre le choix de personne. */
 const PARAMS = Object.assign({
   mode: "auto", themeClair: "velin", themeSombre: "velin",
-  police: "auto", anim: "auto",
+  police: "auto", anim: "auto", taille: "normale", largeur: "normale",
   translit: "fr", showTl: true, showTr: true,
   taj: true, speed: 1, newLimit: 15, silentMarks: true,
   recitation: "husary64", karaoke: true,
@@ -113,6 +113,12 @@ function applyTheme() {
      pour le mode et les animations, on n'écrit JAMAIS dans `store` la valeur
      résolue, sinon on fige un choix que personne n'a fait. */
   r.setAttribute("data-police", PARAMS.police || "auto");
+  /* deux réglages de confort, locaux comme tous les autres (la synchro ne
+     transporte que la progression) : la taille agit sur la RACINE, donc sur
+     tous les corps en rem à la fois, ce qui préserve les rapports entre
+     titres et texte calés par la direction artistique. */
+  r.setAttribute("data-taille", PARAMS.taille || "normale");
+  r.setAttribute("data-largeur", PARAMS.largeur || "normale");
 }
 /* en mode « suivre le système », un basculement de l'OS doit changer le mode ET
    le thème associé, sans recharger */
@@ -713,8 +719,17 @@ function tajChunk(s, from, to, cls) {
 
 /* chaque mot récité est encapsulé (data-w = index dans les segments audio) :
    c'est le support du soulignage mot à mot pendant la récitation */
-function arHtml(v) {
-  const taj = PARAMS.taj && v.taj && v.taj.length ? v.taj : null;
+/* `seule` : ne colorer QUE cette classe de portée, tout le reste en encre
+   neutre. C'est ce qui permet à un exemple d'ISOLER la règle dont il parle
+   (exigence de Yusuf, 28/07). L'alternative, chercher un verset pauvre en
+   règles, a été mesurée et ne suffit pas : sur le roub' 1, le meilleur candidat
+   pour la qalqala porte encore quatre autres couleurs sur 109 signes. Ici on ne
+   dépend plus du verset, puisque les portées déclarent leurs positions exactes.
+   Le réglage « Couleurs tajwid » reste souverain : s'il est coupé, l'exemple ne
+   colore rien non plus, on ne va pas contredire un choix explicite. */
+function arHtml(v, seule) {
+  const portees = seule && v.taj ? v.taj.filter(([, , c]) => c === seule) : v.taj;
+  const taj = PARAMS.taj && portees && portees.length ? portees : null;
   let cls = null;
   if (taj) {
     cls = new Array(v.ar.length).fill(null);
@@ -755,7 +770,7 @@ window.addEventListener("hashchange", () => {
   if (!document.startViewTransition) {
     /* repli : sans l'API, l'ancien écran ne peut pas être photographié, donc
        pas de sortie. On anime la seule entrée, par une classe sur #main. */
-    render();
+    renderNavigation();
     const m = $("#main");
     m.classList.remove("ecran-entre");
     void m.offsetWidth;            // force le redémarrage de l'animation
@@ -765,7 +780,7 @@ window.addEventListener("hashchange", () => {
     m.addEventListener("animationend", () => m.classList.remove("ecran-entre"), { once: true });
     return;
   }
-  document.startViewTransition(render);
+  document.startViewTransition(renderNavigation);
 });
 
 function route() {
@@ -792,12 +807,25 @@ function render() {
   else if (page === "params") main.innerHTML = pageParams();
   else if (page === "sources") main.innerHTML = pageSources();
   else main.innerHTML = pageHome();
+  /* les pages de lecture suivie resserrent leur cadre autour de la colonne ;
+     les autres, qu'on balaie, gardent toute la largeur (cf. styles.css) */
+  main.classList.toggle("page-lecture", page === "tutoriels" || page === "sources");
   bindMain();
   verifierPolicesPages();
+}
+
+/* ⚠ Remonter en haut appartient à la NAVIGATION, pas au rendu. C'était dans
+   `render()`, donc changer de thème dans Paramètres renvoyait en haut de page
+   alors qu'on venait de descendre pour trouver le réglage (signalé par Yusuf le
+   28/07). Or `render()` est appelé par une vingtaine de choses qui ne sont pas
+   des navigations : puces d'options, réglages, et jusqu'au retour de la
+   synchro, qui aurait donc pu remonter la page tout seul en pleine lecture.
+   C'est exactement la couture déjà retenue pour les animations : seul
+   `hashchange` est une navigation. La barre du haut suit la même règle, sinon
+   elle se redéploierait à chaque réglage. */
+function renderNavigation() {
+  render();
   window.scrollTo(0, 0);
-  /* un changement d'écran rend toujours la barre du haut : on n'arrive pas sur
-     une page sans sa navigation. Explicite, parce que remonter une page déjà en
-     haut ne produit aucun événement de défilement. */
   dernierY = 0; cumulDefilement = 0; sensDefilement = 0;
   poserTopbar(false);
 }
@@ -2014,9 +2042,12 @@ function tutoRegles() {
 /* les trois directions livrées par la refonte ; `police` est celle que le thème
    sélectionne d'office, l'utilisateur pouvant ensuite en changer */
 const THEMES = [
-  { id: "velin",    nom: "Vélin",    police: "Gentium Book", desc: "le livre posé" },
-  { id: "ardoise",  nom: "Ardoise",  police: "Noto Sans",    desc: "l'outil de tous les jours" },
-  { id: "colophon", nom: "Colophon", police: "Charis",       desc: "l'édition savante" },
+  { id: "velin",    nom: "Vélin",    police: "Gentium Book", desc: "le livre posé",
+    apercu: "Sérif, papier chaud", apercuSombre: "Brun d'encre chaud" },
+  { id: "ardoise",  nom: "Ardoise",  police: "Noto Sans",    desc: "l'outil de tous les jours",
+    apercu: "Sans empattement, dense", apercuSombre: "Ardoise neutre, sans bleu" },
+  { id: "colophon", nom: "Colophon", police: "Charis",       desc: "l'édition savante",
+    apercu: "Sérif d'édition, indigo", apercuSombre: "Nocturne indigo" },
 ];
 /* Les trois polices de prose livrées avec la refonte, toutes sous licence SIL
    Open Font 1.1 et servies depuis le dépôt. `--font-ui` reste Noto Sans dans
@@ -2033,144 +2064,200 @@ function policeDuTheme() {
   return t ? t.police : THEMES[0].police;
 }
 
-/* une rangée par mode : montrer laquelle est appliquée MAINTENANT et laquelle
-   est en veille est ce qui fait comprendre qu'il y a deux réglages distincts */
-function rangeeTheme(champ, libelle, mode) {
+
+/* ---- composants de la page Paramètres ----------------------------------
+   Trois ajouts du 28/07, après comparaison avec la maquette : la page empilait
+   DIX-HUIT rangées identiques, sans hiérarchie, chacune portant un paragraphe
+   de 120 à 240 signes. Ce n'était pas une affaire de jetons mais de
+   composition. D'où des sections nommées, un contrôle segmenté pour les choix
+   courts, et des vignettes qui MONTRENT les thèmes au lieu de les nommer. */
+
+/* choix court : on voit les options sans ouvrir quoi que ce soit */
+function segment(champ, options, courant) {
+  return `<div class="segment" role="group">` + options.map(([v, lab]) =>
+    `<button type="button" class="${courant === v ? "on" : ""}" data-seg="${champ}" data-val="${v}"
+      >${esc(lab)}</button>`).join("") + `</div>`;
+}
+
+/* Lit les couleurs d'un thème en les faisant RÉSOUDRE par le navigateur : on
+   pose l'attribut sur :root le temps d'une lecture, puis on le remet. Les blocs
+   de roub-themes.css visent `:root[data-theme=...]`, donc un élément imbriqué
+   ne les déclencherait pas, et recopier les six palettes ici créerait une
+   seconde source de vérité, exactement ce qu'on passe la journée à corriger.
+   Tout est synchrone : aucun état intermédiaire n'est peint. */
+function paletteDe(theme, mode) {
+  const r = document.documentElement, y0 = window.scrollY;
+  const t0 = r.getAttribute("data-theme"), m0 = r.getAttribute("data-mode");
+  r.setAttribute("data-theme", theme);
+  if (mode) r.setAttribute("data-mode", mode);
+  const cs = getComputedStyle(r), p = {};
+  for (const k of ["--bg", "--panel", "--border", "--text", "--muted", "--accent", "--accent2"]) {
+    p[k] = cs.getPropertyValue(k).trim();
+  }
+  if (t0) r.setAttribute("data-theme", t0); else r.removeAttribute("data-theme");
+  if (m0) r.setAttribute("data-mode", m0); else r.removeAttribute("data-mode");
+  /* ⚠ essayer un thème change la HAUTEUR du document (mesuré : 2980 → 2876 px).
+     Si le défilement courant dépasse le nouveau maximum, le navigateur le borne,
+     et la position est perdue au retour. On la restaure : tout est synchrone,
+     donc rien n'est peint entre-temps. */
+  if (window.scrollY !== y0) window.scrollTo(0, y0);
+  return p;
+}
+
+/* une vignette par thème : barre du haut, deux lignes de texte, les deux
+   accents. On montre ce qu'on va obtenir plutôt que d'en donner le nom. */
+function vignettesTheme(champ, mode) {
   const actif = modeEffectif() === mode;
-  return `<div class="param-row"><div class="lab"><b>${libelle}</b>
-      <span>${actif ? "appliqué maintenant" : "en veille"}</span></div>
-    <select data-param="${champ}">
-      ${THEMES.map(t => `<option value="${t.id}" ${PARAMS[champ] === t.id ? "selected" : ""}
-        >${t.nom} · ${t.desc}</option>`).join("")}
-    </select></div>`;
+  const nomMode = mode === "light" ? "clair" : "sombre";
+  return `<div class="param-bloc param-bloc-large">
+    <div class="lab"><b>Thème du mode ${nomMode}
+      <span class="etat ${actif ? "on" : ""}">${actif ? "appliqué maintenant" : "en veille"}</span></b>
+      <span>Employé quand le mode ${nomMode} est actif.</span></div>
+    <div class="vignettes">${THEMES.map(th => {
+      const p = paletteDe(th.id, mode), choisi = PARAMS[champ] === th.id;
+      return `<button type="button" class="vignette ${choisi ? "on" : ""}"
+        data-seg="${champ}" data-val="${th.id}">
+        <span class="v-vue" style="background:${p["--bg"]};border-color:${p["--border"]}">
+          <span class="v-barre" style="background:${p["--panel"]};border-color:${p["--border"]}"></span>
+          <span class="v-t1" style="background:${p["--text"]}"></span>
+          <span class="v-t2" style="background:${p["--muted"]}"></span>
+          <span class="v-a1" style="background:${p["--accent"]}"></span>
+          <span class="v-a2" style="background:${p["--accent2"]}"></span>
+        </span>
+        <span class="v-nom">${esc(th.nom)}${choisi ? "<b>choisi</b>" : ""}</span>
+        <span class="v-desc">${esc(mode === "dark" ? th.apercuSombre : th.apercu)}</span>
+      </button>`;
+    }).join("")}</div>
+  </div>`;
+}
+
+/* une rangée ordinaire : libellé, explication courte, commande à droite */
+function rangee(titre, desc, commande) {
+  return `<div class="param-bloc"><div class="lab"><b>${titre}</b>
+    ${desc ? `<span>${desc}</span>` : ""}</div>${commande}</div>`;
+}
+function interrupteur(champ) {
+  return `<label class="switch"><input type="checkbox" data-param="${champ}"
+    ${PARAMS[champ] ? "checked" : ""}><span class="sl"></span></label>`;
+}
+function section(titre, contenu) {
+  return `<h2 class="param-sec">${titre}</h2><div class="param-groupe">${contenu}</div>`;
 }
 
 function pageParams() {
-  return `<div class="hero"><h1>Paramètres</h1></div>
-  <div class="param-row"><div class="lab"><b>Mode</b>
-      <span>ce que commande la bascule en haut à droite. « Suivre le système »
-      reprend le réglage clair ou sombre de ton appareil.</span></div>
-    <select data-param="mode">
-      <option value="auto" ${PARAMS.mode !== "light" && PARAMS.mode !== "dark" ? "selected" : ""}>Suivre le système</option>
-      <option value="light" ${PARAMS.mode === "light" ? "selected" : ""}>Clair</option>
-      <option value="dark" ${PARAMS.mode === "dark" ? "selected" : ""}>Sombre</option>
-    </select></div>
-  ${rangeeTheme("themeClair", "Thème du mode clair", "light")}
-  ${rangeeTheme("themeSombre", "Thème du mode sombre", "dark")}
-  <div class="param-row"><div class="lab"><b>Police</b>
-      <span>elle s'applique à tout le texte de l'application. Chaque thème vient
-      avec la sienne : ${policeDuTheme()} pour le thème appliqué en ce moment.
-      Tu peux en choisir une autre sans changer de thème. Le texte arabe, lui,
-      garde sa calligraphie.</span></div>
-    <select data-param="police">
-      <option value="auto" ${PARAMS.police !== "gentium" && PARAMS.police !== "notosans" && PARAMS.police !== "charis" ? "selected" : ""}
+  const listePolice = `<select data-param="police">
+      <option value="auto" ${!POLICES.some(p => p.id === PARAMS.police) ? "selected" : ""}
         >Celle du thème (${policeDuTheme()})</option>
       ${POLICES.map(p => `<option value="${p.id}" ${PARAMS.police === p.id ? "selected" : ""}
         >${p.nom} · ${p.desc}</option>`).join("")}
-    </select></div>
-  <div class="param-row"><div class="lab"><b>Animations</b>
-      <span>les fondus au changement d'écran et le repli de la barre du haut.
-      « Suivre le système » respecte le réglage d'accessibilité de ton appareil ;
-      les deux autres décident sans lui. Le soulignage de la récitation n'est
-      jamais concerné.</span></div>
-    <select data-param="anim">
-      <option value="auto" ${PARAMS.anim !== "reduite" && PARAMS.anim !== "complete" ? "selected" : ""}>Suivre le système</option>
-      <option value="reduite" ${PARAMS.anim === "reduite" ? "selected" : ""}>Réduites</option>
-      <option value="complete" ${PARAMS.anim === "complete" ? "selected" : ""}>Complètes</option>
-    </select></div>
-  <div class="param-row"><div class="lab"><b>Translittération</b>
-      <span>hybride française (th, dj, kh, ou...) ou scientifique stricte (ṯ, ǧ, ḫ, ū...) :
-      voir le tutoriel « Lire la translittération »</span></div>
-    <select data-param="translit">
-      <option value="fr" ${PARAMS.translit === "fr" ? "selected" : ""}>Hybride française</option>
-      <option value="sci" ${PARAMS.translit === "sci" ? "selected" : ""}>Scientifique stricte</option>
-    </select></div>
-  <div class="param-row"><div class="lab"><b>Couleurs tajwid</b><span>coloration des règles dans le texte arabe</span></div>
-    <label class="switch"><input type="checkbox" data-param="taj" ${PARAMS.taj ? "checked" : ""}><span class="sl"></span></label></div>
-  <div class="param-row"><div class="lab"><b>Ronds des lettres muettes</b>
-      <span>le rond fermé ۟ du mushaf au-dessus des lettres écrites mais non prononcées ;
-      redondant avec le gris tajwid, certains mushafs ne l'impriment pas</span></div>
-    <label class="switch"><input type="checkbox" data-param="silentMarks" ${PARAMS.silentMarks ? "checked" : ""}><span class="sl"></span></label></div>
-  <div class="param-row"><div class="lab"><b>Translittération visible</b><span>affichée par défaut sous chaque verset</span></div>
-    <label class="switch"><input type="checkbox" data-param="showTl" ${PARAMS.showTl ? "checked" : ""}><span class="sl"></span></label></div>
-  <div class="param-row"><div class="lab"><b>Traduction visible</b><span>Hamidullah, affichée par défaut</span></div>
-    <label class="switch"><input type="checkbox" data-param="showTr" ${PARAMS.showTr ? "checked" : ""}><span class="sl"></span></label></div>
-  <div class="param-row"><div class="lab"><b>Style de récitation</b>
-      <span>Al-Husary dans les quatre cas. Le murattal 64 kbps est fourni avec
-      l'appli (et fonctionne donc aussi depuis une copie locale) ; les autres se
-      chargent depuis leur source. Dans tous les cas, ce qui a été écouté reste
-      en cache sur cet appareil ; pour tout avoir d'avance, chaque style se
-      précharge séparément plus bas dans cette page. Si tu utilises un bloqueur
-      de publicités (uBlock Origin et consorts), autorise-lui
-      <code>mirrors.quranicaudio.com</code> et <code>audio-cdn.tarteel.ai</code> :
-      sinon ces trois styles restent muets, le murattal 64 kbps étant le seul
-      fourni avec l'appli</span>
+    </select>`;
+
+  const sync = !SYNC_ON
+    ? rangee("Synchronisation multi-appareils",
+        "Bientôt : reprendre sa progression sur un autre appareil, par code secret anonyme.",
+        `<button class="fb-send" disabled>Bientôt</button>`)
+    : SYNC
+    ? rangee("Synchronisation active",
+        `Ce navigateur est associé à un code. <span id="sync-status">${esc(syncStatus || "en attente de la première synchro")}</span>`,
+        `<span class="param-actions">
+          <button class="fb-send" data-sync-show>Voir le code</button>
+          <button class="iconbtn" data-sync-unlink title="dissocier ce navigateur (la progression locale reste)">Dissocier</button>
+        </span>`)
+    : rangee("Synchronisation multi-appareils",
+        "Un code secret sur le premier appareil, saisi sur les autres : la progression fusionne. <b>Le code est irrécupérable.</b>",
+        `<span class="param-actions">
+          <button class="fb-send" data-sync-create>Générer un code</button>
+          <button class="iconbtn" data-sync-join>Saisir un code</button>
+        </span>`);
+
+  return `<div class="hero"><h1>Paramètres</h1></div>
+  <p class="param-intro">Tout reste dans ce navigateur. Rien n'est envoyé ailleurs sans que tu l'actives.</p>
+
+  ${section("Apparence",
+    rangee("Mode", "Pilote aussi la bascule en haut à droite.",
+      segment("mode", [["auto", "Suivre le système"], ["light", "Clair"], ["dark", "Sombre"]],
+        PARAMS.mode === "light" || PARAMS.mode === "dark" ? PARAMS.mode : "auto"))
+    + vignettesTheme("themeClair", "light")
+    + vignettesTheme("themeSombre", "dark")
+    + rangee("Police", "Celle du thème est prise d'office. En changer ne change pas le thème.", listePolice)
+    + rangee("Taille du texte", "Agit sur toute l'application. Ton navigateur a aussi son propre réglage, qui reste respecté.",
+        segment("taille", [["compacte", "Compacte"], ["normale", "Normale"], ["grande", "Grande"]],
+          PARAMS.taille || "normale"))
+    + rangee("Largeur de page", "La largeur des colonnes de lecture. Les écrans qu'on parcourt ne bougent pas.",
+        segment("largeur", [["etroite", "Étroite"], ["normale", "Normale"], ["large", "Large"]],
+          PARAMS.largeur || "normale"))
+    + rangee("Animations", "Réduites : les écrans se remplacent par un fondu, sans glissement.",
+        segment("anim", [["auto", "Suivre le système"], ["reduite", "Réduites"], ["complete", "Complètes"]],
+          PARAMS.anim === "reduite" || PARAMS.anim === "complete" ? PARAMS.anim : "auto")))}
+
+  ${section("Lecture",
+    rangee("Translittération",
+      `Hybride française (th, dj, kh, ou...) ou scientifique stricte (ṯ, ǧ, ḫ, ū...) : <span class="vref" data-tuto="translit">le tutoriel →</span>`,
+      `<select data-param="translit">
+        <option value="fr" ${PARAMS.translit === "fr" ? "selected" : ""}>Hybride française</option>
+        <option value="sci" ${PARAMS.translit === "sci" ? "selected" : ""}>Scientifique stricte</option>
+      </select>`)
+    + rangee("Translittération visible", "Affichée sous chaque verset.", interrupteur("showTl"))
+    + rangee("Traduction visible", "Hamidullah, sous chaque verset.", interrupteur("showTr"))
+    + rangee("Couleurs tajwid", "Les douze couleurs ne changent pas avec le thème.", interrupteur("taj"))
+    + rangee("Ronds des lettres muettes",
+        "Le rond fermé ۟ du mushaf sur les lettres écrites mais non prononcées ; certains mushafs ne l'impriment pas.",
+        interrupteur("silentMarks")))}
+
+  ${section("Récitation",
+    `<div class="param-bloc"><div class="lab"><b>Style de récitation</b>
+      <span>Al-Husary dans les quatre cas. Seul le murattal 64 kbps est fourni
+      avec l'appli ; les autres se chargent depuis leur source et restent en
+      cache après écoute.</span>
       <details class="aide-repli"><summary>Lequel choisir ?</summary>
     <div class="aide-styles">${gloss(`<p>Les quatre enregistrements sont du cheikh <b>Mahmoud Khalil
     al-Husary</b> (Hafs 'an 'Âsim) : ils diffèrent par l'allure, non par le texte.</p>
-    <p><b>Murattal</b> — pour mémoriser : lecture mesurée, sans ornementation. Les versions
+    <p><b>Murattal</b> : pour mémoriser, lecture mesurée, sans ornementation. Les versions
     64 et 128 kbps sont la <b>même récitation</b>, seule la finesse du son change.</p>
-    <p><b>Mu'allim</b> — pour répéter derrière le cheikh : plus lente, plus détachée. Elle
+    <p><b>Mu'allim</b> : pour répéter derrière le cheikh, plus lente et plus détachée. Elle
     rejoint ce qu'Ibn al-Jazarî appelle le {{taḥqîq}}, « l'allure recommandée à celui qui
     apprend » (<i>an-Nashr</i>, t. I).</p>
-    <p><b>Mujawwad</b> — pour écouter : solennelle et mélodique, prolongations longuement
+    <p><b>Mujawwad</b> : pour écouter, solennelle et mélodique, prolongations longuement
     tenues ; sur un même verset, 13,4 secondes contre 8,0 en murattal.</p>
+    <p>Si tu utilises un bloqueur de publicités, autorise-lui <code>mirrors.quranicaudio.com</code>
+    et <code>audio-cdn.tarteel.ai</code> : sinon ces trois styles restent muets, le murattal
+    64 kbps étant le seul fourni avec l'appli.</p>
     <p class="src">Ibn al-Jazarî rappelle que ces allures sont toutes licites.
     <span class="vref" data-tuto="styles">Tout le tutoriel des styles →</span></p>`)}</div>
       </details></div>
     <select data-param="recitation">
       ${Object.entries(RECITS).map(([k, r]) =>
         `<option value="${k}" ${recitKey() === k ? "selected" : ""}>${esc(r.nom)}</option>`).join("")}
-    </select></div>
-  <div class="param-row"><div class="lab"><b>Soulignage mot à mot</b>
-      <span>souligne le mot en cours de récitation dans le texte arabe</span></div>
-    <label class="switch"><input type="checkbox" data-param="karaoke" ${PARAMS.karaoke ? "checked" : ""}><span class="sl"></span></label></div>
-  <div class="param-row"><div class="lab"><b>Vitesse audio</b><span>récitation Husary</span></div>
-    <select data-param="speed">
-      ${[0.75, 1, 1.25].map(x => `<option value="${x}" ${PARAMS.speed === x ? "selected" : ""}>${x}×</option>`).join("")}
-    </select></div>
-  <div class="param-row"><div class="lab"><b>Nouvelles cartes par session</b><span>révision espacée</span></div>
-    <select data-param="newLimit">
-      ${[5, 10, 15, 20, 30].map(x => `<option value="${x}" ${PARAMS.newLimit === x ? "selected" : ""}>${x}</option>`).join("")}
-    </select></div>
-  <div class="param-row"><div class="lab"><b>Exporter mes avis</b>
-      <span>télécharge un fichier .json avec toutes tes notes et remarques,
-      à envoyer à Yusuf : <a href="mailto:dev.yusuf@pm.me">dev.yusuf@pm.me</a></span></div>
-    <button class="fb-send" data-fb-export>Exporter</button></div>
-  ${!SYNC_ON ? `
-  <div class="param-row"><div class="lab"><b>Synchronisation multi-appareils</b>
-      <span>bientôt disponible : reprendre sa progression sur un autre appareil
-      grâce à un code secret anonyme</span></div>
-    <button class="fb-send" disabled>Bientôt</button></div>`
-  : SYNC ? `
-  <div class="param-row"><div class="lab"><b>Synchronisation active</b>
-      <span>ce navigateur est associé à un code de synchro.
-      <span id="sync-status">${esc(syncStatus || "en attente de la première synchro")}</span></span></div>
-    <span>
-      <button class="fb-send" data-sync-show>Voir le code</button>
-      <button class="iconbtn" data-sync-unlink title="dissocier ce navigateur (la progression locale reste)">Dissocier</button>
-    </span></div>`
-  : `
-  <div class="param-row"><div class="lab"><b>Synchronisation multi-appareils</b>
-      <span>génère un code secret sur ton premier appareil, puis saisis-le sur
-      les autres : la progression (révision, journal, auto-évaluations) fusionne.
-      <b>Le code est irrécupérable : garde-le en lieu sûr.</b></span></div>
-    <span>
-      <button class="fb-send" data-sync-create>Générer un code</button>
-      <button class="iconbtn" data-sync-join>Saisir un code</button>
-    </span></div>`}
-  <div class="param-row"><div class="lab"><b>Précharger pour le hors-ligne</b>
-      <span>le texte, les notes, le tafsir et l'interface sont déjà gardés
-      hors-ligne dès la première visite ; ci-dessous, choisis ce que tu veux
-      ajouter (chaque élément se télécharge séparément, inutile de tout prendre).
-      Sur iPhone/iPad, le quota de cache peut limiter le préchargement.
-      <span id="preload-status"></span></span>
+    </select></div>`
+    + rangee("Soulignage mot à mot", "Souligne le mot en cours dans le texte arabe.", interrupteur("karaoke"))
+    + rangee("Vitesse audio", "", `<select data-param="speed">
+        ${[0.75, 1, 1.25].map(x => `<option value="${x}" ${PARAMS.speed === x ? "selected" : ""}>${x}×</option>`).join("")}
+      </select>`))}
+
+  ${section("Révision et avis",
+    rangee("Nouvelles cartes par session", "Révision espacée.",
+      `<select data-param="newLimit">
+        ${[5, 10, 15, 20, 30].map(x => `<option value="${x}" ${PARAMS.newLimit === x ? "selected" : ""}>${x}</option>`).join("")}
+      </select>`)
+    + rangee("Exporter mes avis",
+        `Un fichier .json avec tes notes et remarques, à envoyer à <a href="mailto:dev.yusuf@pm.me">dev.yusuf@pm.me</a>`,
+        `<button class="fb-send" data-fb-export>Exporter</button>`))}
+
+  ${section("Hors connexion",
+    `<div class="param-bloc param-bloc-large"><div class="lab"><b>Précharger</b>
+      <span>Le texte, les notes, le tafsir et l'interface sont déjà gardés dès la
+      première visite. Choisis ce que tu veux ajouter ; sur iPhone et iPad, le
+      quota de cache peut limiter le préchargement.
+      <span id="preload-status"></span></span></div>
       <div class="preload-list">
       ${[["pages", "Pages du mushaf"]].concat(Object.entries(RECITS).map(([k, r]) => [k, r.nom]))
         .map(([k, nom]) => `<div class="preload-item"><span>${esc(nom)} <b>~${PRELOAD_MO[k]} Mo</b></span>
           <button class="iconbtn" data-preload="${k}" ${("serviceWorker" in navigator) && navigator.serviceWorker.controller ? "" : "disabled title='disponible sur la version en ligne (après un premier chargement)'"}>Précharger</button></div>`).join("")}
-      </div></div></div>
-  <p style="color:var(--muted);font-size:13px">Version : <b id="appver">${esc(APPVER || "…")}</b><br><br>
+      </div></div>`)}
+
+  ${section("Synchronisation", sync)}
+
+  <p class="param-pied">Version : <b id="appver">${esc(APPVER || "…")}</b><br><br>
     <b>Anis</b> (co-fondateur, docteur en mathématiques) : à l'origine de la
     méthode. <b>Yusuf</b> (co-fondateur, interne en médecine) : conception et
     réalisation. <b>Israa</b> (ostéopathe) : conseillère pédagogique.
@@ -2404,6 +2491,19 @@ function bindMain() {
   }));
 
   /* paramètres */
+  /* segments et vignettes : un bouton porte le champ et sa valeur. Même
+     effet qu'une liste déroulante, mais la valeur courante se lit sans ouvrir. */
+  /* Un réglage n'est pas une navigation : la page ne doit pas bouger d'un pixel
+     sous le curseur. `render()` reconstruit #main, dont la hauteur change d'un
+     rendu à l'autre, donc on remet le défilement là où il était. Signalé par
+     Yusuf le 28/07 : « à chaque fois que je clique sur un paramètre, la page
+     descend un peu ». */
+  const sansBouger = f => { const y = window.scrollY; f(); window.scrollTo(0, y); };
+  $$("[data-seg]", main).forEach(el => el.addEventListener("click", () => {
+    PARAMS[el.dataset.seg] = el.dataset.val;
+    saveParams();   // saveParams appelle déjà applyTheme()
+    sansBouger(render);   // l'état « appliqué maintenant / en veille » change aussi
+  }));
   $$("[data-param]", main).forEach(el => {
     el.addEventListener("change", () => {
       const k = el.dataset.param;
@@ -2414,7 +2514,7 @@ function bindMain() {
       saveParams();   // saveParams appelle déjà applyTheme()
       /* changer de mode ou de thème change aussi le libellé « appliqué
          maintenant / en veille » des deux rangées : il faut repeindre l'écran */
-      if (["mode", "themeClair", "themeSombre", "police", "anim"].includes(k)) render();
+      if (["mode", "themeClair", "themeSombre", "police", "anim", "taille", "largeur"].includes(k)) sansBouger(render);
     });
   });
 
@@ -2702,7 +2802,7 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "1.17.1";   // réécrit par tools/release.py
+const BUILD_VERSION = "1.17.2";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {

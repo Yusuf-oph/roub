@@ -197,7 +197,7 @@ button { font: inherit; cursor: pointer; }
    La navigation du haut est exclue : ses boutons n'ont ni fond ni filet, une
    ombre y flotterait sans surface à soulever. */
 .iconbtn, .chip, .tabs button, .audiobar button, .audiobar select,
-.param-row select, .param-row input[type="range"], .fc-actions button,
+.param-bloc select, .param-bloc input[type="range"], .fc-actions button,
 .fb-box .fb-send, .fb-box textarea, .pill, .vref {
   box-shadow: var(--shadow-sm);
 }
@@ -207,7 +207,13 @@ button { font: inherit; cursor: pointer; }
   position: sticky; top: 0; z-index: 40;
   display: flex; align-items: center; gap: 14px;
   padding: 10px 18px;
-  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  /* --panel et non --bg : la barre est une surface POSÉE sur la page, pas un
+     morceau de page. Sur --bg elle se fondait dans le fond et ne se lisait que
+     par son filet du bas (écart relevé par Yusuf contre la maquette, 28/07).
+     En Vélin clair, #fffaf0 contre #f4efe3 : c'est peu, mais c'est ce peu qui
+     fait qu'une barre se détache. On garde le flou d'arrière-plan, qui sert
+     quand le contenu défile dessous. */
+  background: color-mix(in srgb, var(--panel) 94%, transparent);
   backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--border);
   /* Repli au défilement (mobile seulement : les seuils valent 0 en large, cf.
@@ -218,6 +224,18 @@ button { font: inherit; cursor: pointer; }
      qu'on ne la perd, c'est l'asymétrie voulue par la direction artistique. */
   transition: transform var(--topbar-show-dur) var(--topbar-ease);
 }
+/* En SOMBRE, --panel n'est que 5 unités au-dessus de --bg (#191712 contre
+   #14130f) : la barre se fond quand même. Mesuré le 28/07 après que Yusuf a
+   relevé qu'elle devait se détacher dans les deux modes. --bg2 donne +8, ce qui
+   se voit, sans monter jusqu'à --bg3 (+18) qui écraserait les cartes. En clair
+   la question ne se pose pas, --panel y est déjà 11 unités au-dessus.
+   Trio habituel : l'attribut pour un choix explicite, la requête média pour
+   « suivre le système ». */
+:root[data-mode="dark"] .topbar { background: color-mix(in srgb, var(--bg2) 94%, transparent); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-mode="light"]) .topbar { background: color-mix(in srgb, var(--bg2) 94%, transparent); }
+}
+
 :root.topbar-repliee .topbar {
   transform: translateY(-100%);
   transition-duration: var(--topbar-hide-dur);
@@ -280,6 +298,43 @@ button { font: inherit; cursor: pointer; }
   --audiobar-h: 62px;
   --bottom-h: calc(var(--audiobar-h) + var(--navbar-h) + env(safe-area-inset-bottom, 0px));
 }
+/* ---------- deux réglages de confort (28/07) ----------
+   TAILLE : on agit sur la taille de base du DOCUMENT, en pourcentage. Toutes
+   les échelles typographiques des thèmes sont en rem, donc un seul réglage les
+   déplace toutes en bloc et les rapports entre titres et corps, calés par la
+   direction artistique, restent intacts. En POURCENTAGE et jamais en px : la
+   valeur reste relative à la préférence du navigateur, qu'on ne doit pas
+   écraser — c'est le mécanisme d'accessibilité standard, et il marche déjà.
+   Les espacements sont en px et ne bougent pas : c'est voulu, un texte plus
+   grand dans des marges stables reste lisible, l'inverse déforme les écrans.
+   LARGEUR : un facteur appliqué à --measure, qui reste la source. Le cadre des
+   pages de lecture en dérive, donc les deux suivent sans qu'on entretienne
+   deux séries de valeurs. */
+:root[data-taille="compacte"] { font-size: 93.75%; }
+:root[data-taille="grande"]   { font-size: 112.5%; }
+/* Échelle décalée d'un cran le 28/07 : ce qui s'appelait « large » devient la
+   NORMALE, et un cran plus large apparaît au-dessus. Le facteur par défaut est
+   donc posé sur :root et non laissé au repli du `var()`, sinon le tout premier
+   rendu, avant que app.js ne pose l'attribut, servirait une colonne plus
+   étroite que le réglage — un clignotement de largeur au chargement. */
+:root                         { --largeur-f: 1.18; }
+:root[data-largeur="etroite"] { --largeur-f: 1; }
+:root[data-largeur="large"]   { --largeur-f: 1.36; }
+
+/* Le cadre suit le TYPE DE PAGE, demande de Yusuf du 28/07. Constat mesuré :
+   une colonne de 66 signes dans un cadre de 1080 laissait 540 px de vide d'un
+   SEUL côté, d'où l'impression d'un texte comprimé dans un coin et ces retours
+   à la ligne incessants. Deux corrections, et pas une seule : la mesure monte
+   (blocs de thème de roub-themes.css, 84 / 88 / 80 signes, l'ordre voulu par le
+   dessinateur étant conservé), et sur les pages de LECTURE SUIVIE le cadre se
+   resserre jusqu'à la colonne.
+   ⚠ Le resserrement ne vaut QUE pour ces pages. Rétrécir `.wrap` partout aurait
+   fait tomber la grille d'accueil de quatre cartes à trois, puisqu'elle est en
+   auto-fill sur des colonnes de 240 px : vérifié avant de choisir. Les pages
+   qu'on BALAIE gardent leur largeur.
+   Le cadre est DÉRIVÉ de la mesure, jamais écrit à côté : chaque thème garde
+   ainsi son propre ratio sans qu'on entretienne deux séries de valeurs. */
+.wrap.page-lecture { max-width: calc(var(--measure) * var(--largeur-f, 1) + 2 * var(--gutter)); }
 .wrap {
   max-width: 1080px; margin: 0 auto;
   padding: var(--sp-5) var(--gutter) calc(var(--bottom-h) + var(--sp-4));
@@ -296,7 +351,7 @@ button { font: inherit; cursor: pointer; }
 /* le paragraphe d'en-tête est du texte suivi : il se borne à la colonne de
    lecture comme le reste, sinon il court sur toute la largeur de l'écran */
 .hero-txt { min-width: 0; }
-.hero-txt p { max-width: var(--measure, none); }
+.hero-txt p { max-width: calc(var(--measure) * var(--largeur-f, 1)); }
 .hero h1 { margin: 0 0 4px; font-size: var(--fs-700); }
 .hero p { margin: 0; color: var(--muted); }
 .juz-title {
@@ -637,8 +692,8 @@ button { font: inherit; cursor: pointer; }
 
 /* aide contextuelle « Lequel choisir ? » : elle vit dans un .lab de Paramètres,
    dont la règle « .lab b { display:block } » casserait les phrases */
-.param-row .lab .aide-repli { margin-top: 8px; }
-.param-row .lab .aide-repli > summary {
+.param-bloc .lab .aide-repli { margin-top: 8px; }
+.param-bloc .lab .aide-repli > summary {
   cursor: pointer; color: var(--accent); font-size: var(--fs-300); font-weight: 600;
 }
 .aide-styles { font-size: var(--fs-300); line-height: 1.6; color: var(--text); margin-top: 6px; }
@@ -748,7 +803,7 @@ h2.sec { font-size: var(--fs-500); margin: 22px 0 8px; }
    tableau ou une planche n'a aucune raison de se serrer à la largeur d'une
    ligne de texte, et l'usage typographique les laisse déborder la mesure. */
 .prose { line-height: var(--lh-prose, 1.75); }
-.prose p, .prose li { max-width: var(--measure, none); }
+.prose p, .prose li { max-width: calc(var(--measure) * var(--largeur-f, 1)); }
 .prose p { margin: 12px 0; text-align: justify; hyphens: auto; }
 .prose ul { margin: 10px 0; padding-left: 22px; }
 .prose li { margin: 7px 0; text-align: justify; hyphens: auto; }
@@ -774,18 +829,85 @@ h2.sec { font-size: var(--fs-500); margin: 22px 0 8px; }
 .prose .biblio i { color: var(--fg); }
 
 /* ---------- paramètres ---------- */
-.param-row {
-  display: flex; justify-content: space-between; align-items: center; gap: 14px;
+/* ---------- page Paramètres ----------
+   Refondue le 28/07 : elle empilait dix-huit cartes identiques, sans hiérarchie.
+   Trois changements de COMPOSITION, aucun jeton nouveau. D'abord des sections
+   nommées. Ensuite un cadre COMMUN par section, les rangées n'étant plus
+   séparées que par un filet : dix-huit bordures et dix-huit ombres faisaient un
+   bruit proportionnel au nombre de réglages. Enfin des commandes qui montrent
+   leur état sans qu'on les ouvre. */
+.param-intro { color: var(--muted); margin: -8px 0 var(--sp-6); max-width: var(--measure, none); }
+.param-sec {
+  font-size: var(--fs-200); color: var(--muted); font-weight: 700;
+  text-transform: uppercase; letter-spacing: var(--ls-caps, .08em);
+  margin: var(--sp-6) 0 var(--sp-2);
+}
+.param-groupe {
   background: var(--panel); border: 1px solid var(--border);
-  border-radius: var(--r); padding: 13px 16px; margin-bottom: 10px;
-  box-shadow: var(--shadow);
+  border-radius: var(--r); box-shadow: var(--shadow); overflow: hidden;
 }
-.param-row .lab b { display: block; }
-.param-row .lab span { color: var(--muted); font-size: var(--fs-300); }
-.param-row select, .param-row input[type="range"] {
+/* la rangée n'a plus de cadre à elle : c'est la section qui le porte */
+.param-bloc {
+  display: flex; justify-content: space-between; align-items: center; gap: var(--sp-5);
+  padding: var(--sp-3) var(--sp-4);
+  border-top: 1px solid var(--border);
+}
+.param-groupe > .param-bloc:first-child { border-top: 0; }
+.param-bloc .lab b { display: block; }
+.param-bloc .lab span { color: var(--muted); font-size: var(--fs-300); }
+.param-bloc .lab { min-width: 0; }
+/* les blocs qui portent leur commande dessous plutôt qu'à droite */
+.param-bloc-large { flex-direction: column; align-items: stretch; }
+.param-bloc select, .param-bloc input[type="range"] {
   background: var(--bg3); color: var(--text); border: 1px solid var(--border);
-  border-radius: var(--r-sm); padding: 6px 10px;
+  border-radius: var(--r-sm); padding: 6px 10px; box-shadow: var(--shadow-sm);
 }
+.param-actions { display: flex; gap: var(--sp-2); flex: none; }
+.param-pied { color: var(--muted); font-size: var(--fs-300); margin-top: var(--sp-7); }
+
+/* pastille d'état : dire lequel des deux thèmes s'applique en ce moment */
+.etat {
+  display: inline-block; margin-left: var(--sp-2); padding: 1px 8px;
+  border-radius: var(--r-pill); font-size: var(--fs-100); font-weight: 700;
+  background: var(--bg3); color: var(--muted); vertical-align: 2px;
+}
+.etat.on { background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); }
+
+/* contrôle segmenté : trois options visibles d'un coup, pour les choix courts */
+.segment { display: flex; flex: none; border: 1px solid var(--border);
+  border-radius: var(--r-sm); overflow: hidden; box-shadow: var(--shadow-sm); }
+.segment button {
+  background: var(--bg3); color: var(--muted); border: 0;
+  padding: 7px 12px; font-size: var(--fs-300); font-weight: 600;
+  border-left: 1px solid var(--border); white-space: nowrap;
+}
+.segment button:first-child { border-left: 0; }
+.segment button.on { background: var(--accent); color: var(--panel); }
+
+/* vignettes de thème : on MONTRE la palette au lieu de la nommer. Les couleurs
+   sont posées en style inline par paletteDe(), qui les fait résoudre au
+   navigateur depuis roub-themes.css : pas de seconde source de vérité. */
+.vignettes { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-3); margin-top: var(--sp-3); }
+.vignette {
+  display: block; text-align: left; padding: var(--sp-2);
+  background: var(--bg3); color: var(--text);
+  border: 2px solid var(--border); border-radius: var(--r);
+}
+.vignette.on { border-color: var(--accent); }
+.v-vue {
+  display: block; height: 66px; border: 1px solid; border-radius: var(--r-sm);
+  padding: 7px; position: relative; overflow: hidden;
+}
+.v-barre { display: block; height: 13px; border-bottom: 1px solid; border-radius: 2px; margin: -7px -7px 8px; }
+.v-t1, .v-t2 { display: block; height: 4px; border-radius: 2px; opacity: .85; }
+.v-t1 { width: 58%; margin-bottom: 5px; }
+.v-t2 { width: 78%; margin-bottom: 8px; }
+.v-a1, .v-a2 { display: inline-block; height: 8px; border-radius: 4px; }
+.v-a1 { width: 26px; margin-right: 5px; }
+.v-a2 { width: 12px; }
+.v-nom { display: block; margin-top: 7px; font-weight: 700; font-size: var(--fs-300); }
+.v-nom b { float: right; color: var(--accent); font-weight: 600; font-size: var(--fs-100); }
+.v-desc { display: block; color: var(--muted); font-size: var(--fs-100); }
 .switch { position: relative; width: 44px; height: 24px; flex: none; }
 .switch input { opacity: 0; width: 0; height: 0; }
 .switch .sl {
@@ -898,9 +1020,21 @@ h2.sec { font-size: var(--fs-500); margin: 22px 0 8px; }
      aggravé en portant le corps de 15 à 17 px. On empile : l'explication en
      pleine largeur, la commande dessous, alignée à droite comme sur grand
      écran. */
-  .param-row { flex-direction: column; align-items: stretch; gap: 10px; }
-  .param-row select, .param-row input[type="range"] { align-self: flex-end; min-width: 60%; }
-  .param-row .switch { align-self: flex-end; }
+  /* en mobile la commande passe SOUS son explication : à 390 px, une colonne
+     de texte à côté d'une liste déroulante tombe à trois mots par ligne */
+  .param-bloc { flex-direction: column; align-items: stretch; gap: var(--sp-2); }
+  .param-bloc select, .param-bloc input[type="range"] { align-self: flex-end; min-width: 60%; }
+  .param-bloc .switch, .param-bloc .segment, .param-actions { align-self: flex-end; }
+  /* On GARDE les trois colonnes : à 390 px chaque vignette fait encore 111 px,
+     largement de quoi lire une palette, alors que les empiler coûterait près de
+     900 px de défilement pour les deux rangées de thèmes. Ce qui cède, c'est la
+     hauteur de l'aperçu et la description, pas le nombre de colonnes. */
+  .vignettes { gap: var(--sp-2); }
+  .v-vue { height: 48px; padding: 5px; }
+  .v-barre { height: 10px; margin: -5px -5px 6px; }
+  .v-desc { display: none; }
+  .v-nom { font-size: var(--fs-100); }
+  .v-nom b { float: none; display: block; }
 
   /* en mobile le logo repasse AU-DESSUS du titre : côte à côte, il mangerait
      un quart de la largeur utile */
