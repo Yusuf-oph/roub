@@ -81,31 +81,29 @@ html, body { margin: 0; padding: 0; }
 body {
   background: var(--bg);
   color: var(--text);
-  /* --font-ui est Noto Sans dans les trois directions ; la pile de repli reste
-     derrière, elle sert tant que le woff2 n'est pas arrivé et sous file://
-     si un fichier manque. */
-  font: var(--fs-400, 15px)/1.55 var(--font-ui, "Segoe UI", system-ui, sans-serif);
+  /* La police choisie gouverne TOUT le texte latin, interface comprise
+     (exigence de Yusuf, 27/07) : elle est donc posée sur le corps du document
+     et tout en hérite. La pile de repli reste derrière, elle sert tant que le
+     woff2 n'est pas arrivé et sous file:// si un fichier manque.
+     Conséquence assumée : `--font-ui`, que la direction artistique réservait au
+     chrome, n'a plus de consommateur. La distinction prose/interface qu'elle
+     portait ne survit pas à un réglage unique, et c'est le réglage qui gagne. */
+  font: var(--fs-400, 15px)/1.55 var(--font-prose, "Segoe UI", system-ui, sans-serif);
   min-height: 100vh;
 }
-/* Les surfaces de LECTURE prennent la police de prose du thème, celle que la
-   rangée « Police de lecture » commande. La ligne de partage est l'usage, pas
-   le composant : ce qu'on LIT prend la prose, ce qu'on MANŒUVRE garde la police
-   d'interface. Le texte coranique garde UthmanicHafs, hors périmètre.
-   ⚠ Corrigé le 27/07 : cette liste ne comptait au départ que .prose, .tl et .tr,
-   si bien que les onglets Tajwid, Difficultés et Vocabulaire, qui sont pourtant
-   du texte suivi, restaient en police d'interface. Sur Colophon, Charis
-   n'apparaissait donc nulle part sur ces écrans. Repéré par Yusuf à l'œil, et
-   confirmé à la mesure. Leçon : après avoir câblé un jeton, VÉRIFIER OÙ IL
-   S'APPLIQUE RÉELLEMENT, écran par écran, plutôt que de supposer la liste
-   complète. */
-.prose, .tl, .tr,
-.note-card, .tfr .tfr-body, .accueil-corps, .fc-card .fc-txt, .fc-card .fc-sub,
-.vocab-table td, .aide-styles {
-  font-family: var(--font-prose, inherit);
-}
-/* ... et ce qu'on manœuvre revient à la police d'interface, même à l'intérieur
-   d'une carte de lecture : pastilles de règle, renvois de verset, source. */
-.note-card .vref, .note-card .src, .pill, .badge { font-family: var(--font-ui, inherit); }
+/* Rien à réaffirmer surface par surface : tout hérite du corps du document.
+   L'historique de cette règle vaut d'être connu, il a coûté deux tours. Elle a
+   d'abord listé .prose, .tl et .tr seulement, si bien que les onglets Tajwid,
+   Difficultés et Vocabulaire, pourtant du texte suivi, restaient en police
+   d'interface : sur Colophon, Charis n'apparaissait alors NULLE PART sur ces
+   écrans. La liste a donc été élargie aux cartes de notes, puis Yusuf a tranché
+   plus court le 27/07 : la police choisie s'applique à TOUT. Une liste
+   d'exceptions est une liste qu'on oublie de tenir à jour.
+   Seul le texte coranique reste à part, avec UthmanicHafs, et il est hors
+   périmètre. Les formulaires n'héritent pas de la police du corps : on le leur
+   dit, sinon les listes déroulantes de Paramètres et de la barre audio
+   resteraient dans la police du système. */
+input, select, textarea { font-family: inherit; }
 a { color: var(--accent); text-decoration: none; }
 button { font: inherit; cursor: pointer; }
 
@@ -173,6 +171,35 @@ button { font: inherit; cursor: pointer; }
 :root[data-theme="colophon"] h2.sec {
   text-transform: uppercase;
   letter-spacing: var(--ls-caps);
+}
+
+/* --shadow-sm : notre extension. Le --shadow du dessinateur est calibré pour
+   des surfaces posées sur le fond ; appliqué à une pastille de 24 px de haut,
+   son flou de 16 px déborde l'objet (constaté et montré le 27/07). Les
+   contrôles prennent donc une élévation courte, dérivée de la teinte de chaque
+   thème pour rester cohérente : Vélin douce, Colophon nette, Ardoise presque
+   plate, fidèle à son parti « des filets plutôt que des ombres ». */
+:root, :root[data-theme="velin"] { --shadow-sm: 0 1px 3px rgba(74, 58, 28, .16); }
+:root[data-theme="ardoise"]      { --shadow-sm: 0 1px 1px rgba(35, 38, 42, .10); }
+:root[data-theme="colophon"]     { --shadow-sm: 0 1px 2px rgba(40, 38, 60, .16); }
+:root[data-mode="dark"] { --shadow-sm: 0 1px 3px rgba(0, 0, 0, .55); }
+:root[data-mode="dark"][data-theme="ardoise"] { --shadow-sm: 0 1px 1px rgba(0, 0, 0, .45); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-mode="light"]) { --shadow-sm: 0 1px 3px rgba(0, 0, 0, .55); }
+  :root:not([data-mode="light"])[data-theme="ardoise"] { --shadow-sm: 0 1px 1px rgba(0, 0, 0, .45); }
+}
+
+/* Ce qui se PRESSE prend l'élévation courte ; ce qui informe reste plat. Le
+   critère est l'interaction, pas l'apparence : la pastille de règle ouvre sa
+   fiche et le renvoi saute au verset, donc ils l'ont ; les badges « 17 cartes »
+   et « notes à venir » n'ont aucun gestionnaire de clic, donc ils ne l'ont pas,
+   sous peine de promettre un geste qui n'existe pas.
+   La navigation du haut est exclue : ses boutons n'ont ni fond ni filet, une
+   ombre y flotterait sans surface à soulever. */
+.iconbtn, .chip, .tabs button, .audiobar button, .audiobar select,
+.param-row select, .param-row input[type="range"], .fc-actions button,
+.fb-box .fb-send, .fb-box textarea, .pill, .vref {
+  box-shadow: var(--shadow-sm);
 }
 
 /* ---------- barre haute ---------- */
@@ -270,7 +297,7 @@ button { font: inherit; cursor: pointer; }
    lecture comme le reste, sinon il court sur toute la largeur de l'écran */
 .hero-txt { min-width: 0; }
 .hero-txt p { max-width: var(--measure, none); }
-.hero h1 { margin: 0 0 4px; font-size: var(--fs-600); }
+.hero h1 { margin: 0 0 4px; font-size: var(--fs-700); }
 .hero p { margin: 0; color: var(--muted); }
 .juz-title {
   display: flex; align-items: baseline; gap: 10px;
@@ -288,6 +315,7 @@ button { font: inherit; cursor: pointer; }
   border-radius: var(--r); padding: 14px; cursor: pointer;
   transition: transform .12s, border-color .12s;
   display: flex; flex-direction: column; gap: 6px;
+  box-shadow: var(--shadow);
 }
 .rub-card:hover { transform: translateY(-2px); border-color: var(--accent); }
 .rub-card.off { opacity: .55; cursor: default; }
@@ -336,12 +364,14 @@ button { font: inherit; cursor: pointer; }
   text-align: center; margin: 20px 0 10px;
   padding: 12px; background: var(--bg2); border-radius: var(--r);
   border: 1px solid var(--border);
+  box-shadow: var(--shadow);
 }
 .surah-head .nom { font-weight: 700; font-size: var(--fs-400); }
 .surah-head .basmala { font-family: "UthmanicHafs", serif; font-size: 26px; margin-top: 6px; }
 .verse {
   padding: 14px 14px 12px; border-radius: var(--r); margin-bottom: 10px;
   background: var(--panel); border: 1px solid var(--border);
+  box-shadow: var(--shadow);
 }
 .verse.playing { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
 .verse .vhead {
@@ -376,6 +406,7 @@ button { font: inherit; cursor: pointer; }
   color: var(--text);
   background: var(--panel); border: 1px solid var(--border);
   border-radius: var(--r); padding: 20px 24px; margin-bottom: 14px;
+  box-shadow: var(--shadow);
 }
 .mushaf .mver { cursor: pointer; border-radius: var(--r-sm); transition: background .12s; }
 .mushaf .mver:hover { background: color-mix(in srgb, var(--accent) 9%, transparent); }
@@ -396,6 +427,7 @@ button { font: inherit; cursor: pointer; }
   background: var(--panel); border: 1px solid var(--border);
   border-radius: var(--r-lg); padding: 20px 22px 10px;
   margin: 0 auto 18px; max-width: 640px;
+  box-shadow: var(--shadow);
 }
 .qline {
   display: flex; flex-direction: row-reverse; justify-content: center;
@@ -417,7 +449,7 @@ button { font: inherit; cursor: pointer; }
    dans app.js pour les déclarations @font-palette-values.
    Rappel : les couleurs CSS --tj-* ne s'appliquent JAMAIS ici, elles sont dans
    la police. */
-.qpage.colored { background: #faf6ec; border-color: #d8d0bc; }
+.qpage.colored { background: var(--paper); border-color: var(--paper-border); }
 .qpage.colored .qpage-num { color: #8a8570; }
 .qpage.colored .qw.playing { background: rgba(56, 180, 137, .3); }
 .qpage.colored .qline { font-palette: --mushafClair; }
@@ -462,7 +494,7 @@ button { font: inherit; cursor: pointer; }
 }
 .evalbtn.e0:hover { border-color: var(--muted); }
 .evalbtn.e1 { color: var(--danger); border-color: var(--danger); }
-.evalbtn.e2 { color: var(--accent2); border-color: var(--accent2); }
+.evalbtn.e2 { color: var(--mid); border-color: var(--mid); }
 .evalbtn.e3 { color: var(--ok); border-color: var(--ok); }
 .evalnote {
   background: none; border: none; color: var(--muted);
@@ -470,7 +502,7 @@ button { font: inherit; cursor: pointer; }
 }
 .evalnote:hover { color: var(--accent); }
 .vend.e1 { border-color: var(--danger); color: var(--danger); }
-.vend.e2 { border-color: var(--accent2); color: var(--accent2); }
+.vend.e2 { border-color: var(--mid); color: var(--mid); }
 .vend.e3 { border-color: var(--ok); color: var(--ok); }
 /* renvoi cliquable : apparence de lien PARTOUT, y compris hors des fiches où il
    n'avait ni couleur ni curseur et ne se voyait pas ; la mise en pastille des
@@ -539,6 +571,7 @@ button { font: inherit; cursor: pointer; }
 .note-card {
   background: var(--panel); border: 1px solid var(--border);
   border-radius: var(--r); padding: 13px 15px; margin-bottom: 10px;
+  box-shadow: var(--shadow);
 }
 .note-card .nc-head { font-weight: 700; margin-bottom: 4px; }
 .note-card .vref {
@@ -563,6 +596,7 @@ button { font: inherit; cursor: pointer; }
 .tajcur {
   margin: 2px 0 14px; padding: 7px 12px;
   border: 1px solid var(--border); border-radius: var(--r); background: var(--bg2);
+  box-shadow: var(--shadow);
 }
 .tajcur summary { cursor: pointer; font-size: var(--fs-300); color: var(--muted); }
 .tajcur summary b { color: var(--accent); font-weight: 700; }
@@ -595,6 +629,7 @@ button { font: inherit; cursor: pointer; }
 .accueil {
   border: 1px solid var(--border); border-radius: var(--r); background: var(--panel);
   padding: 10px 14px; margin-bottom: 18px;
+  box-shadow: var(--shadow);
 }
 .accueil summary { cursor: pointer; color: var(--accent); font-weight: 600; font-size: var(--fs-300); }
 .accueil-corps { font-size: var(--fs-300); line-height: 1.6; color: var(--text); }
@@ -621,6 +656,7 @@ button { font: inherit; cursor: pointer; }
   display: block; margin: 8px 0; padding: 10px 12px;
   border: 1px solid var(--accent); border-radius: var(--r); background: var(--bg2);
   font-size: var(--fs-300); line-height: 1.5;
+  box-shadow: var(--shadow);
 }
 /* seul le TITRE de la bulle est en bloc : les gras du texte restent en ligne
    (sinon chaque terme en gras casse la phrase en morceaux) */
@@ -646,6 +682,7 @@ button { font: inherit; cursor: pointer; }
 .tfr {
   border: 1px solid var(--border); border-radius: var(--r);
   background: var(--bg2); padding: 7px 12px; margin-bottom: 8px;
+  box-shadow: var(--shadow);
 }
 .tfr summary { cursor: pointer; font-size: var(--fs-300); color: var(--muted); }
 .tfr summary b { color: var(--accent); font-weight: 700; margin-right: 6px; }
@@ -741,6 +778,7 @@ h2.sec { font-size: var(--fs-500); margin: 22px 0 8px; }
   display: flex; justify-content: space-between; align-items: center; gap: 14px;
   background: var(--panel); border: 1px solid var(--border);
   border-radius: var(--r); padding: 13px 16px; margin-bottom: 10px;
+  box-shadow: var(--shadow);
 }
 .param-row .lab b { display: block; }
 .param-row .lab span { color: var(--muted); font-size: var(--fs-300); }
@@ -765,6 +803,7 @@ h2.sec { font-size: var(--fs-500); margin: 22px 0 8px; }
 .fb-box {
   margin-top: 26px; background: var(--bg2); border: 1px dashed var(--border);
   border-radius: var(--r); padding: 14px 16px;
+  box-shadow: var(--shadow);
 }
 .fb-box .fb-stars { font-size: 22px; cursor: pointer; letter-spacing: 3px; color: var(--muted); }
 .fb-box .fb-stars .lit { color: var(--star); }

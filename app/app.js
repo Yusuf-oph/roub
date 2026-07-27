@@ -853,7 +853,7 @@ function accueilHtml() {
       religieux est sourcé et vérifié ; une erreur reste possible, signale-la.
       <span class="vref" data-goto-page="sources">Bibliographie complète →</span></p>
       <p><b>Apparence.</b> Trois habillages au choix (Vélin, Ardoise, Colophon),
-      chacun en clair et en sombre, avec sa police de lecture, que tu peux
+      chacun en clair et en sombre, avec sa police, que tu peux
       remplacer sans changer d'habillage. À la première visite l'application
       suit le réglage clair ou sombre de ton appareil ; la bascule en haut à
       droite tranche ensuite. Les animations se règlent aussi. Tout est dans
@@ -2057,10 +2057,11 @@ function pageParams() {
     </select></div>
   ${rangeeTheme("themeClair", "Thème du mode clair", "light")}
   ${rangeeTheme("themeSombre", "Thème du mode sombre", "dark")}
-  <div class="param-row"><div class="lab"><b>Police de lecture</b>
-      <span>chaque thème vient avec la sienne : ${policeDuTheme()} pour le thème
-      appliqué en ce moment. Tu peux en choisir une autre sans changer de thème.
-      Le texte arabe, lui, garde sa calligraphie.</span></div>
+  <div class="param-row"><div class="lab"><b>Police</b>
+      <span>elle s'applique à tout le texte de l'application. Chaque thème vient
+      avec la sienne : ${policeDuTheme()} pour le thème appliqué en ce moment.
+      Tu peux en choisir une autre sans changer de thème. Le texte arabe, lui,
+      garde sa calligraphie.</span></div>
     <select data-param="police">
       <option value="auto" ${PARAMS.police !== "gentium" && PARAMS.police !== "notosans" && PARAMS.police !== "charis" ? "selected" : ""}
         >Celle du thème (${policeDuTheme()})</option>
@@ -2701,7 +2702,7 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "1.17.0";   // réécrit par tools/release.py
+const BUILD_VERSION = "1.17.1";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {

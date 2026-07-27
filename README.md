@@ -28,7 +28,7 @@ anonyme**. PWA installable ; le texte, le tafsir et l'interface fonctionnent
 hors-ligne dès la première visite.
 
 **Apparence.** Trois habillages au choix (Vélin, Ardoise, Colophon), chacun
-en clair et en sombre, avec sa police de lecture, que tu peux remplacer sans
+en clair et en sombre, avec sa police, que tu peux remplacer sans
 changer d'habillage. À la première visite l'application suit le réglage clair
 ou sombre de ton appareil ; la bascule en haut à droite tranche ensuite, et
 ton choix est retenu. Les animations se règlent aussi (elles suivent par

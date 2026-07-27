@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.17.1 · 2026-07-27
+- La police choisie s'applique désormais à tout le texte de l'application, et plus seulement aux passages de lecture. Le réglage s'appelle simplement « Police »
+- Les cartes, encadrés et blocs prennent le relief de leur habillage, et les commandes cliquables une élévation plus courte : Vélin la donne douce, Colophon nette, Ardoise presque plate
+- L'état intermédiaire de l'auto-évaluation change de couleur pour une teinte plus lisible : l'ancienne était décorative et ne tenait pas le contraste sur du texte
+- Le titre de l'accueil et le papier des pages du mushaf suivent enfin les valeurs de l'habillage au lieu de valeurs figées
+
 ## 1.17.0 · 2026-07-27
 - Nouvelle apparence, avec trois habillages au choix : Vélin, Ardoise et Colophon, chacun en clair et en sombre. L'habillage se choisit séparément pour chaque mode
 - Le mode clair devient celui par défaut, et à la première visite l'application suit le réglage clair ou sombre de votre appareil. Un choix déjà enregistré est conservé
