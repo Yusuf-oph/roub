@@ -23,6 +23,18 @@ propre et n'est pas présenté comme une position savante.
   d'affichage, et elles sont réversibles. Elles sont deux : la **graphie du
   soukoun** propre au mushaf de Médine, et la **graphie de l'iqlâb**, où le
   petit mîm remplace le second trait du tanwin, comme sur la page imprimée.
+- **D'où vient la graphie du soukoun.** La commission scientifique du mushaf de
+  Médine prescrit « une petite tête de *khâ'* sans point posée au-dessus d'une
+  lettre quelconque, qui indique le soukoun de cette lettre et qu'elle est
+  prononcée distinctement, la langue la frappant » (exemples donnés :
+  {مِنْ خَيْرٍ}, {أَوَعَظْتَ}, {قَدْ سَمِعَ}). Le signe n'est pas universel :
+  certaines écoles emploient un petit cercle, et c'est encore l'usage des
+  mushafs du Maghreb ; le mushaf de Médine, comme le mushaf égyptien et les
+  autres mushafs d'Orient, suit **Khalîl et ses compagnons**, chez qui la marque
+  de soukoun est cette tête de *khâ'*, tirée de la première lettre du mot
+  *khafîf*. Rapporté par **Musāʿid aṭ-Ṭayyār**, *al-Muḥarrar fī ʿulūm
+  al-Qurʾān*, p. 294 (notice complète au § 11). C'est ce choix éditorial du
+  mushaf que l'application reproduit, et rien d'autre.
 - Contrôle : `tools/verifie.py` compare, verset par verset, le texte publié au
   texte de l'API.
 
@@ -84,9 +96,20 @@ mu'allim* enregistré au monde (1969).
   référence pour le noûn sakina, le tanwin, le mîm sakina, les madd.
 - **Ibn al-Jazarî** (m. 833 H), *al-Muqaddima al-Jazariyya* : qalqala, lâm du
   nom d'Allah, râ'.
-- Les 19 fiches de l'application s'en tiennent au contenu de ces deux matns ;
-  chaque exemple cité est vérifié par script comme présent dans le texte
-  coranique (`tools/verifie.py`).
+- **Deuxième commission scientifique du mushaf de Médine**, présidée par le
+  shaykh Dr ʿAlī ibn ʿAbd ar-Raḥmān al-Ḥudhayfī : les *conventions de ḍabṭ* du
+  mushaf, citées mot pour mot par **Musāʿid aṭ-Ṭayyār** dans *al-Muḥarrar fī
+  ʿulūm al-Qurʾān* (p. 292-294). Source de la fiche « Lettre écrite et non
+  prononcée » : le **rond vide** posé sur une lettre de prolongation ajoutée au
+  tracé signifie qu'elle ne se prononce « ni en enchaînant, ni à l'arrêt » ; le
+  **rond ovale vertical** signale au contraire une lettre qui tombe en
+  enchaînant seulement. La même page donne l'origine du signe du soukoun employé
+  par le mushaf de Médine, la petite tête de *khâ'* sans point, que
+  l'application reproduit dans son rendu.
+- Les 21 fiches de l'application s'en tiennent au contenu de ces sources ;
+  chaque exemple est désigné par sa **référence**, jamais par du texte arabe
+  saisi, et `tools/verifie.py` vérifie que le verset existe, qu'il fait partie
+  des roub' chargés et qu'il porte bien une portée de la règle.
 
 ## 8. Tutoriels et glossaire
 
@@ -237,6 +260,14 @@ QuranEnc.com, clé `french_mokhtasar`. [Consulté le 24 juillet 2026]. Disponibl
 TARTEEL AI. *Quranic Universal Library : segments mot à mot des récitations*
 [jeu de données en ligne]. [Consulté le 25 juillet 2026]. Disponible à
 l'adresse : https://qul.tarteel.ai/
+
+AṬ-ṬAYYĀR, Musāʿid ibn Sulaymān ibn Nāṣir. *Al-Muḥarrar fī ʿulūm al-Qurʾān*.
+2e éd. Markaz ad-dirāsāt wa-l-maʿlūmāt al-qurʾāniyya bi-Maʿhad al-Imām
+ash-Shāṭibī, 1429 H / 2008, 320 p. Chapitre « Iṣṭilāḥāt aḍ-ḍabṭ li-muṣḥaf
+al-Madīna an-nabawiyya », p. 292-294, qui cite mot pour mot la **deuxième
+commission scientifique du mushaf de Médine**, présidée par le shaykh
+Dr ʿAlī ibn ʿAbd ar-Raḥmān al-Ḥudhayfī [en ligne]. [Consulté le 28 juillet 2026].
+Disponible à l'adresse : https://shamela.ws/book/13896/277
 
 AT-TIRMIDHĪ, Muḥammad ibn ʿĪsā. *Sunan at-Tirmidhī*, hadith 2954 [en ligne].
 [Consulté le 23 juillet 2026]. Disponible à l'adresse : https://sunnah.com/

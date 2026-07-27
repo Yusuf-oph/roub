@@ -162,6 +162,24 @@ for (const rid of Object.keys(QURAN)) {
   DECKS[rid] = list;
 }
 
+/* ---------------- règles de tajwid déjà vues ----------------
+   8e clé de `store`. Avant, « nouveau » était CALCULÉ depuis TAJCUR, c'est-à-dire
+   depuis un ordre d'apprentissage statique, le même pour tout le monde : rien
+   n'enregistrait ce que l'utilisateur avait effectivement travaillé. Ici il coche
+   lui-même, et la règle sort du décompte des nouvelles.
+   Forme retenue {id: horodatage} plutôt qu'une simple liste : c'est de la
+   PROGRESSION, donc ça part dans la synchro, et la future remise à zéro « partout »
+   a besoin d'une date par entrée pour ignorer ce qui précède l'époque de reset
+   (`mergeRemote` ne sait pas exprimer une suppression, cf. fiche d'état). */
+const VUES_KEY = "quran-tajwid-vues";
+const VUES = store.get(VUES_KEY, {});
+function basculerRegleVue(id) {
+  if (VUES[id]) delete VUES[id];
+  else VUES[id] = Date.now();
+  store.set(VUES_KEY, VUES);
+  schedulePush();
+}
+
 /* ---------------- auto-évaluation par verset (Lot G) ---------------- */
 /* {verseKey: {n: 1|2|3, note?, ts}} : 1 = à revoir, 2 = fragile, 3 = solide */
 const EVAL_KEY = "quran-eval";
@@ -991,6 +1009,9 @@ const TABS = [
 ];
 const memoState = { maskAr: false, maskTl: false, maskTr: false,
   mode: "versets", pagesColor: false };
+/* filtre de l'onglet Tajwid : état de vue, non persisté, comme memoState.mode */
+const tajState = { filtre: "toutes" };
+let tjObs = null;      // observateur du sommaire de l'onglet Tajwid (cf. bindMain)
 const anum = n => String(n).replace(/\d/g, d => "٠١٢٣٤٥٦٧٨٩"[+d]);
 
 /* polices par page du mushaf (chargées à la demande par le navigateur) */
@@ -1041,7 +1062,7 @@ function pageRub(rid, tab) {
   const N = NOTES[rid];
   if (tab === "memoriser") h += secMemoriser(R);
   else if (tab === "difficultes") h += secDifficultes(N, meta);
-  else if (tab === "tajwid") h += secTajwid(N);
+  else if (tab === "tajwid") h += secTajwid(R, N);
   else if (tab === "tafsir") h += secTafsir(R);
   else if (tab === "vocab") h += secVocab(N);
   else if (tab === "cartes") h += secCartes(rid);
@@ -1055,17 +1076,21 @@ function tajCurHtml(s) {
   const TC = window.TAJCUR;
   const e = TC && TC.parSourate && TC.parSourate[s];
   if (!e || !e.regles.length) return "";
-  const nouv = new Set(e.nouvelles);
+  /* une règle cochée sort du décompte des nouvelles : le badge suit l'utilisateur
+     et non plus le seul ordre d'apprentissage statique */
+  const nouv = new Set(e.nouvelles.filter(id => !VUES[id]));
   const pill = id => {
     const r = REGLES.find(x => x.id === id);
     return r ? `<span class="pill${nouv.has(id) ? " new" : ""}" data-regle="${id}">${esc(r.nom)}${nouv.has(id) ? `<b class="tag-new">nouveau</b>` : ""}</span>` : "";
   };
-  const ordered = e.nouvelles.concat(e.regles.filter(id => !nouv.has(id)));
-  const nR = e.regles.length, nN = e.nouvelles.length;
+  const ordered = e.nouvelles.filter(id => nouv.has(id))
+    .concat(e.regles.filter(id => !nouv.has(id)));
+  const nR = e.regles.length, nN = nouv.size;
   return `<details class="tajcur"><summary>Tajwid de cette sourate · ${nR} règle${nR > 1 ? "s" : ""}${nN ? ` <b>dont ${nN} nouvelle${nN > 1 ? "s" : ""}</b>` : ""}</summary>
     <div class="pill-row">${ordered.map(pill).join("")}</div>
-    <p class="fb-note">« nouveau » = première apparition dans le parcours (Fâtiḥa, puis les
-    sourates courtes en remontant d'An-Nâs vers An-Naba) ; cliquer une règle ouvre sa fiche.</p></details>`;
+    <p class="fb-note">« nouveau » signale la première apparition d'une règle dans le parcours
+    (Fâtiḥa, puis les sourates courtes en remontant d'An-Nâs vers An-Naba) tant que tu ne l'as
+    pas cochée dans l'onglet Tajwid d'un roub'. Cliquer une règle ouvre sa fiche.</p></details>`;
 }
 
 function secMemoriser(R) {
@@ -1222,28 +1247,186 @@ function secDifficultes(N, meta) {
   return h + `</div>`;
 }
 
-function secTajwid(N) {
-  if (!N || !N.tajwid) return `<div class="empty">Contenu à venir pour ce roub'.</div>`;
-  let h = `<div class="note-sec"><h3>Particularités tajwid de ce roub'</h3>`;
-  for (const t of N.tajwid) {
-    h += `<div class="note-card"><div class="nc-head">${arEsc(t.titre)} ${(t.refs || []).map(vrefBtn).join(" ")}</div>
-      ${fmt(t.texte)}
-      ${t.regles && t.regles.length ? `<div class="pill-row">` + t.regles.map(id => {
-        const r = REGLES.find(x => x.id === id);
-        return r ? `<span class="pill" data-regle="${id}">${esc(r.nom)}</span>` : "";
-      }).join("") + `</div>` : ""}
-    </div>`;
-  }
-  h += `</div><div class="note-sec"><h3>Règles à connaître</h3><div class="pill-row">`;
-  const ids = new Set();
-  for (const t of N.tajwid) (t.regles || []).forEach(id => ids.add(id));
-  for (const id of ids) {
+/* ---------------- onglet Tajwid d'un roub' ----------------
+   La liste des règles est DÉRIVÉE des portées des versets du roub'. Deux
+   conséquences, et ce sont elles qui ont fait retenir cette voie : la page ne
+   peut pas citer une règle absente du roub', et chaque règle a par construction
+   un verset du roub' à montrer, ce que Yusuf a posé comme condition (« cette
+   page sert à voir les particularités de CE roub' »). Les cinq fiches que les
+   portées ne marquent pas (izhâr, izhâr shafawi, lâm d'Allâh, râ' tafkhîm,
+   madd 'âriḍ) n'y figurent donc pas : leur cas est un travail de contenu. */
+
+const CONTEXTE_MOTS = 2;   // mots gardés de part et d'autre de la portée
+
+function reglesDuRub(R) {
+  const spanFiche = (window.TAJCUR || {}).spanFiche || {};
+  const vues = new Map();
+  for (const v of R.verses)
+    for (const [, , c] of v.taj || []) {
+      const id = spanFiche[c];
+      if (id && !vues.has(id)) vues.set(id, c);
+    }
+  const out = [];
+  for (const [id, cls] of vues) {
     const r = REGLES.find(x => x.id === id);
-    if (r) h += `<span class="pill" data-regle="${id}">${esc(r.nom)}</span>`;
+    if (r) out.push({ id, cls, r });
   }
-  h += `</div><p style="color:var(--muted);font-size:13px">Cliquer une règle ouvre sa fiche ;
-    toutes les fiches sont dans l'onglet Tutoriels.</p></div>`;
-  return h;
+  return out;
+}
+
+/* Verset d'exemple : celui d'une particularité rédigée pour cette règle quand
+   il y en a une (c'est un choix humain, il prime sur tout calcul), sinon le
+   verset du roub' qui isole le mieux la règle : le moins d'autres couleurs
+   d'abord, le plus court ensuite. */
+function versetExemple(R, N, id, cls) {
+  const porte = v => (v.taj || []).some(([, , c]) => c === cls);
+  for (const t of (N && N.tajwid) || []) {
+    if (!(t.regles || []).includes(id)) continue;
+    for (const k of t.refs || []) {
+      const v = R.verses.find(x => x.k === k);
+      if (v && porte(v)) return v;
+    }
+  }
+  return R.verses.filter(porte).sort((a, b) =>
+    (new Set(a.taj.map(x => x[2])).size - new Set(b.taj.map(x => x[2])).size)
+    || (a.ar.length - b.ar.length))[0];
+}
+
+/* Fenêtre de mots autour de la règle. Les portées déclarent leurs positions
+   exactes, donc l'extrait se CALCULE : aucun arabe n'est saisi nulle part. */
+function fenetreExemple(v, cls) {
+  const mots = [];
+  let i = 0;
+  for (const m of v.ar.split(" ")) {
+    if (m && !estPause(m)) mots.push([i, i + m.length]);
+    i += m.length + 1;
+  }
+  const sp = (v.taj || []).find(([, , c]) => c === cls);
+  if (!sp || !mots.length) return { de: 0, a: mots.length - 1, mots, coupe: false };
+  let de = 0, a = mots.length - 1;
+  for (let j = 0; j < mots.length; j++) {
+    if (mots[j][0] <= sp[0]) de = j;
+    if (mots[j][1] >= sp[1]) { a = j; break; }
+  }
+  de = Math.max(0, de - CONTEXTE_MOTS);
+  a = Math.min(mots.length - 1, a + CONTEXTE_MOTS);
+  if (de === 1) de = 0;                        // un seul mot resté en tête : on le prend
+  if (a === mots.length - 2) a = mots.length - 1;
+  return { de, a, mots, coupe: de > 0 || a < mots.length - 1 };
+}
+
+/* la tranche est présentée à arHtml comme un verset : même graphie d'affichage,
+   mêmes couleurs, aucune duplication de la logique de rendu coranique */
+function trancheVerset(v, f) {
+  const st = f.mots[f.de][0], en = f.mots[f.a][1];
+  return Object.assign({}, v, {
+    ar: v.ar.slice(st, en),
+    taj: (v.taj || []).filter(([s, e]) => e > st && s < en)
+      .map(([s, e, c]) => [Math.max(st, s) - st, Math.min(en, e) - st, c]),
+  });
+}
+
+/* La translittération est alignée mot à mot sur l'arabe dans 797 versets sur
+   823 ; les 26 exceptions forment une classe connue (25 yâ vocatifs et 2:181),
+   la même qui décalait déjà les segments audio. Quand le compte ne tombe pas
+   juste, on rend la translittération ENTIÈRE plutôt qu'une coupe fausse. */
+function trancheTranslit(v, f) {
+  const t = tlOf(v).split(/\s+/);
+  return t.length === f.mots.length ? t.slice(f.de, f.a + 1).join(" ") : tlOf(v);
+}
+
+/* La traduction, elle, ne se coupe PAS : c'est une phrase française, et c'est
+   un texte tiers qu'on ne tronque pas. On donne donc celle du verset entier, en
+   le disant, plutôt qu'une traduction d'extrait qu'il faudrait rédiger. */
+function carteExemple(v, cls, idx) {
+  const f = fenetreExemple(v, cls);
+  const vue = f.coupe ? trancheVerset(v, f) : v;
+  return `<div class="ex-card">
+    <div class="ex-head">${vrefBtn(v.k)}
+      <button class="ex-btn" data-play-one="${idx}" title="écouter ce verset">▶</button>
+      <button class="ex-btn" data-play-from="${idx}" title="lire à partir d'ici">▶▶</button>
+      <span class="etiq">${f.coupe ? "extrait" : "exemple"}</span></div>
+    <div class="ex-ar">${arHtml(vue, cls || "aucune-portee")}</div>
+    ${PARAMS.showTl ? `<div class="ex-tl">${esc(f.coupe ? trancheTranslit(v, f) : tlOf(v))}</div>` : ""}
+    <div class="ex-tr">${f.coupe ? `<span class="etiq">verset entier</span> ` : ""}${esc(v.tr)}</div>
+  </div>`;
+}
+
+/* La page couvre TOUT le roub' d'un seul tenant (arbitrage de Yusuf, 28/07,
+   après avoir vu la version groupée par sourate) : une seule liste, donc aucune
+   règle répétée. L'encart « Tajwid de cette sourate » n'a pas sa place ici, il
+   reste dans l'onglet Mémoriser où il commente la sourate qu'on lit. */
+function secTajwid(R, N) {
+  const regles = reglesDuRub(R);
+  if (!regles.length) return `<div class="empty">Aucune règle marquée dans ce roub'.</div>`;
+  const idx = {};
+  R.verses.forEach((v, i) => { idx[v.k] = i; });
+
+  /* Une particularité rédigée déclare souvent PLUSIEURS règles (celle du lâm
+     d'Allah en cite trois) : posée sous chacune, elle se lirait deux ou trois
+     fois de suite, mot pour mot. On la rattache à la règle qu'elle DÉCLARE
+     elle-même en premier, et non à la première venue dans l'ordre du roub' :
+     la remarque sur l'iqlâb annonce ["iqlab", "ghunna"], c'est l'iqlâb son sujet
+     même si la ghunna apparaît plus tôt dans le texte. Aucune n'est perdue :
+     chacune des neuf déclare au moins une règle marquée par les portées. */
+  const parRegle = {};
+  const dansLaPage = new Set(regles.map(x => x.id));
+  for (const t of (N && N.tajwid) || []) {
+    const id = (t.regles || []).find(x => dansLaPage.has(x));
+    if (id) (parRegle[id] = parRegle[id] || []).push(t);
+  }
+
+  /* Filtres. « Nouvelle » ne veut pas dire « première apparition dans un ordre
+     statique » mais « pas encore cochée par toi » : c'est la seule définition qui
+     ait un sens ici, la liste venant du roub' affiché et non du parcours. Le
+     numéro d'affichage reste celui de la liste complète, sinon un filtre
+     renumérote les règles et le sommaire ne correspond plus. */
+  const f = tajState.filtre;
+  const visible = x => f === "toutes" || (f === "nouvelles" ? !VUES[x.id] : !!VUES[x.id]);
+  const nNouv = regles.filter(x => !VUES[x.id]).length;
+  const FILTRES = [["toutes", "Toutes les règles"],
+                   ["nouvelles", `Nouvelles (${nNouv})`],
+                   ["vues", `Déjà vues (${regles.length - nNouv})`]];
+
+  let h = `<div class="memo-opts">
+    ${FILTRES.map(([k, lib]) =>
+      `<button class="chip ${f === k ? "on" : ""}" data-tjfiltre="${k}">${lib}</button>`).join("")}
+    <span style="width:10px"></span>
+    <button class="chip ${PARAMS.taj ? "on" : ""}" data-opt="taj">Couleurs tajwid</button>
+    <button class="chip ${PARAMS.showTl ? "on" : ""}" data-opt="showTl">Translittération</button>
+  </div>
+  <div class="tj-grid"><nav class="tj-rail" aria-label="Les règles de ce roub'">
+    <div class="tj-rail-tit">Les ${regles.length} règles de ce roub'</div><ol>`;
+  regles.forEach((x, i) => {
+    h += `<li><span class="tj-lien${VUES[x.id] ? " vue" : ""}${visible(x) ? "" : " hors"}"
+      data-tjgoto="${x.id}">${i + 1} · ${esc(x.r.nom)}</span></li>`;
+  });
+  h += `</ol></nav><div class="tj-corps">`;
+  if (!regles.some(visible)) {
+    h += `<div class="empty">${f === "nouvelles"
+      ? "Toutes les règles de ce roub' sont cochées."
+      : "Aucune règle de ce roub' n'est encore cochée."}</div>`;
+  }
+  regles.forEach((x, i) => {
+    if (!visible(x)) return;
+    const v = versetExemple(R, N, x.id, x.cls);
+    h += `<section class="tj-regle" id="tj-${x.id}">
+      <h3 class="tj-tit"><span class="tj-num">${i + 1}</span>
+        <span class="tj-nom tj-${x.cls}">${esc(x.r.nom)}</span>
+        <span class="tj-cat">${esc(x.r.cat)}</span>
+        <label class="tj-vue"><input type="checkbox" data-tjvue="${x.id}"
+          ${VUES[x.id] ? "checked" : ""}> déjà vue</label></h3>
+      ${fmt(x.r.texte)}
+      ${v ? carteExemple(v, x.cls, idx[v.k]) : ""}`;
+    for (const t of parRegle[x.id] || []) {
+      h += `<div class="tj-dans"><div class="etiq">dans ce roub'</div>
+        <div class="nc-head">${arEsc(t.titre)} ${(t.refs || []).map(vrefBtn).join(" ")}</div>
+        ${fmt(t.texte)}</div>`;
+    }
+    h += `<div class="tj-fiche"><span class="vref" data-regle="${x.id}">Fiche complète de la règle →</span></div>
+      </section>`;
+  });
+  return h + `</div></div>`;
 }
 
 /* Tafsir : œuvre tierce reproduite verbatim (al-Mukhtaṣar), jamais de
@@ -1688,6 +1871,14 @@ d'<i>al-Mukhtaṣar fī tafsīr al-Qurʾān al-karīm</i> [en ligne]. Version 1.
 des récitations</i> [jeu de données en ligne]. [Consulté le 25 juillet 2026].
 Disponible à l'adresse : https://qul.tarteel.ai/</p>
 
+<p class="biblio">AṬ-ṬAYYĀR, Musāʿid ibn Sulaymān ibn Nāṣir. <i>Al-Muḥarrar fī
+ʿulūm al-Qurʾān</i>. 2e éd. Markaz ad-dirāsāt wa-l-maʿlūmāt al-qurʾāniyya
+bi-Maʿhad al-Imām ash-Shāṭibī, 1429 H / 2008, 320 p. Chapitre
+« Iṣṭilāḥāt aḍ-ḍabṭ li-muṣḥaf al-Madīna an-nabawiyya », p. 292-294, citant la
+deuxième commission scientifique du mushaf de Médine, présidée par le shaykh
+Dr ʿAlī ibn ʿAbd ar-Raḥmān al-Ḥudhayfī [en ligne]. [Consulté le 28 juillet 2026].
+Disponible à l'adresse : https://shamela.ws/book/13896/277</p>
+
 <p class="biblio">AT-TIRMIDHĪ, Muḥammad ibn ʿĪsā. <i>Sunan at-Tirmidhī</i>,
 hadith 2954 [en ligne]. [Consulté le 23 juillet 2026]. Disponible à l'adresse :
 https://sunnah.com/</p>
@@ -2017,6 +2208,22 @@ function tutoTajwid() {
   return h;
 }
 
+/* Un exemple de fiche ne porte qu'une RÉFÉRENCE : l'arabe est tiré de QURAN,
+   donc exact par construction, et colorié par la SEULE règle de la fiche pour
+   que l'œil trouve ce dont parle le texte. Les cinq fiches que les portées ne
+   marquent pas (izhâr, izhâr shafawi, lâm d'Allâh, râ' tafkhîm, madd 'âriḍ)
+   n'ont pas de classe : on passe alors un nom qui ne correspond à aucune
+   portée, si bien que l'exemple s'affiche en encre neutre plutôt que d'allumer
+   des règles dont la fiche ne parle pas. */
+function exempleFiche(rid, ex) {
+  const hit = VIDX[ex.ref];
+  if (!hit) return "";
+  const cls = ((window.TAJCUR || {}).ficheSpan || {})[rid] || "aucune-portee";
+  return `<div class="regle-ex">${vrefBtn(ex.ref)}
+    <div class="ar-inline">${arHtml(hit.v, cls)}</div>
+    ${ex.note ? `<div class="rx-note">${esc(ex.note)}</div>` : ""}</div>`;
+}
+
 function tutoRegles() {
   let h = "";
   const cats = [];
@@ -2026,15 +2233,18 @@ function tutoRegles() {
     for (const r of REGLES.filter(x => x.cat === cat)) {
       h += `<div class="note-card" id="regle-${r.id}"><div class="nc-head">${esc(r.nom)}</div>
         ${fmt(r.texte)}
-        ${r.exemple ? `<div style="margin-top:6px"><span class="ar-inline">${esc(r.exemple)}</span>
-          ${r.exempleNote ? `<span style="color:var(--muted);font-size:13px"> — ${esc(r.exempleNote)}</span>` : ""}</div>` : ""}
+        ${(r.exemples || []).map(ex => exempleFiche(r.id, ex)).join("")}
       </div>`;
     }
   }
   h += `<p style="color:var(--muted);font-size:13px">Fiches établies d'après les
     matns classiques de référence : <b>Tuhfat al-Atfal</b> (al-Jamzûrî) et
     <b>al-Muqaddima al-Jazariyya</b> (Ibn al-Jazarî), pour la riwaya Hafs 'an
-    'Asim ; exemples pris dans le texte du mushaf.</p>`;
+    'Asim. La fiche sur les lettres écrites et non prononcées suit les
+    <b>conventions de ضبط du mushaf de Médine</b>, telles que la commission
+    scientifique du mushaf les a formulées. Détail des sources sur la
+    <span class="vref" data-goto-page="sources">page Sources</span> ; les exemples
+    sont pris dans le texte du mushaf.</p>`;
   return h || `<div class="empty">Fiches à venir.</div>`;
 }
 
@@ -2336,6 +2546,44 @@ function bindMain() {
     ev.stopPropagation();
     gotoVerse(el.dataset.goto);
   }));
+  /* sommaire collant de l'onglet Tajwid : on rejoint la règle, et l'entrée
+     courante se marque toute seule. L'observateur est recréé à chaque rendu,
+     d'où la déconnexion du précédent : `main` est vidé mais un observateur
+     oublié continuerait de tourner sur des nœuds détachés. */
+  if (tjObs) { tjObs.disconnect(); tjObs = null; }
+  $$("[data-tjgoto]", main).forEach(el => el.addEventListener("click", () => {
+    const t = $("#tj-" + el.dataset.tjgoto, main);
+    if (t) t.scrollIntoView({ block: "start", behavior: "smooth" });
+  }));
+  $$("[data-tjfiltre]", main).forEach(el => el.addEventListener("click", () => {
+    tajState.filtre = el.dataset.tjfiltre;
+    render();
+  }));
+  /* Cocher une règle change le décompte des filtres et l'encart de la sourate,
+     donc on redessine. On retient la position : sans cela, cocher la 11e règle
+     d'une page longue renvoie l'utilisateur en haut, ce qui est intenable quand
+     on coche plusieurs règles à la suite. */
+  $$("[data-tjvue]", main).forEach(el => el.addEventListener("change", () => {
+    const y = window.scrollY;
+    basculerRegleVue(el.dataset.tjvue);
+    render();
+    window.scrollTo(0, y);
+  }));
+  const sections = $$(".tj-regle", main);
+  if (sections.length) {
+    const liens = {};
+    $$("[data-tjgoto]", main).forEach(el => { liens[el.dataset.tjgoto] = el; });
+    tjObs = new IntersectionObserver(entrees => {
+      for (const e of entrees) {
+        const l = liens[e.target.id.replace("tj-", "")];
+        if (l) l.classList.toggle("on", e.isIntersecting);
+      }
+      const on = $$(".tj-lien.on", main);
+      on.forEach((l, i) => l.classList.toggle("on", i === 0));   // la première visible
+    }, { rootMargin: "-25% 0px -60% 0px" });
+    sections.forEach(s => tjObs.observe(s));
+  }
+
   $$("[data-regle]", main).forEach(el => el.addEventListener("click", () => {
     nav("tutoriels/regles");
     setTimeout(() => {
@@ -2685,7 +2933,7 @@ const syncHeaders = () => ({
   "Content-Type": "application/json",
 });
 function localPayload() {
-  return { v: 1, srs: SRS, journal: store.get(JOURNAL_KEY, {}), eval: EVAL };
+  return { v: 1, srs: SRS, journal: store.get(JOURNAL_KEY, {}), eval: EVAL, vues: VUES };
 }
 function mergeRemote(remote) {
   if (!remote) return;
@@ -2705,6 +2953,13 @@ function mergeRemote(remote) {
     if (!EVAL[k] || (e.ts || 0) > (EVAL[k].ts || 0)) EVAL[k] = e;
   }
   store.set(EVAL_KEY, EVAL);
+  /* règles vues : une règle cochée quelque part est plus avancée qu'une règle
+     non cochée, donc union. On garde l'horodatage le PLUS RÉCENT, pour que la
+     future époque de remise à zéro ne balaie pas une coche postérieure. */
+  for (const [id, ts] of Object.entries(remote.vues || {})) {
+    if (!VUES[id] || ts > VUES[id]) VUES[id] = ts;
+  }
+  store.set(VUES_KEY, VUES);
 }
 /* état de la synchro : il doit dire la VÉRITÉ du moment. Un « synchronisé
    14:32 » figé alors que les envois échouent depuis est trompeur : on
@@ -2802,7 +3057,7 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "1.17.2";   // réécrit par tools/release.py
+const BUILD_VERSION = "1.18.0";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {

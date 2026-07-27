@@ -32,6 +32,7 @@
   --tj-madd45: #c22525;
   --tj-madd6: #8d1a19;
   --tj-special: #8a53ce;
+
 }
 
 /* tajwid — jeu SOMBRE. Deux déclarations pour la même chose : l'attribut pour
@@ -639,6 +640,98 @@ button { font: inherit; cursor: pointer; }
   unicode-bidi: isolate;
 }
 .note-card .src { color: var(--muted); font-size: var(--fs-200); margin-top: 6px; }
+/* ---------- onglet Tajwid d'un roub' ---------- */
+.tj-grid {
+  display: grid; gap: 0 var(--sp-5);
+  grid-template-columns: var(--rail) minmax(0, var(--measure));
+}
+.tj-rail {
+  position: sticky; align-self: start; top: calc(var(--topbar-h) + var(--sp-4));
+  font-size: var(--fs-200); line-height: var(--lh-ui);
+}
+.tj-rail-tit {
+  text-transform: uppercase; letter-spacing: var(--ls-caps, .08em);
+  color: var(--muted); font-size: var(--fs-100); margin-bottom: var(--sp-2);
+}
+.tj-rail ol { list-style: none; margin: 0; padding: 0; }
+.tj-rail li { margin-bottom: var(--sp-2); }
+.tj-lien { color: var(--muted); cursor: pointer; }
+.tj-lien:hover { color: var(--accent); }
+.tj-lien.on { color: var(--text); font-weight: 700; }
+/* règle cochée : le sommaire le dit sans crier, et une règle exclue par le
+   filtre reste listée mais s'efface, pour que la numérotation garde son sens */
+.tj-lien.vue::before { content: "✓ "; color: var(--ok); }
+.tj-lien.hors { opacity: .45; }
+.tj-vue {
+  margin-left: auto; display: inline-flex; align-items: center; gap: var(--sp-1);
+  font-size: var(--fs-100); color: var(--muted); font-weight: 400;
+  text-transform: none; letter-spacing: normal; cursor: pointer;
+}
+.tj-vue input { cursor: pointer; }
+/* le titre ne doit pas passer sous la barre du haut quand on rejoint une règle */
+.tj-regle { scroll-margin-top: calc(var(--topbar-h) + var(--sp-4)); margin-bottom: var(--sp-7); }
+.tj-tit {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--sp-2);
+  margin: 0 0 var(--sp-3); font-size: var(--fs-500);
+  text-transform: uppercase; letter-spacing: var(--ls-caps, .06em);
+}
+.tj-num { color: var(--muted); font-weight: 400; }
+.tj-cat {
+  color: var(--muted); font-weight: 400; font-size: var(--fs-100);
+  letter-spacing: var(--ls-caps, .06em);
+}
+/* encart « dans ce roub' » : filet à gauche, sur le fond secondaire */
+.tj-dans {
+  margin: var(--sp-3) 0; padding: var(--sp-3) var(--sp-4);
+  background: var(--bg2); border-left: 3px solid var(--accent);
+  border-radius: 0 var(--r-sm) var(--r-sm) 0;
+}
+.etiq {
+  display: inline-block; text-transform: uppercase;
+  letter-spacing: var(--ls-caps, .08em); font-size: var(--fs-100);
+  color: var(--muted); font-weight: 700;
+}
+.tj-fiche { margin-top: var(--sp-3); font-size: var(--fs-200); }
+
+/* carte d'exemple : arabe tiré de QURAN et colorié par la SEULE règle */
+.ex-card {
+  margin: var(--sp-4) 0; padding: var(--sp-3) var(--sp-4);
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: var(--r); box-shadow: var(--shadow);
+}
+.ex-head { display: flex; align-items: center; gap: var(--sp-2); }
+.ex-head .vref {
+  display: inline-block; background: var(--bg3); border-radius: var(--r-sm);
+  padding: 0 7px; font-size: var(--fs-200); font-weight: 700;
+}
+.ex-head .etiq { margin-left: auto; }
+.ex-btn {
+  background: none; border: 0; color: var(--accent); cursor: pointer;
+  font-size: var(--fs-300); padding: 2px 4px; line-height: 1;
+}
+.ex-ar {
+  font-family: "UthmanicHafs", serif; font-size: 26px; line-height: 2.1;
+  direction: rtl; unicode-bidi: isolate; margin: var(--sp-3) 0 var(--sp-2);
+}
+.ex-tl { color: var(--text); }
+.ex-tr { color: var(--muted); font-style: italic; margin-top: var(--sp-1); }
+.ex-tr .etiq { font-style: normal; margin-right: var(--sp-1); }
+
+@media (max-width: 640px) {
+  .tj-grid { grid-template-columns: minmax(0, 1fr); }
+  .tj-rail { position: static; margin-bottom: var(--sp-4); }
+  .ex-ar { font-size: 23px; }
+}
+
+/* exemple d'une fiche de règle : verset entier tiré de QURAN, colorié par la
+   seule règle de la fiche (cf. exempleFiche dans app.js) */
+.regle-ex {
+  margin-top: var(--sp-3); padding: var(--sp-2) var(--sp-3);
+  background: var(--bg2); border-radius: var(--r-sm);
+}
+.regle-ex .vref { margin-left: 0; }
+.regle-ex .ar-inline { margin-top: var(--sp-2); line-height: 2; }
+.regle-ex .rx-note { color: var(--muted); font-size: var(--fs-200); margin-top: var(--sp-2); }
 .pill-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
 .pill {
   font-size: var(--fs-200); padding: 3px 10px; border-radius: var(--r-lg);

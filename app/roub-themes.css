@@ -103,6 +103,12 @@
 
   --r-sm:8px; --r:10px; --r-lg:14px; --r-pill:999px; --bw:1px;
 
+  /* Marge de repères. Elle n'était définie que dans Colophon, où elle relevait
+     de l'ornement ; l'onglet Tajwid d'un roub' en fait un COMPOSANT (le sommaire
+     collant des règles), qui doit donc exister dans les trois habillages.
+     Arbitrage de Yusuf, 28/07. Colophon garde sa valeur, plus large. */
+  --rail:104px;
+
   --dur-micro:90ms;   --ease-micro:cubic-bezier(.32,.72,.32,1);
   --dur-panel:160ms;  --ease-panel:cubic-bezier(.2,.8,.3,1);
   --dur-screen:220ms; --ease-screen:cubic-bezier(.22,.68,.24,1);
@@ -493,6 +499,9 @@
     --topbar-hide-after:64px;  /* défilement vers le bas avant de replier   */
     --topbar-show-after:24px;  /* défilement vers le haut avant de rendre   */
     --topbar-pin-until:8px;    /* sous ce défilement absolu, toujours posée */
+
+    /* le sommaire des règles passe au-dessus du contenu, il n'a plus de colonne */
+    --rail:0px;
   }
 
   :root,

@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.18.0 · 2026-07-27
+- L'onglet Tajwid d'un roub' est refait : les règles ne sont plus une liste de pastilles, chacune a sa place, son explication et un exemple pris dans le roub' que vous lisez
+- Un sommaire à gauche liste toutes les règles du roub', suit votre lecture et vous emmène de l'une à l'autre
+- Chaque exemple montre le passage exact où la règle se produit, avec sa seule couleur allumée et tout le reste en encre neutre, plus la translittération et la traduction du verset
+- Une case « déjà vue » par règle, et trois filtres pour ne voir que les nouvelles ou que celles que vous avez déjà travaillées. L'état suit d'un appareil à l'autre comme le reste de votre progression
+- Deux nouvelles fiches de règles : l'idghâm mutajânisayn, et les lettres écrites mais non prononcées, dont la page Sources donne désormais l'origine exacte dans les conventions du mushaf de Médine
+- Les exemples des fiches sont maintenant tirés du texte du mushaf par leur référence, ce qui garantit qu'ils sont exacts au signe près
+
 ## 1.17.2 · 2026-07-27
 - L'écran Paramètres est réorganisé en sections, et les habillages se choisissent sur un aperçu de leurs couleurs au lieu d'un nom dans une liste
 - Deux nouveaux réglages : la taille du texte et la largeur de page, en trois crans chacun. Le réglage de police de votre navigateur reste respecté

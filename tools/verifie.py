@@ -173,18 +173,46 @@ def main():
     rids = [r["id"] for r in REGLES]
     if len(rids) != len(set(rids)):
         err("regles : ids en double")
-    # exemples des fiches : présents dans le Qur'an (squelette), sauf mnémoniques
-    MNEMO = {"ينمو", "يرملون", "قطب جد"}
-    full_skels = None
+    # Un exemple se désigne par sa RÉFÉRENCE, jamais par de l'arabe saisi :
+    # l'appli tire le verset de QURAN et le colorie par la seule règle de la
+    # fiche. D'où trois exigences : la référence existe et fait partie des 24
+    # roub' chargés (sinon l'appli n'a pas le texte), et le verset porte
+    # vraiment une portée de la règle (sinon la carte s'affiche sans couleur).
+    sys.path.insert(0, HERE)
+    from build_tajcur import SPAN2FICHE
+    FICHE2SPAN = {f: s for s, f in SPAN2FICHE.items()}
+    COUV = {v["k"]: v for R in QURAN.values() for v in R["verses"]}
+    # Exception unique, MESURÉE le 28/07 : sur les 823 versets, les 806 portées
+    # madda_normal tombent toutes sur une longue « cachée » (alif suscrit ـٰ,
+    # petit wâw ۥ ou yâ ۦ), jamais sur un ا و ي écrit. Aucun verset ne peut
+    # donc colorer « qâloû » : l'exemple de cette fiche reste en encre neutre.
+    SANS_COULEUR = {"madd-tabii"}
+    n_ex = 0
     for r in REGLES:
-        ex = r.get("exemple")
-        if not ex or skel(ex) in MNEMO:
-            continue
-        if full_skels is None:
-            full_skels = [skel(t) for t in FULL_U.values()]
-        if not any(skel(ex) in t for t in full_skels):
-            err(f"regles {r['id']} : exemple [[{ex}]] introuvable dans le Qur'an")
-    print(f"D. regles : {len(rids)} fiches, exemples contrôlés")
+        if "exemple" in r or "exempleNote" in r:
+            err(f"regles {r['id']} : champ exemple/exempleNote résiduel "
+                f"(migrer vers exemples: [{{ref, note}}])")
+        if not r.get("exemples"):
+            err(f"regles {r['id']} : aucun exemple")
+        for ex in r.get("exemples") or []:
+            n_ex += 1
+            ref = ex.get("ref")
+            if not ex.get("note"):
+                err(f"regles {r['id']} : exemple {ref} sans note")
+            if ref not in FULL_U:
+                err(f"regles {r['id']} : référence {ref} inexistante")
+                continue
+            if ref not in COUV:
+                err(f"regles {r['id']} : référence {ref} hors des 24 roub' "
+                    f"chargés, l'appli n'a pas le texte de ce verset")
+                continue
+            cls = FICHE2SPAN.get(r["id"])
+            if (cls and r["id"] not in SANS_COULEUR
+                    and not any(c == cls for _, _, c in (COUV[ref].get("taj") or []))):
+                err(f"regles {r['id']} : le verset {ref} ne porte aucune portée "
+                    f"{cls}, l'exemple s'afficherait sans couleur")
+    print(f"D. regles : {len(rids)} fiches, {n_ex} exemples "
+          f"(références couvertes, portées présentes)")
 
     # E. notes
     def check_refs(refs, ctx):

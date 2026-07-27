@@ -40,8 +40,10 @@ SPAN2FICHE = {
     "madda_permissible": "madd-munfasil",
     "madda_obligatory": "madd-muttasil",
     "madda_necessary": "madd-lazim",
+    "idgham_mutajanisayn": "idgham-mutajanisayn",
+    "slnt": "lettre-muette",
 }
-SANS_FICHE = {"slnt", "idgham_mutajanisayn", "idgham_mutaqaribayn"}
+SANS_FICHE = {"idgham_mutaqaribayn"}
 HORS_CURRICULUM = {2}  # Al-Baqara : pas une sourate courte, pas d'encart
 
 
