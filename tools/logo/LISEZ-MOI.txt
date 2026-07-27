@@ -1,0 +1,57 @@
+Roub' — logo
+============
+
+roub-logo.svg
+  Entrelacs a double filet, monochrome. Le trait est en currentColor :
+  place dans la page, il prend la couleur heritee, donc il suit les deux
+  themes sans second fichier. Fond transparent. A utiliser a partir de
+  32 px (en-tete large, documents, page d'accueil).
+
+roub-logo-compact.svg
+  Meme silhouette en filet simple, pour 16 a 32 px : barre du haut a
+  24 px et favicon a 16 px. Sous 32 px les deux lignes du ruban se
+  referment, d'ou cette reduction. currentColor egalement.
+
+Ou chaque fichier sert, dans Roub'
+  roub-logo.svg — l'entrelacs, a partir de 44 px :
+    barre du haut (44 px, la barre passe a 64 px de haut pour le loger),
+    en-tete de l'accueil (84 px), ecran de demarrage, page A propos,
+    en-tete de document imprime.
+  roub-logo-compact.svg — le filet simple, sous 44 px :
+    favicon (16 px), et tout endroit ou 44 px ne rentre pas.
+
+  Le seuil de 44 px n'est pas un gout, c'est une mesure. Le trait de
+  l'entrelacs vaut 1,35 unite sur une grille de 64 : a 32 px il fait
+  0,68 px reel et l'ecart entre les deux lignes du ruban 0,73 px — tous
+  deux sous le pixel, donc l'anticrenelage etale le double filet en un
+  trait gris. A 44 px le trait atteint 0,93 px et l'ecart 1,00 : c'est la
+  premiere taille ou l'entrelacement se lit a 1x. On ne rattrape pas en
+  epaississant : a ecart constant, un trait plus gras referme le ruban.
+  Sur un ecran a 2x tout ceci disparait, mais on ne choisit pas l'ecran.
+
+roub-icone-application.svg
+  Fond plein #14432f, dessin en #f4efe3, 512 x 512. Le dessin occupe 68 %
+  du carre et tient donc dans la zone de securite Android (cercle inscrit
+  a 66 %). C'est de ce fichier que vous tirerez les PNG des plateformes.
+
+Geometrie
+  Deux carres de meme taille tournes de 45 degres, chacun dessine comme un
+  ruban de deux lignes. Aux huit croisements, l'un passe dessus et l'autre
+  dessous, en alternance stricte : la profondeur ne vient d'aucune ombre.
+  Les interruptions sont decoupees au parallelogramme exact de
+  l'intersection, donc bornees par les bords du ruban qui passe dessus.
+  Etoile a huit branches au centre (union de deux carres, 16 sommets).
+
+Attention a currentColor
+  Il ne fonctionne que si le SVG est ECRIT DANS LA PAGE (balise <svg> inline)
+  ou utilise en masque CSS :
+    .logo { background: currentColor;
+            -webkit-mask: url(roub-logo.svg) center/contain no-repeat;
+                    mask: url(roub-logo.svg) center/contain no-repeat; }
+  Charge en <img src="roub-logo.svg">, le fichier est isole : currentColor y
+  vaut noir. Pour un usage en <img>, servez une copie ou le trait porte une
+  couleur explicite.
+
+Si vous changez l'epaisseur du trait, changez aussi l'ecart entre les deux
+lignes d'un ruban et la taille des parallelogrammes de decoupe : les trois
+valeurs sont liees, sinon les croisements laissent des moignons.

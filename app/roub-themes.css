@@ -1,0 +1,520 @@
+/* =============================================================================
+   ROUB' — feuille de thèmes
+   Trois thèmes au choix de l'utilisateur, chacun avec son mode clair et son
+   mode sombre. Un seul fichier, uniquement des variables.
+
+   Marquage attendu sur <html> :
+     data-theme="velin" | "ardoise" | "colophon"     (défaut : velin)
+     data-mode="light" | "dark"                      (absent = préférence système)
+
+   Ce qui change d'un thème à l'autre : polices, échelles, rayons, densité,
+   mouvement, et les deux palettes. Ce qui ne change jamais : les douze
+   couleurs de tajwid et le papier du mushaf (voir la section 5).
+
+   CE FICHIER NE CONTIENT PAS LES POLICES. À récupérer et sous-ensembler vous-même,
+   les binaires ne peuvent pas être produits ici :
+     Gentium Book (v7)  software.sil.org/gentium  — nommée « Gentium Book Plus »
+                        jusqu'en v6, et encore sous ce nom sur Google Fonts
+     Charis (v7)        software.sil.org/charis   — « Charis SIL » jusqu'en v6
+                        Le nom déclaré ici doit être celui des fichiers embarqués.
+     Noto Sans          notofonts.github.io       (ou Google Fonts)
+   L'OFL.txt de chaque famille est dans son archive : recopiez-le tel quel à côté
+   des woff2, un par famille. Ne le réécrivez pas.
+
+   Poids réels après sous-ensemblage, mesurés sur les fichiers embarqués :
+     Noto Sans      158 Ko en 4 fichiers (regular, italique, demi-gras, gras)
+     Gentium Book   200 Ko en 3 fichiers
+     Charis         190 Ko en 3 fichiers
+     total          548 Ko
+   L'italique de Noto Sans n'est pas optionnel : la traduction française est en
+   italique, et Ardoise n'a que cette famille — sans le fichier, le navigateur
+   fabrique une oblique par inclinaison géométrique, qui se voit sur un texte
+   long et casse le rythme des diacritiques.
+
+   Préchargement : ne préchargez pas des FAMILLES, préchargez les FONTES vues en
+   premier — Noto Sans regular et le regular de la prose du thème par défaut,
+   soit deux fichiers. Les autres graisses arrivent par font-display:swap sans
+   retarder le premier rendu. Précharger Noto Sans et Gentium Book entiers, ce
+   serait 358 Ko dans le chemin critique pour un utilisateur en Vélin.
+
+   Sous-ensemblage (fonttools), à répéter pour chacun des neuf fichiers :
+     pyftsubset SOURCE.ttf --output-file=fonts/NOM.woff2 --flavor=woff2 \
+       --layout-features='kern,liga,ccmp,mark,mkmk' \
+       --unicodes='U+0020-007E,U+00A0-00FF,U+0100-017F,U+0180-024F,U+02B0-02FF,\
+                   U+0300-036F,U+1E00-1EFF,U+2000-206F,U+20AC,U+2122,U+25CC,U+FB01-FB02'
+   Les deux plages qui décident de tout : U+1E00-1EFF (ḥ ṣ ṭ ẓ) et U+02B0-02FF (ʾ ʿ).
+   Vérifiez le résultat sur une chaîne réelle — « al-ḥurūf al-mufakhkhama, ʿaẓīm, ʾimāla »
+   — et pas sur un aperçu de caractères : un repli se voit au milieu d'un mot.
+   ============================================================================= */
+
+
+/* -----------------------------------------------------------------------------
+   1. POLICES — toutes en SIL Open Font License 1.1, embarquées dans le dépôt.
+      Le navigateur ne télécharge une famille que si un thème actif l'emploie :
+      Charis n'est tiré que par Colophon, Gentium que par Vélin. Si vous
+      préchargez pour l'usage hors connexion, préchargez Noto Sans et la famille
+      du thème par défaut, et laissez les deux autres se mettre en cache à la
+      première sélection.
+
+      Sous-ensemblage : conservez impérativement U+1E00-1EFF (latin étendu
+      additionnel : ḥ ṣ ṭ ẓ) et U+02B0-02FF (lettres modificatives : ʾ ʿ).
+      Le sous-ensemble « latin » standard ne les contient pas.
+   -------------------------------------------------------------------------- */
+
+@font-face{font-family:"Noto Sans";font-style:normal;font-weight:400;font-display:swap;
+  src:url("fonts/NotoSans-Regular.woff2") format("woff2")}
+@font-face{font-family:"Noto Sans";font-style:italic;font-weight:400;font-display:swap;
+  src:url("fonts/NotoSans-Italic.woff2") format("woff2")}
+@font-face{font-family:"Noto Sans";font-style:normal;font-weight:600;font-display:swap;
+  src:url("fonts/NotoSans-SemiBold.woff2") format("woff2")}
+@font-face{font-family:"Noto Sans";font-style:normal;font-weight:700;font-display:swap;
+  src:url("fonts/NotoSans-Bold.woff2") format("woff2")}
+
+@font-face{font-family:"Gentium Book";font-style:normal;font-weight:400;font-display:swap;
+  src:url("fonts/GentiumBook-Regular.woff2") format("woff2")}
+@font-face{font-family:"Gentium Book";font-style:italic;font-weight:400;font-display:swap;
+  src:url("fonts/GentiumBook-Italic.woff2") format("woff2")}
+@font-face{font-family:"Gentium Book";font-style:normal;font-weight:700;font-display:swap;
+  src:url("fonts/GentiumBook-Bold.woff2") format("woff2")}
+
+@font-face{font-family:"Charis";font-style:normal;font-weight:400;font-display:swap;
+  src:url("fonts/Charis-Regular.woff2") format("woff2")}
+@font-face{font-family:"Charis";font-style:italic;font-weight:400;font-display:swap;
+  src:url("fonts/Charis-Italic.woff2") format("woff2")}
+@font-face{font-family:"Charis";font-style:normal;font-weight:700;font-display:swap;
+  src:url("fonts/Charis-Bold.woff2") format("woff2")}
+
+
+/* -----------------------------------------------------------------------------
+   2. THÈME VÉLIN — le livre posé. Sérif humaniste, papier vélin, angles doux.
+   -------------------------------------------------------------------------- */
+
+:root,
+:root[data-theme="velin"]{
+  --font-prose:"Gentium Book",Georgia,"Times New Roman",serif;
+  --font-ui:"Noto Sans",system-ui,-apple-system,sans-serif;
+
+  --fs-100:.72rem; --fs-200:.79rem; --fs-300:.86rem; --fs-400:1.0625rem;
+  --fs-500:1.31rem; --fs-600:1.63rem; --fs-700:2.13rem;
+  --lh-prose:1.68; --lh-ui:1.45; --lh-tight:1.18; --measure:66ch;
+
+  --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:22px;
+  --sp-6:30px; --sp-7:40px; --sp-8:56px; --sp-9:76px;
+
+  --r-sm:8px; --r:10px; --r-lg:14px; --r-pill:999px; --bw:1px;
+
+  --dur-micro:90ms;   --ease-micro:cubic-bezier(.32,.72,.32,1);
+  --dur-panel:160ms;  --ease-panel:cubic-bezier(.2,.8,.3,1);
+  --dur-screen:220ms; --ease-screen:cubic-bezier(.22,.68,.24,1);
+  --dur-screen-exit:130ms;   /* la sortie finit avant l'entrée : voir section 6 */
+  --move-screen:10px;
+
+  /* palette claire (défaut) */
+  --bg:#f4efe3;      --bg2:#ece5d5;     --bg3:#e2d9c4;
+  --panel:#fffaf0;   --border:#d9cfb8;
+  --text:#2a2823;    --muted:#5e584c;
+  --accent:#1b6a4c;  --accent2:#9a7a34;
+  --danger:#b03f34;  --ok:#27744c;      --star:#9e6b0a;
+  --mid:#87610f;
+  --shadow:0 4px 16px rgba(74,58,28,.13);
+  --paper-mat:#ece5d5; --paper-mat-pad:0px;
+}
+:root[data-theme="velin"][data-mode="dark"]{
+  --bg:#14130f;      --bg2:#1c1a15;     --bg3:#262319;
+  --panel:#191712;   --border:#35312a;
+  --text:#efe9dc;    --muted:#a89f8e;
+  --accent:#5cbb8e;  --accent2:#d8b46a;
+  --danger:#e07a6a;  --ok:#58c08e;      --star:#f0c452;
+  --mid:#d8b46a;
+  --shadow:0 6px 24px rgba(0,0,0,.5);
+  --paper-mat:#443f34; --paper-mat-pad:10px;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-mode="light"]),
+  :root[data-theme="velin"]:not([data-mode="light"]){
+    --bg:#14130f;      --bg2:#1c1a15;     --bg3:#262319;
+    --panel:#191712;   --border:#35312a;
+    --text:#efe9dc;    --muted:#a89f8e;
+    --accent:#5cbb8e;  --accent2:#d8b46a;
+    --danger:#e07a6a;  --ok:#58c08e;      --star:#f0c452;
+  --mid:#d8b46a;
+    --shadow:0 6px 24px rgba(0,0,0,.5);
+    --paper-mat:#443f34; --paper-mat-pad:10px;
+  }
+}
+
+
+/* -----------------------------------------------------------------------------
+   3. THÈME ARDOISE — l'outil de tous les jours. Une seule famille sans
+      empattement, des filets à la place des ombres, une densité plus courte.
+   -------------------------------------------------------------------------- */
+
+:root[data-theme="ardoise"]{
+  --font-prose:"Noto Sans",system-ui,-apple-system,sans-serif;
+  --font-ui:"Noto Sans",system-ui,-apple-system,sans-serif;
+
+  --fs-100:.69rem; --fs-200:.78rem; --fs-300:.84rem; --fs-400:.97rem;
+  --fs-500:1.13rem; --fs-600:1.38rem; --fs-700:1.75rem;
+  --lh-prose:1.62; --lh-ui:1.4; --lh-tight:1.15; --measure:72ch;
+
+  --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:14px; --sp-5:20px;
+  --sp-6:26px; --sp-7:34px; --sp-8:48px; --sp-9:64px;
+
+  --r-sm:5px; --r:5px; --r-lg:10px; --r-pill:999px; --bw:1px;
+
+  --dur-micro:70ms;   --ease-micro:cubic-bezier(.4,0,.2,1);
+  --dur-panel:120ms;  --ease-panel:cubic-bezier(.4,0,.2,1);
+  --dur-screen:170ms; --ease-screen:cubic-bezier(.35,0,.15,1);
+  --dur-screen-exit:100ms;
+  --move-screen:6px;
+
+  --bg:#f2efe8;      --bg2:#eae6dc;     --bg3:#e0dbcf;
+  --panel:#fbf9f4;   --border:#d5cfc2;
+  --text:#23262a;    --muted:#575b61;
+  --accent:#0f6a63;  --accent2:#997a35;
+  --danger:#b2423c;  --ok:#1c7053;      --star:#9c6c08;
+  --mid:#87610f;
+  --shadow:0 1px 2px rgba(35,38,42,.07);
+  --paper-mat:#eae6dc; --paper-mat-pad:0px;
+}
+:root[data-theme="ardoise"][data-mode="dark"]{
+  --bg:#101315;      --bg2:#171b1e;     --bg3:#212629;
+  --panel:#14181b;   --border:#2b3236;
+  --text:#e6eaec;    --muted:#98a2a7;
+  --accent:#45bda8;  --accent2:#d5b06a;
+  --danger:#e2716b;  --ok:#45c092;      --star:#ffcb57;
+  --mid:#d5b06a;
+  --shadow:0 1px 2px rgba(0,0,0,.5);
+  --paper-mat:#363c40; --paper-mat-pad:10px;
+}
+@media (prefers-color-scheme:dark){
+  :root[data-theme="ardoise"]:not([data-mode="light"]){
+    --bg:#101315;      --bg2:#171b1e;     --bg3:#212629;
+    --panel:#14181b;   --border:#2b3236;
+    --text:#e6eaec;    --muted:#98a2a7;
+    --accent:#45bda8;  --accent2:#d5b06a;
+    --danger:#e2716b;  --ok:#45c092;      --star:#ffcb57;
+  --mid:#d5b06a;
+    --shadow:0 1px 2px rgba(0,0,0,.5);
+    --paper-mat:#363c40; --paper-mat-pad:10px;
+  }
+}
+
+
+/* -----------------------------------------------------------------------------
+   4. THÈME COLOPHON — l'édition savante. Marge de repères, titres en capitales
+      espacées, angles droits, encre bleu-noir et indigo.
+   -------------------------------------------------------------------------- */
+
+:root[data-theme="colophon"]{
+  --font-prose:"Charis",Georgia,"Times New Roman",serif;
+  --font-ui:"Noto Sans",system-ui,-apple-system,sans-serif;
+
+  --fs-100:.69rem; --fs-200:.78rem; --fs-300:.84rem; --fs-400:1.03rem;
+  --fs-500:.94rem; /* titre de sous-section EN CAPITALES */
+  --fs-600:1.31rem; --fs-700:1.94rem;
+  --lh-prose:1.72; --lh-ui:1.45; --lh-tight:1.2; --measure:62ch;
+  --ls-caps:.1em; --rail:118px;
+
+  --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:22px;
+  --sp-6:30px; --sp-7:42px; --sp-8:58px; --sp-9:80px;
+
+  --r-sm:3px; --r:3px; --r-lg:8px; --r-pill:999px; --bw:1px;
+
+  --dur-micro:100ms;  --ease-micro:cubic-bezier(.3,.7,.3,1);
+  --dur-panel:180ms;  --ease-panel:cubic-bezier(.2,.6,.2,1);
+  --dur-screen:240ms; --ease-screen:cubic-bezier(.2,.6,.2,1);
+  --dur-screen-exit:140ms;
+  --move-screen:14px;
+
+  --bg:#f5f0e4;      --bg2:#ece6d6;     --bg3:#e3dbc7;
+  --panel:#fdfaf1;   --border:#dbd2bd;
+  --text:#25262e;    --muted:#5b5b67;
+  --accent:#2f3f7d;  --accent2:#96762f;
+  --danger:#a93f3a;  --ok:#24795a;      --star:#99670c;
+  --mid:#825d0e;
+  --shadow:0 2px 10px rgba(40,38,60,.10);
+  --paper-mat:#ece6d6; --paper-mat-pad:0px;
+}
+:root[data-theme="colophon"][data-mode="dark"]{
+  --bg:#0f1118;      --bg2:#171a24;     --bg3:#202433;
+  --panel:#13161f;   --border:#2b3042;
+  --text:#e7e8f0;    --muted:#98a0b4;
+  --accent:#8ba3ee;  --accent2:#d6b475;
+  --danger:#e37a74;  --ok:#4dc094;      --star:#f5cb5c;
+  --mid:#d6b475;
+  --shadow:0 6px 24px rgba(0,0,0,.5);
+  --paper-mat:#333852; --paper-mat-pad:10px;
+}
+@media (prefers-color-scheme:dark){
+  :root[data-theme="colophon"]:not([data-mode="light"]){
+    --bg:#0f1118;      --bg2:#171a24;     --bg3:#202433;
+    --panel:#13161f;   --border:#2b3042;
+    --text:#e7e8f0;    --muted:#98a0b4;
+    --accent:#8ba3ee;  --accent2:#d6b475;
+    --danger:#e37a74;  --ok:#4dc094;      --star:#f5cb5c;
+  --mid:#d6b475;
+    --shadow:0 6px 24px rgba(0,0,0,.5);
+    --paper-mat:#333852; --paper-mat-pad:10px;
+  }
+}
+
+
+/* -----------------------------------------------------------------------------
+   5. ZONE MUSHAF — commune aux six combinaisons, jamais thémée.
+      Le papier est clair et fixe : tout ce qui se pose dessus doit donc rester
+      accordé au papier et non au thème. Ces jetons ne bougent pas.
+   -------------------------------------------------------------------------- */
+
+:root{
+  --paper:#faf6ea;         /* fond des pages reproduisant le mushaf imprimé */
+  --paper-border:#e6dfcc;  /* filet du bloc en mode clair */
+  --rosace:#997a35;        /* rosace ۞ de fin de verset, à l'intérieur du papier */
+
+  /* Passe-partout — cadre intercalaire entre le fond de page et le papier.
+     Sans lui, le papier ressort à 17:1 sur les fonds sombres : un rectangle
+     blanc en pleine nuit. Avec lui, l'œil monte par deux paliers, ~1,9 du fond
+     au cadre puis ~9 du cadre au papier. Sa couleur est thémée (--paper-mat,
+     sections 2 à 4) parce qu'elle doit rester dans la famille du fond ; sa
+     géométrie ne l'est pas et tient dans ces trois valeurs. En mode clair,
+     --paper-mat-pad vaut 0 : le cadre existe mais ne s'affiche pas, le papier
+     n'étant qu'à 1,06 du fond. */
+  /* --mid — état intermédiaire de l'auto-évaluation.
+     La graduation « mal su / moyen / bien su » est portée par --danger, --mid et
+     --ok. Elle est SÉMANTIQUE : ses trois crans doivent se lire comme du texte,
+     y compris à 12 px sur le bouton d'évaluation et à 14,5 px dans la rosace de
+     fin de verset. --accent2 ne pouvait pas tenir ce rôle : à 3,5-3,8 sur --bg,
+     le cran du milieu paraissait désactivé alors qu'il ne l'est pas. Plutôt que
+     d'assombrir l'or partout et de le perdre pour le décor, la couleur porteuse
+     de sens et la couleur décorative sont séparées — même geste que --star.
+     Mesures en clair, sur --bg puis --panel :
+       --danger 4,89-5,34 / 5,34-5,82
+       --mid    4,88-5,24 / 5,33-5,71
+       --ok     4,96-5,26 / 5,41-5,80   (--ok assombri en Vélin et Ardoise,
+                                         il passait sous 4,5 sur --bg)
+     Les trois crans sont donc au même poids visuel, ce qui est le point : une
+     graduation dont un cran s'efface n'est plus une graduation.
+     Sur --bg3 le trio retombe à 4,0-4,3 : pas de petit caractère d'état sur
+     cette surface, elle est faite pour les pastilles et les onglets actifs.
+     En sombre, --accent2 tient déjà 8,7 à 9,6 : --mid y reprend sa valeur, non
+     par paresse mais parce que rien ne justifie deux ors distincts là où la
+     contrainte est satisfaite. */
+
+  /* Rappels AA vérifiés sur les six combinaisons :
+     - --star et --muted des trois palettes claires ont été assombris pour tenir
+       3:1 et 4,5:1 jusque sur --bg3, la surface la plus foncée qui les porte ;
+     - --accent2 clair plafonne à 3,5-3,8 sur --bg : décoratif seulement —
+       surfaces, filets, gros caractère. Pour tout ce qui porte du sens, c'est
+       --mid ci-dessus ;
+     - --border n'est jamais porteur de sens (les étoiles vides s'appuient sur la
+       forme, pas sur le contraste). */
+  --paper-mat-r:calc(var(--r) + 6px);  /* rayon extérieur du cadre */
+  --paper-mat-bw:0;                    /* le cadre est une masse, pas un filet */
+
+  /* Chrome et gouttières — communs aux six combinaisons, repris en section 7 */
+  --gutter:30px;      /* marge latérale du contenu */
+  --topbar-h:64px;    /* barre du haut : loge le logo entrelacs de 44 px */
+  --navbar-h:0px;     /* barre de navigation basse : inexistante en large */
+  --audiobar-h:0px;   /* lecteur audio : en flux dans la page en large */
+  --bottom-h:0px;     /* hauteur totale du chrome bas, à réserver au contenu */
+
+  /* Repli de la barre du haut — voir §7 pour les valeurs mobiles et la règle.
+     Le repli est un déplacement de chrome, pas un changement d'écran : il
+     emprunte --dur-panel, plus court au retour qu'à la disparition. */
+  --topbar-hide-dur:var(--dur-panel);
+  --topbar-show-dur:var(--dur-screen-exit);
+  --topbar-ease:var(--ease-panel);
+  --topbar-hide-after:0px;   /* 0 = pas de repli : en large, la barre est fixe */
+  --topbar-show-after:0px;
+  --topbar-pin-until:0px;
+  --tap-min:44px;     /* cible tactile minimale, jamais réduite */
+  /* --paper-mat-pad : 10px en sombre, 0 en clair — voir les blocs de thème */
+
+  /* les douze couleurs de tajwid, jeu clair : à employer PARTOUT où le fond est
+     le papier, y compris en mode sombre */
+  --tjp-neutre:#9aa1ad;  --tjp-ghunna:#1c8f47;  --tjp-ikhfa:#4faf74;
+  --tjp-idgham:#0d6e3f;  --tjp-idgham-sg:#4a7fae; --tjp-iqlab:#c67615;
+  --tjp-qalqala:#1f6fd0; --tjp-madd2:#d98181;   --tjp-madd4:#cc4f4f;
+  --tjp-madd45:#c22525;  --tjp-madd6:#8d1a19;   --tjp-special:#8a53ce;
+}
+:root[data-mode="dark"]{ --paper-border:#cdc4ac; }
+@media (prefers-color-scheme:dark){
+  :root:not([data-mode="light"]){ --paper-border:#cdc4ac; }
+}
+
+
+/* -----------------------------------------------------------------------------
+   6. MOUVEMENT — caractère, composition, et ce qui ne s'anime jamais.
+
+   LE CARACTÈRE, ET POURQUOI
+   Une application de mémorisation se rouvre dix fois par jour et se parcourt
+   pendant des heures. Le mouvement n'y a qu'un seul travail : confirmer qu'on a
+   changé d'endroit. Il ne raconte rien, il ne récompense rien, il ne célèbre
+   rien — une animation qui félicite à la dixième révision agace à la centième.
+   D'où trois durées courtes, et une règle simple : la transition doit être finie
+   avant que l'œil ne la cherche. Le glissement, lui, n'est pas décoratif : il
+   porte le sens d'où l'on vient, et c'est ce qui aide à se faire une carte
+   mentale d'une application où l'on revient toujours aux mêmes endroits. C'est
+   la raison pour laquelle il est court mais pas nul.
+     Vélin     souple et bref   90 / 160 / 220 ms — la page qu'on tourne
+     Ardoise   net et rapide    70 / 120 / 170 ms — l'instrument qui répond
+     Colophon  posé et régulier 100 / 180 / 240 ms — une seule vitesse pour tout
+
+   LA COMPOSITION ÉCRAN À ÉCRAN
+   Fondu croisé, les deux mouvements partant ensemble :
+     sortie   opacité 1 → 0 sur --dur-screen-exit, aucun déplacement
+     entrée   opacité 0 → 1 et translation de --move-screen → 0 sur --dur-screen
+   La sortie est plus courte que l'entrée (environ 60 %) : l'ancien écran
+   s'efface avant que le nouveau ne soit posé, ce qui évite la bouillie de deux
+   textes superposés à mi-course. Le signe de --move-screen porte le sens de la
+   navigation : positif quand on entre dans un roub', négatif quand on remonte
+   vers la liste. La translation se fait sur un seul axe, jamais d'échelle,
+   jamais de rotation, jamais de flou.
+
+   LES MICRO-RÉACTIONS
+   --dur-micro ne sert qu'aux retours d'un geste en cours : appui, survol, prise
+   de focus, bascule d'un interrupteur. Uniquement opacité, fond, filet, et un
+   déplacement de 2 px au plus.
+
+   CE QUI NE S'ANIME JAMAIS
+     - une valeur qui change sans geste de l'utilisateur : progression mise à
+       jour, synchronisation en arrière-plan, compteur de cartes, état de
+       téléchargement. La valeur remplace l'ancienne, point ;
+     - un rafraîchissement de contenu au même endroit : cocher une option ne
+       fait pas rejouer la transition d'écran ;
+     - la hauteur d'un bloc de prose, ni le retour à la ligne du texte ;
+     - la zone mushaf, jamais : le texte coranique n'entre pas en scène ;
+     - le suivi de récitation. L'application fait défiler la page elle-même pour
+       tenir au centre le verset récité, et le mot récité dans un verset long.
+       Ce défilement n'est PAS un geste de l'utilisateur : il ne replie pas la
+       barre du haut (§7), il ne déclenche aucune transition, et il ne se
+       compose avec rien. La règle générale dont il découle : le repli du chrome
+       répond au pouce, jamais au lecteur. Concrètement, le compteur de
+       défilement cumulé n'est alimenté que par un défilement d'origine
+       utilisateur, et le suivi de récitation le laisse intact — il ne le remet
+       pas non plus à zéro, sinon un verset long annulerait un repli déjà acquis.
+       Le déplacement du suivi lui-même est un mouvement de lecture, pas une
+       animation d'interface : il suit la voix, donc ni --dur-screen ni
+       --dur-panel ne s'y appliquent.
+
+   MOUVEMENT RÉDUIT
+   Il ne reste qu'un fondu d'opacité de 80 ms, sans déplacement ; les
+   micro-réactions passent à 0 ms. Rien ne disparaît de l'interface, tout se
+   pose net. C'est le réglage « Réduites » de l'écran Paramètres, et c'est aussi
+   ce que fait la préférence système.
+   -------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion:reduce){
+  /* :not([data-anim="complete"]) ajouté à la greffe (27/07) : sans lui, le
+     réglage « Animations : complètes » de l'écran Paramètres ne pourrait pas
+     réautoriser le mouvement quand le système demande sa réduction, alors que
+     c'est le sens d'un choix explicite. Restaurer les valeurs par thème depuis
+     styles.css était impossible, d'où cette retouche à la source. */
+  :root:not([data-anim="complete"]){
+         --dur-micro:0ms; --dur-panel:0ms; --dur-screen:80ms;
+         --ease-screen:linear; --move-screen:0px; }
+}
+
+/* -----------------------------------------------------------------------------
+   7. MOBILE — point de rupture unique à 640 px.
+
+   Principe : on ne rétrécit pas la lecture, on rétrécit ce qui l'entoure.
+   --fs-400 (la prose) ne baisse dans aucun thème ; il monte même d'un demi-point
+   chez Ardoise, dont le sans-empattement se lit plus petit qu'un sérif. Ce qui
+   cède, ce sont les titres d'affichage, les paliers hauts d'espacement et les
+   marges. La colonne de lecture perd sa limite en ch et prend la largeur
+   disponible moins les gouttières : à 640 px, 62ch dépasserait l'écran.
+
+   Trois règles de structure, à tenir dans votre balisage :
+     - la barre du haut à cinq entrées ne tient pas : les entrées descendent en
+       barre basse (--navbar-h), le haut ne garde que le logo et la bascule ;
+     - aucune cible tactile sous --tap-min, y compris les pastilles d'options et
+       les commandes de la barre audio ;
+     - la marge de repères de Colophon (--rail) disparaît, ses ancres passent en
+       ligne au-dessus de la section ;
+     - le logo de la barre du haut descend de 44 à 40 px. C'est sous le seuil de
+       lisibilité de l'entrelacs à 1×, mais un mobile est à 2× ou plus : le
+       trait y fait 1,68 px réel. Si vous visez un appareil à 1×, servez-y la
+       réduction en filet simple.
+
+   LE CHROME BAS NE BOUGE JAMAIS
+   Deux barres empilées, lecteur audio au-dessus de la navigation, toutes deux
+   fixes. Ni l'une ni l'autre ne se replie, ne glisse ni ne se masque au
+   défilement : ce sont les deux seules choses dont la position doit être
+   apprise une fois pour toutes. Le contenu réserve --bottom-h en bas, jamais
+   moins, y compris quand aucun verset ne joue — une barre audio qui apparaît en
+   poussant le texte vers le haut ferait sauter la ligne en cours de lecture.
+   Quand elle est inactive, la place est tenue, pas remplie.
+
+   LE REPLI DE LA BARRE DU HAUT
+   Elle se replie ENTIÈREMENT, logo compris. Un bandeau résiduel coûterait sa
+   hauteur en permanence et donnerait une troisième bande de chrome sur un écran
+   de 390 px, alors que ce qu'il porte n'est pas du travail : l'identité n'a pas
+   besoin d'être à l'écran, et la bascule clair-sombre est à un geste dans
+   Paramètres, dont l'entrée, elle, ne bouge jamais. Ce qui doit rester atteignable
+   au pouce est en bas ; ce qui se replie est ce qu'on ne touche pas en lisant.
+
+     état posé      translateY(0)
+     état replié    translateY(-100%)
+     disparition    --topbar-hide-dur / --topbar-ease  (160 / 120 / 180 ms)
+     retour         --topbar-show-dur / --topbar-ease  (130 / 100 / 140 ms)
+
+   Le contenu ne se réajuste pas : la barre glisse AU-DESSUS de lui, la réserve
+   haute reste à --topbar-h. Sans quoi chaque repli déplacerait la ligne en cours
+   de lecture, ce que la section 6 interdit.
+
+   Déclenchement, dans l'ordre où les conditions se lisent :
+     1. défilement absolu <= --topbar-pin-until : posée, sans condition ;
+     2. --topbar-hide-after de défilement cumulé vers le bas : elle se replie ;
+     3. --topbar-show-after cumulé vers le haut : elle revient ;
+     4. tout changement de sens remet le cumul à zéro.
+   En bout de page, elle revient : le rebond élastique de fin de liste ne compte
+   pas comme un défilement vers le haut.
+
+   Le repli n'a pas lieu si l'utilisateur a demandé un mouvement réduit. Une
+   barre qui apparaît et disparaît sans transition est pire qu'une barre fixe :
+   dans ce cas elle reste posée, et les 52 px sont le prix — c'est le sens de la
+   préférence.
+   -------------------------------------------------------------------------- */
+
+@media (max-width:640px){
+  :root{
+    --gutter:16px;
+    --topbar-h:56px;  /* mobile : logo entrelacs reduit a 40 px */
+    --navbar-h:56px;
+    --audiobar-h:64px;
+    --bottom-h:calc(var(--audiobar-h) + var(--navbar-h) + env(safe-area-inset-bottom,0px));
+    --measure:100%;
+
+    /* Repli de la barre du haut. Seuils en pixels de défilement cumulé, dans un
+       sens puis dans l'autre : l'écart entre les deux est l'hystérésis, sans
+       quoi la barre bat à chaque tremblement du pouce. Le retour coûte moins
+       cher que la disparition — on récupère la barre plus vite qu'on ne la perd. */
+    --topbar-hide-after:64px;  /* défilement vers le bas avant de replier   */
+    --topbar-show-after:24px;  /* défilement vers le haut avant de rendre   */
+    --topbar-pin-until:8px;    /* sous ce défilement absolu, toujours posée */
+  }
+
+  :root,
+  :root[data-theme="velin"]{
+    --fs-700:1.63rem; --fs-600:1.31rem; --fs-500:1.19rem;  /* 26 / 21 / 19 px */
+    --lh-prose:1.62;
+    --sp-6:24px; --sp-7:30px; --sp-8:40px; --sp-9:52px;
+  }
+
+  :root[data-theme="ardoise"]{
+    --fs-700:1.44rem; --fs-600:1.19rem; --fs-500:1.06rem;  /* 23 / 19 / 17 px */
+    --fs-400:1rem;    /* 16 px : la prose MONTE, elle ne baisse pas */
+    --lh-prose:1.6;
+    --sp-6:22px; --sp-7:28px; --sp-8:36px; --sp-9:48px;
+  }
+
+  :root[data-theme="colophon"]{
+    --fs-700:1.56rem; --fs-600:1.19rem;                    /* 25 / 19 px */
+    --fs-500:.94rem;  /* inchangé : c'est un titre en capitales, pas une taille */
+    --lh-prose:1.68;
+    --sp-6:24px; --sp-7:32px; --sp-8:42px; --sp-9:56px;
+    --rail:0px;
+  }
+}
+

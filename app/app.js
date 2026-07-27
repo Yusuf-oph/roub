@@ -25,11 +25,30 @@ const store = {
   set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
 };
 
+/* Deux axes indépendants depuis la refonte (27/07) :
+   - le MODE (clair/sombre) : ce que commande la bascule en haut à droite et le
+     lien ?theme=light|dark ; "auto" suit la préférence du système ;
+   - le THÈME (Vélin, Ardoise, Colophon) : choisi SÉPARÉMENT pour chaque mode,
+     de sorte que la bascule serve la bonne paire sans rien demander.
+   L'ancien champ `theme`, qui valait light/dark, est repris par migrerParams()
+   pour les réglages déjà enregistrés : il ne faut perdre le choix de personne. */
 const PARAMS = Object.assign({
-  theme: "dark", translit: "fr", showTl: true, showTr: true,
+  mode: "auto", themeClair: "velin", themeSombre: "velin",
+  police: "auto", anim: "auto",
+  translit: "fr", showTl: true, showTr: true,
   taj: true, speed: 1, newLimit: 15, silentMarks: true,
   recitation: "husary64", karaoke: true,
 }, store.get("quran-params", {}));
+
+(function migrerParams() {
+  /* un réglage enregistré avant la refonte porte `theme: "light"|"dark"` et
+     aucun `mode` : c'était un mode, pas un thème. On le convertit une fois. */
+  if (PARAMS.theme === "light" || PARAMS.theme === "dark") {
+    if (!store.get("quran-params", {}).mode) PARAMS.mode = PARAMS.theme;
+    delete PARAMS.theme;
+    store.set("quran-params", PARAMS);
+  }
+})();
 
 /* Affichage du texte arabe :
    - U+0652 (soukoun rond « usuel ») -> U+06E1 (petite tête de khâ'), la
@@ -66,9 +85,40 @@ function arDisplay(s) {
 const arEsc = s => esc(arDisplay(s));
 const BASMALA = "بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ";
 function saveParams() { store.set("quran-params", PARAMS); applyTheme(); }
-function applyTheme() {
-  document.documentElement.setAttribute("data-theme", PARAMS.theme);
+
+/* Le mode réellement affiché : le choix explicite s'il existe, sinon le
+   système. Ordre de préséance complet, du plus fort au plus faible :
+   ?theme= dans l'URL > réglage enregistré > prefers-color-scheme > clair. */
+function modeEffectif() {
+  return PARAMS.mode === "light" || PARAMS.mode === "dark"
+    ? PARAMS.mode
+    : (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
 }
+function themeEffectif() {
+  return modeEffectif() === "dark" ? PARAMS.themeSombre : PARAMS.themeClair;
+}
+/* Le nom reste `applyTheme` : il est appelé depuis plusieurs endroits, et le
+   renommer n'apporterait rien. Il pose désormais DEUX attributs. */
+function applyTheme() {
+  const r = document.documentElement;
+  /* data-mode n'est posé QUE s'il est explicite : absent, la feuille suit
+     prefers-color-scheme d'elle-même, donc le premier rendu est déjà juste,
+     avant même que ce script ne s'exécute. Le poser systématiquement ferait
+     clignoter la page au chargement. */
+  if (PARAMS.mode === "light" || PARAMS.mode === "dark") r.setAttribute("data-mode", PARAMS.mode);
+  else r.removeAttribute("data-mode");
+  r.setAttribute("data-theme", themeEffectif());
+  r.setAttribute("data-anim", PARAMS.anim || "auto");
+  /* "auto" ne pose aucune surcharge : la police reste celle du thème. Comme
+     pour le mode et les animations, on n'écrit JAMAIS dans `store` la valeur
+     résolue, sinon on fige un choix que personne n'a fait. */
+  r.setAttribute("data-police", PARAMS.police || "auto");
+}
+/* en mode « suivre le système », un basculement de l'OS doit changer le mode ET
+   le thème associé, sans recharger */
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
+  if (PARAMS.mode !== "light" && PARAMS.mode !== "dark") { applyTheme(); render(); }
+});
 
 /* index des versets toutes roub' confondues */
 const VIDX = {};
@@ -389,8 +439,132 @@ player.el.addEventListener("loadedmetadata", () => {
    un timer plutôt que timeupdate (déclenché trop rarement : ~4 fois/seconde) */
 let wordTimer = null;
 const KARAOKE_LEAD = 70;   // ms d'avance sur le temps audio (voir wordTick)
+
+/* ---- défilement piloté par l'application ----------------------------------
+   Deux choses défilent la page toutes seules : le passage au verset suivant et
+   le suivi du mot récité. Il faut pouvoir les distinguer d'un geste de
+   l'utilisateur (la barre du haut se replie au geste, pas au défilement
+   automatique). D'où un marqueur de FIN et non d'instant : un défilement doux
+   dure, le marqueur doit couvrir toute sa durée. */
+let defilementAutoJusqua = 0;
+function defilementEstAuto() { return Date.now() < defilementAutoJusqua; }
+function defilerVers(y, duree = 900) {
+  defilementAutoJusqua = Date.now() + duree;
+  window.scrollTo({
+    top: Math.max(0, y),
+    behavior: mouvementReduit() ? "auto" : "smooth",
+  });
+}
+const MARGE_HAUT = 72;     // barre du haut + un peu d'air
+
+/* suivi du mot à l'intérieur d'un verset : on ne recentre PAS à chaque mot,
+   l'écran tremblerait et deviendrait illisible. On ne bouge que si le mot sort
+   d'une zone de confort, et on le repose alors un peu au-dessus du milieu. */
+const ZONE_HAUTE = .28, ZONE_BASSE = .72, CIBLE_MOT = .42;
+function suivreMot(el) {
+  /* un défilement est déjà en vol (changement de verset, ou mot précédent) :
+     ne pas lui courir après, les deux se battraient */
+  if (!el || defilementEstAuto()) return;
+  const r = el.getBoundingClientRect(), h = window.innerHeight;
+  const y = r.top + r.height / 2;
+  if (y >= h * ZONE_HAUTE && y <= h * ZONE_BASSE) return;
+  defilerVers(window.scrollY + y - h * CIBLE_MOT, 500);
+}
+let motSuivi = -1;
+
+/* ---- repli de la barre du haut --------------------------------------------
+   Règle sous-jacente : ce qu'on touche en lisant reste en bas, ce qu'on ne
+   touche pas se replie. La barre du haut part donc ENTIÈRE, logo compris ; un
+   bandeau résiduel coûterait sa hauteur en permanence pour porter une identité
+   et une bascule qui sont déjà ailleurs.
+
+   Tout est piloté par les jetons de la direction artistique : ils valent 0 en
+   large, ce qui éteint le repli sans qu'aucun test de largeur ne traîne ici.
+   Les relire à chaque événement de défilement coûterait un calcul de style par
+   image, d'où le cache et sa péremption au redimensionnement. */
+const JETONS_CHROME = { pin: 0, cacher: 0, montrer: 0 };
+function relireJetonsChrome() {
+  const cs = getComputedStyle(document.documentElement);
+  const px = n => parseFloat(cs.getPropertyValue(n)) || 0;
+  JETONS_CHROME.pin = px("--topbar-pin-until");
+  JETONS_CHROME.cacher = px("--topbar-hide-after");
+  JETONS_CHROME.montrer = px("--topbar-show-after");
+}
+
+/* le réglage explicite l'emporte sur le système, dans les deux sens ; c'est la
+   même mécanique que le thème, et elle sert aussi le défilement de suivi */
+function mouvementReduit() {
+  if (PARAMS.anim === "complete") return false;
+  if (PARAMS.anim === "reduite") return true;
+  return matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+let dernierY = 0, cumulDefilement = 0, sensDefilement = 0, topbarRepliee = false;
+function poserTopbar(replie) {
+  if (topbarRepliee === replie) return;
+  topbarRepliee = replie;
+  document.documentElement.classList.toggle("topbar-repliee", replie);
+}
+function surDefilement() {
+  const y = Math.max(0, window.scrollY);
+  const d = y - dernierY;
+  dernierY = y;   // toujours, sinon la reprise après un défilement automatique
+                  // compterait tout le trajet parcouru comme un geste
+
+  /* repli éteint : en large, ou quand un mouvement réduit est demandé. Une
+     barre qui saute sans transition est pire qu'une barre fixe, et les 56 px
+     de --topbar-h sont alors le prix assumé de la préférence. */
+  if (!JETONS_CHROME.cacher || mouvementReduit()) { poserTopbar(false); cumulDefilement = 0; return; }
+
+  /* 1. près du haut : posée, sans condition */
+  if (y <= JETONS_CHROME.pin) { poserTopbar(false); cumulDefilement = 0; sensDefilement = 0; return; }
+
+  /* en bout de page, la barre revient. Placé avant la lecture du sens pour que
+     le rebond élastique de fin de liste ne soit pas compté comme un geste vers
+     le haut, ce qu'il n'est pas. */
+  const restant = document.documentElement.scrollHeight - window.innerHeight - y;
+  if (restant <= 2) { poserTopbar(false); cumulDefilement = 0; sensDefilement = 0; return; }
+
+  /* le suivi de récitation défile lui aussi : il n'alimente PAS le compteur, et
+     surtout il ne le remet pas à zéro — sinon un verset long annulerait un
+     repli déjà acquis. Le chrome répond au pouce, jamais au lecteur. */
+  if (!d || defilementEstAuto()) return;
+
+  /* 4. tout changement de sens repart de zéro : l'écart entre les deux seuils
+     est l'hystérésis, sans laquelle la barre bat au tremblement du pouce */
+  const sens = d > 0 ? 1 : -1;
+  if (sens !== sensDefilement) { sensDefilement = sens; cumulDefilement = 0; }
+  cumulDefilement += Math.abs(d);
+
+  /* 2. et 3. : les seuils, volontairement asymétriques */
+  if (sens > 0) { if (cumulDefilement >= JETONS_CHROME.cacher) poserTopbar(true); }
+  else if (cumulDefilement >= JETONS_CHROME.montrer) poserTopbar(false);
+}
+/* La barre du haut porte un backdrop-filter, et une transformation dès qu'elle
+   se replie : l'un comme l'autre font d'elle le BLOC CONTENEUR de ses
+   descendants en position fixed. Une navigation écrite dans la barre mais fixée
+   en bas se retrouve donc collée sous le logo (constaté le 27/07). On déplace
+   le nœud au lieu de le dupliquer : les écouteurs le suivent, l'état actif
+   reste à un seul endroit, et c'est le CSS qui décide, par --navbar-h, où il
+   doit vivre — aucun point de rupture n'est recopié ici. */
+function placerNav() {
+  const nav = $(".nav"), bar = $(".topbar");
+  if (!nav || !bar) return;
+  const enBas = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--navbar-h")) > 0;
+  const cible = enBas ? document.body : bar;
+  if (nav.parentElement === cible) return;
+  if (enBas) document.body.appendChild(nav);
+  else bar.insertBefore(nav, $(".spacer", bar));
+}
+
+relireJetonsChrome();
+placerNav();
+addEventListener("scroll", surDefilement, { passive: true });
+addEventListener("resize", () => { relireJetonsChrome(); placerNav(); surDefilement(); });
+
 function clearWords() {
   $$(".wd.on, .wd.done").forEach(el => el.classList.remove("on", "done"));
+  motSuivi = -1;
 }
 function wordTick() {
   if (!PARAMS.karaoke || !player.curKey || player.el.paused) return;
@@ -406,11 +580,17 @@ function wordTick() {
   let cur = -1;
   for (let i = 0; i < sg.length; i++) if (t >= sg[i][2]) cur = sg[i][0];
   const els = $$(`.verse[data-k="${player.curKey}"] .wd, .mver[data-k="${player.curKey}"] .wd`);
+  let elCourant = null;
   els.forEach(el => {
     const w = +el.dataset.w;
-    el.classList.toggle("on", w === cur);
+    const on = w === cur;
+    if (on) elCourant = el;
+    el.classList.toggle("on", on);
     el.classList.toggle("done", w < cur);
   });
+  /* au CHANGEMENT de mot seulement, pas aux 40 ms : un verset plus haut que
+     l'écran sortait du champ sans que rien ne bouge jusqu'au verset suivant */
+  if (cur !== motSuivi) { motSuivi = cur; suivreMot(elCourant); }
 }
 player.el.addEventListener("play", () => {
   clearInterval(wordTimer);
@@ -425,7 +605,15 @@ function highlightVerse(key, defiler = true) {
   if (!key) return;
   const els = $$(`.verse[data-k="${key}"], .mver[data-k="${key}"], .qw[data-k="${key}"]`);
   els.forEach(el => el.classList.add("playing"));
-  if (els[0] && defiler) els[0].scrollIntoView({ block: "center", behavior: "smooth" });
+  if (els[0] && defiler) {
+    const r = els[0].getBoundingClientRect(), h = window.innerHeight;
+    /* un verset PLUS HAUT que l'écran ne se centre pas : le centrer poserait ses
+       premiers mots au-dessus du bord, et on commencerait à lire au milieu.
+       On l'aligne alors en haut, sous la barre ; le suivi du mot fera le reste. */
+    defilerVers(r.height > h * .9
+      ? window.scrollY + r.top - MARGE_HAUT
+      : window.scrollY + r.top - (h - r.height) / 2);
+  }
 }
 /* un style de récitation non embarqué peut manquer (hors connexion, source
    indisponible) : le dire, au lieu de s'arrêter sans explication */
@@ -551,7 +739,34 @@ function vrefBtn(key) {
 
 /* ---------------- navigation ---------------- */
 function nav(hash) { location.hash = hash; }
-window.addEventListener("hashchange", render);
+
+/* SEUL ce chemin est animé, et c'est le point le plus important de tout le
+   mouvement. `render()` est appelé depuis une vingtaine d'endroits dont la
+   plupart ne sont PAS des navigations : puces d'options, enregistrement d'un
+   réglage, dévoilement d'une carte, bascule de thème — et surtout `fetchFB()`
+   et `syncPull()`, qui se déclenchent SEULS quand la réponse arrive. Poser la
+   transition sur `render()` ferait donc clignoter l'écran entier à chaque clic
+   sur une puce, et tout seul pendant qu'on lit. Les navigations, elles, passent
+   toutes par `hashchange` et rien d'autre n'y passe : c'est la couture propre.
+   Les durées, la courbe et le déplacement viennent des jetons de la direction
+   artistique ; sous mouvement réduit ils valent 80 ms et 0 px, ce qui laisse un
+   fondu net au lieu de supprimer la transition — c'est ce qui est demandé. */
+window.addEventListener("hashchange", () => {
+  if (!document.startViewTransition) {
+    /* repli : sans l'API, l'ancien écran ne peut pas être photographié, donc
+       pas de sortie. On anime la seule entrée, par une classe sur #main. */
+    render();
+    const m = $("#main");
+    m.classList.remove("ecran-entre");
+    void m.offsetWidth;            // force le redémarrage de l'animation
+    m.classList.add("ecran-entre");
+    /* la retirer une fois jouée : `#main` survit aux rendus, une classe
+       oubliée dessus resterait à vie et brouillerait toute mesure ultérieure */
+    m.addEventListener("animationend", () => m.classList.remove("ecran-entre"), { once: true });
+    return;
+  }
+  document.startViewTransition(render);
+});
 
 function route() {
   const h = (location.hash || "#home").slice(1);
@@ -580,6 +795,11 @@ function render() {
   bindMain();
   verifierPolicesPages();
   window.scrollTo(0, 0);
+  /* un changement d'écran rend toujours la barre du haut : on n'arrive pas sur
+     une page sans sa navigation. Explicite, parce que remonter une page déjà en
+     haut ne produit aucun événement de défilement. */
+  dernierY = 0; cumulDefilement = 0; sensDefilement = 0;
+  poserTopbar(false);
 }
 
 /* les pages du mushaf sont dessinées par des polices chargées à la demande :
@@ -632,6 +852,12 @@ function accueilHtml() {
       d'après Tuhfat al-Atfâl et al-Muqaddima al-Jazariyya. Tout le contenu
       religieux est sourcé et vérifié ; une erreur reste possible, signale-la.
       <span class="vref" data-goto-page="sources">Bibliographie complète →</span></p>
+      <p><b>Apparence.</b> Trois habillages au choix (Vélin, Ardoise, Colophon),
+      chacun en clair et en sombre, avec sa police de lecture, que tu peux
+      remplacer sans changer d'habillage. À la première visite l'application
+      suit le réglage clair ou sombre de ton appareil ; la bascule en haut à
+      droite tranche ensuite. Les animations se règlent aussi. Tout est dans
+      <b>Paramètres</b>. La calligraphie du texte coranique ne change jamais.</p>
       <p><b>Gratuit et sans compte</b> : progression et réglages restent dans ce
       navigateur. Rien n'est envoyé ailleurs, sauf si tu actives toi-même la
       synchronisation multi-appareils, qui repose sur un code secret anonyme.</p>
@@ -639,11 +865,19 @@ function accueilHtml() {
 }
 
 function pageHome() {
-  let h = `<div class="hero"><h1>Roub' ۞ mémoriser le Qur'an roub' par roub'</h1>
-    <p>Juz 1 et 2 (Al-Fâtiḥa + Al-Baqara) et juz 'Amma (les sourates courtes,
-    idéales pour débuter). Riwaya Hafs 'an 'Asim, récitation Al-Husary.
-    Les étoiles notent la difficulté de mémorisation sur l'échelle de tous
-    les roub' du Qur'an.</p></div>`;
+  /* L'entrelacs en tête de l'accueil, à 84 px, À CÔTÉ du titre en large et
+     au-dessus en mobile : c'est la disposition de la direction artistique.
+     Le titre se réduit à « Roub' », la phrase qui le complétait ouvre le
+     paragraphe ; et le caractère ۞ quitte ce titre, où il ferait doublon avec
+     le dessin posé juste à côté. */
+  let h = `<div class="hero">
+    <svg class="hero-logo" viewBox="0 0 64 64" aria-hidden="true"><use href="#logo-roub"/></svg>
+    <div class="hero-txt">
+    <h1>Roub'</h1>
+    <p>Mémoriser le Qur'an roub' par roub'. Juz 1 et 2 (Al-Fâtiḥa + Al-Baqara)
+    et juz 'Amma (les sourates courtes, idéales pour débuter). Riwaya Hafs 'an
+    'Asim, récitation Al-Husary. Les étoiles notent la difficulté de
+    mémorisation sur l'échelle de tous les roub' du Qur'an.</p></div></div>`;
   h += accueilHtml();
   const juzList = [...new Set(RUBS.map(r => r.juz))].sort((a, b) => a - b);
   for (const juz of juzList) {
@@ -738,8 +972,27 @@ const anum = n => String(n).replace(/\d/g, d => "٠١٢٣٤٥٦٧٨٩"[+d]);
     const f = "QCF_P" + String(n).padStart(3, "0");
     css += `@font-face{font-family:"p${n}";src:url("fonts/qcf/${f}.woff2") format("woff2");font-display:block;}`;
   }
+  /* Les QCF v4 sont des polices COLRv1 : la couleur de chaque glyphe est DANS
+     la police, le CSS n'y a aucune prise. Elles embarquent SIX palettes
+     officielles du KFGQPC, et non une seule (relevé dans la table CPAL le
+     27/07) :
+       0  base noire, couleurs vives      2  base noire, seconde variante
+       1  base BLANCHE, couleurs éclaircies : celle du mode sombre
+       3, 5  quasi monochromes clair      4  quasi monochrome sombre
+     On emploie donc la 2 en clair (moins agressive que la 0, choix de Yusuf) et
+     la 1 en sombre. `override-colors` ne touche que l'entrée 0, le corps de la
+     lettre, c'est-à-dire l'encre : AUCUNE couleur de règle n'est modifiée, et
+     c'est l'exact équivalent du `color` déjà appliqué aux pages en noir et
+     blanc. Le blanc pur de la palette 1 sur un fond très sombre donne 18,6:1,
+     qui « bave » et fatigue ; l'encre adoucie sur --bg3 ramène à ~13:1.
+     Le descripteur font-family est OBLIGATOIRE dans @font-palette-values : il
+     faut donc une déclaration par police, d'où cette génération en boucle. */
+  const ENCRE_SOMBRE = "#e9e5dd";   // moyenne des trois --text sombres
   for (const n of Object.keys(PAGES2)) {
-    css += `@font-face{font-family:"t${n}";src:url("fonts/qcf4/p${n}.woff2") format("woff2");font-display:block;}`;
+    css += `@font-face{font-family:"t${n}";src:url("fonts/qcf4/p${n}.woff2") format("woff2");font-display:block;}`
+         + `@font-palette-values --mushafClair{font-family:"t${n}";base-palette:2}`
+         + `@font-palette-values --mushafSombre{font-family:"t${n}";base-palette:1;`
+         + `override-colors:0 ${ENCRE_SOMBRE}}`;
   }
   if (!css) return;
   const st = document.createElement("style");
@@ -861,15 +1114,23 @@ function secMemoriser(R) {
     <button data-audio="pause" id="audio-pause">⏸</button>
     <button data-audio="stop">⏹</button>
     <span style="flex:1"></span>
-    <label style="font-size:12.5px;color:var(--muted)">répéter
-      <select id="audio-rep">
-        ${[1, 2, 3, 5].map(n => `<option value="${n}" ${player.rep === n ? "selected" : ""}>×${n}</option>`).join("")}
-      </select></label>
-    <button data-audio="loop" class="${player.loopRange ? "on" : ""}" id="audio-loop" title="reboucler la plage entière">boucle</button>
-    <label style="font-size:12.5px;color:var(--muted)">vitesse
-      <select id="audio-speed">
-        ${[0.75, 1, 1.25].map(x => `<option value="${x}" ${PARAMS.speed === x ? "selected" : ""}>${x}×</option>`).join("")}
-      </select></label>
+    <button class="ab-reglages" data-audio="reglages" aria-expanded="false"
+      title="répétition, boucle et vitesse" aria-label="répétition, boucle et vitesse"
+      ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+      stroke-linecap="round" aria-hidden="true"><path
+      d="M3 8.5h5M12.5 8.5H21M3 15.5h11.5M19 15.5H21"/><circle cx="10.25" cy="8.5"
+      r="2.25"/><circle cx="16.75" cy="15.5" r="2.25"/></svg></button>
+    <div class="ab-second">
+      <label>répéter
+        <select id="audio-rep">
+          ${[1, 2, 3, 5].map(n => `<option value="${n}" ${player.rep === n ? "selected" : ""}>×${n}</option>`).join("")}
+        </select></label>
+      <button data-audio="loop" class="${player.loopRange ? "on" : ""}" id="audio-loop" title="reboucler la plage entière">boucle</button>
+      <label>vitesse
+        <select id="audio-speed">
+          ${[0.75, 1, 1.25].map(x => `<option value="${x}" ${PARAMS.speed === x ? "selected" : ""}>${x}×</option>`).join("")}
+        </select></label>
+    </div>
   </div>`;
   return h;
 }
@@ -1750,12 +2011,71 @@ function tutoRegles() {
 }
 
 /* ---------------- paramètres ---------------- */
+/* les trois directions livrées par la refonte ; `police` est celle que le thème
+   sélectionne d'office, l'utilisateur pouvant ensuite en changer */
+const THEMES = [
+  { id: "velin",    nom: "Vélin",    police: "Gentium Book", desc: "le livre posé" },
+  { id: "ardoise",  nom: "Ardoise",  police: "Noto Sans",    desc: "l'outil de tous les jours" },
+  { id: "colophon", nom: "Colophon", police: "Charis",       desc: "l'édition savante" },
+];
+/* Les trois polices de prose livrées avec la refonte, toutes sous licence SIL
+   Open Font 1.1 et servies depuis le dépôt. `--font-ui` reste Noto Sans dans
+   les trois directions : seule la prose change ici. */
+const POLICES = [
+  { id: "gentium",  nom: "Gentium Book", desc: "sérif de lecture" },
+  { id: "notosans", nom: "Noto Sans",    desc: "sans empattement" },
+  { id: "charis",   nom: "Charis",       desc: "sérif compacte" },
+];
+/* le nom de la police que le thème appliqué en ce moment choisit d'office :
+   c'est ce qui rend l'option « Celle du thème » lisible plutôt qu'abstraite */
+function policeDuTheme() {
+  const t = THEMES.find(x => x.id === themeEffectif());
+  return t ? t.police : THEMES[0].police;
+}
+
+/* une rangée par mode : montrer laquelle est appliquée MAINTENANT et laquelle
+   est en veille est ce qui fait comprendre qu'il y a deux réglages distincts */
+function rangeeTheme(champ, libelle, mode) {
+  const actif = modeEffectif() === mode;
+  return `<div class="param-row"><div class="lab"><b>${libelle}</b>
+      <span>${actif ? "appliqué maintenant" : "en veille"}</span></div>
+    <select data-param="${champ}">
+      ${THEMES.map(t => `<option value="${t.id}" ${PARAMS[champ] === t.id ? "selected" : ""}
+        >${t.nom} · ${t.desc}</option>`).join("")}
+    </select></div>`;
+}
+
 function pageParams() {
   return `<div class="hero"><h1>Paramètres</h1></div>
-  <div class="param-row"><div class="lab"><b>Thème</b><span>sombre ou clair</span></div>
-    <select data-param="theme">
-      <option value="dark" ${PARAMS.theme === "dark" ? "selected" : ""}>Sombre</option>
-      <option value="light" ${PARAMS.theme === "light" ? "selected" : ""}>Clair</option>
+  <div class="param-row"><div class="lab"><b>Mode</b>
+      <span>ce que commande la bascule en haut à droite. « Suivre le système »
+      reprend le réglage clair ou sombre de ton appareil.</span></div>
+    <select data-param="mode">
+      <option value="auto" ${PARAMS.mode !== "light" && PARAMS.mode !== "dark" ? "selected" : ""}>Suivre le système</option>
+      <option value="light" ${PARAMS.mode === "light" ? "selected" : ""}>Clair</option>
+      <option value="dark" ${PARAMS.mode === "dark" ? "selected" : ""}>Sombre</option>
+    </select></div>
+  ${rangeeTheme("themeClair", "Thème du mode clair", "light")}
+  ${rangeeTheme("themeSombre", "Thème du mode sombre", "dark")}
+  <div class="param-row"><div class="lab"><b>Police de lecture</b>
+      <span>chaque thème vient avec la sienne : ${policeDuTheme()} pour le thème
+      appliqué en ce moment. Tu peux en choisir une autre sans changer de thème.
+      Le texte arabe, lui, garde sa calligraphie.</span></div>
+    <select data-param="police">
+      <option value="auto" ${PARAMS.police !== "gentium" && PARAMS.police !== "notosans" && PARAMS.police !== "charis" ? "selected" : ""}
+        >Celle du thème (${policeDuTheme()})</option>
+      ${POLICES.map(p => `<option value="${p.id}" ${PARAMS.police === p.id ? "selected" : ""}
+        >${p.nom} · ${p.desc}</option>`).join("")}
+    </select></div>
+  <div class="param-row"><div class="lab"><b>Animations</b>
+      <span>les fondus au changement d'écran et le repli de la barre du haut.
+      « Suivre le système » respecte le réglage d'accessibilité de ton appareil ;
+      les deux autres décident sans lui. Le soulignage de la récitation n'est
+      jamais concerné.</span></div>
+    <select data-param="anim">
+      <option value="auto" ${PARAMS.anim !== "reduite" && PARAMS.anim !== "complete" ? "selected" : ""}>Suivre le système</option>
+      <option value="reduite" ${PARAMS.anim === "reduite" ? "selected" : ""}>Réduites</option>
+      <option value="complete" ${PARAMS.anim === "complete" ? "selected" : ""}>Complètes</option>
     </select></div>
   <div class="param-row"><div class="lab"><b>Translittération</b>
       <span>hybride française (th, dj, kh, ou...) ou scientifique stricte (ṯ, ǧ, ḫ, ū...) :
@@ -2016,6 +2336,15 @@ function bindMain() {
         player.loopRange = !player.loopRange;
         el.classList.toggle("on", player.loopRange);
       }
+      /* répétition, boucle et vitesse se règlent une fois et ne se touchent pas
+         en lisant : sur téléphone ils passent derrière ce bouton, ce qui rend la
+         barre à une seule rangée. En large le panneau est toujours déplié et le
+         bouton n'existe pas (CSS), donc ce cas n'y sert jamais. */
+      else if (act === "reglages") {
+        const bar = el.closest(".audiobar");
+        const ouvert = bar.classList.toggle("reglages-ouverts");
+        el.setAttribute("aria-expanded", ouvert ? "true" : "false");
+      }
     }));
     const rep = $("#audio-rep", main);
     if (rep) rep.addEventListener("change", () => {
@@ -2081,8 +2410,10 @@ function bindMain() {
       else if (k === "speed") PARAMS[k] = +el.value;
       else if (k === "newLimit") PARAMS[k] = +el.value;
       else PARAMS[k] = el.value;
-      saveParams();
-      if (k === "theme") applyTheme();
+      saveParams();   // saveParams appelle déjà applyTheme()
+      /* changer de mode ou de thème change aussi le libellé « appliqué
+         maintenant / en veille » des deux rangées : il faut repeindre l'écran */
+      if (["mode", "themeClair", "themeSombre", "police", "anim"].includes(k)) render();
     });
   });
 
@@ -2370,7 +2701,7 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "1.16.3";   // réécrit par tools/release.py
+const BUILD_VERSION = "1.17.0";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {
@@ -2480,17 +2811,26 @@ const PRELOAD_MO = { pages: 10, husary64: 121, husary128: 240, muallim: 265, muj
 
 /* ---------------- boot ---------------- */
 {
-  // thème imposable par URL (?theme=light|dark), pratique pour partager
-  const qsTheme = new URLSearchParams(location.search).get("theme");
-  if (qsTheme === "light" || qsTheme === "dark") {
-    PARAMS.theme = qsTheme;
+  /* ?theme=light|dark impose le MODE, pas le thème : ce lien est publié dans le
+     README et sert aux captures, son sens ne change pas. Le thème, lui, se
+     choisit par ?direction=velin|ardoise|colophon, et pour les DEUX modes à la
+     fois, ce qui est le seul comportement utile pour partager une capture. */
+  const q = new URLSearchParams(location.search);
+  const qsTheme = q.get("theme");
+  if (qsTheme === "light" || qsTheme === "dark") { PARAMS.mode = qsTheme; saveParams(); }
+  const qsDir = q.get("direction");
+  if (["velin", "ardoise", "colophon"].includes(qsDir)) {
+    PARAMS.themeClair = PARAMS.themeSombre = qsDir;
     saveParams();
   }
 }
 applyTheme();
 $("#theme-toggle").addEventListener("click", () => {
-  PARAMS.theme = PARAMS.theme === "dark" ? "light" : "dark";
+  /* on part du mode EFFECTIF : si l'on suivait le système, le premier clic doit
+     basculer par rapport à ce qui est affiché, pas par rapport à "auto" */
+  PARAMS.mode = modeEffectif() === "dark" ? "light" : "dark";
   saveParams();
+  render();   // le thème associé au nouveau mode peut différer
 });
 $$(".nav button").forEach(btn =>
   btn.addEventListener("click", () => nav(btn.dataset.page)));

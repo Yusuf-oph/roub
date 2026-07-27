@@ -22,9 +22,19 @@ APP = os.path.join(ROOT, "app")
 
 
 def shell_files():
-    files = ["./", "index.html", "styles.css", "app.js",
+    files = ["./", "index.html", "roub-themes.css", "styles.css", "app.js",
              "manifest.webmanifest", "version.json",
              "fonts/UthmanicHafs.woff2"]
+    # Polices latines des trois thèmes : les DIX fichiers, ~548 Ko sous-ensemblés
+    # (décision de Yusuf, 27/07, contre l'avis du dessinateur qui n'en voulait
+    # que deux). La raison : l'application se veut utilisable hors connexion, et
+    # un sélecteur de thème qui sert une police de repli parce qu'on est dans le
+    # métro est un sélecteur qui ment. 548 Ko une fois valent mieux qu'une
+    # promesse tenue à moitié.
+    fdir = os.path.join(APP, "fonts")
+    for f in sorted(os.listdir(fdir)):
+        if f.endswith(".woff2") and f != "UthmanicHafs.woff2":
+            files.append(f"fonts/{f}")
     # paquet Anki proposé au téléchargement : précaché, sinon le bouton
     # échoue sans connexion (1,4 Mo, régénéré par build_apkg.py collection)
     if os.path.exists(os.path.join(APP, "anki", "roub-cartes.apkg")):

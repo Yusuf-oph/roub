@@ -14,6 +14,13 @@ l'interface sont gardés hors-ligne dès la première visite ; l'audio et les
 pages du mushaf se préchargent à la carte (Paramètres -> « Précharger »),
 chaque style de récitation séparément.
 
+Apparence : trois habillages (Vélin, Ardoise, Colophon), chacun en clair et
+en sombre, avec sa police de lecture, remplaçable sans changer d'habillage.
+À la première visite l'application suit le réglage clair ou sombre de ton
+appareil ; la bascule en haut à droite tranche ensuite. Les animations se
+règlent également. Tout est dans Paramètres. La calligraphie du texte
+coranique ne change jamais.
+
 COPIE LOCALE (ce dossier)
 -------------------------
 Si tu as téléchargé ce dossier depuis GitHub (Code -> Download ZIP) :

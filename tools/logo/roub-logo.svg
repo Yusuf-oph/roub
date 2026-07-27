@@ -1,0 +1,12 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Roub&#39;">
+  <defs>
+    <mask id="carre" maskUnits="userSpaceOnUse" x="0" y="0" width="64" height="64"><rect width="64" height="64" fill="#fff"></rect><polygon points="24.791,15.775 16.659,15.775 23.209,9.225 31.341,9.225" fill="#000"></polygon><polygon points="54.775,31.341 54.775,23.209 48.225,16.659 48.225,24.791" fill="#000"></polygon><polygon points="40.791,54.775 32.659,54.775 39.209,48.225 47.341,48.225" fill="#000"></polygon><polygon points="15.775,47.341 15.775,39.209 9.225,32.659 9.225,40.791" fill="#000"></polygon></mask>
+    <mask id="losange" maskUnits="userSpaceOnUse" x="0" y="0" width="64" height="64"><rect width="64" height="64" fill="#fff"></rect><polygon points="47.507,15.375 41.757,9.625 32.493,9.625 38.243,15.375" fill="#000"></polygon><polygon points="48.625,47.507 54.375,41.757 54.375,32.493 48.625,38.243" fill="#000"></polygon><polygon points="31.507,54.375 25.757,48.625 16.493,48.625 22.243,54.375" fill="#000"></polygon><polygon points="9.625,31.507 15.375,25.757 15.375,16.493 9.625,22.243" fill="#000"></polygon></mask>
+  </defs>
+  <g fill="none" stroke="currentColor" stroke-width="1.35" stroke-linejoin="miter">
+    <g mask="url(#carre)"><path d="M11.1 11.1H52.9V52.9H11.1Z"></path><path d="M13.9 13.9H50.1V50.1H13.9Z"></path></g>
+    <g mask="url(#losange)"><path d="M32 3.1L60.9 32L32 60.9L3.1 32Z"></path><path d="M32 5.9L58.1 32L32 58.1L5.9 32Z"></path></g>
+    <path d="M32 18.5L35.954 22.454L41.546 22.454L41.546 28.046L45.5 32L41.546 35.954L41.546 41.546L35.954 41.546L32 45.5L28.046 41.546L22.454 41.546L22.454 35.954L18.5 32L22.454 28.046L22.454 22.454L28.046 22.454Z"></path>
+  </g>
+</svg>

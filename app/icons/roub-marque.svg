@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Roub'">
+  <title>Roub'</title>
+  <!-- Marque du favicon. Un SVG référencé par <link rel="icon"> est un document
+       ISOLÉ : currentColor y vaudrait noir, invisible sur un onglet sombre.
+       D'où des couleurs explicites, et une requête de thème INTERNE au fichier,
+       qui se dégrade toute seule là où elle n'est pas gérée : l'onglet affiche
+       alors le trait sombre, rien ne casse, aucun repli à écrire.
+       Silhouette reprise de tools/logo/roub-logo-compact.svg (filet simple,
+       lisible dès 16 px) : ne pas la redessiner ici, la recopier. -->
+  <style>
+    .filet { stroke: #14432f; }
+    @media (prefers-color-scheme: dark) { .filet { stroke: #f4efe3; } }
+  </style>
+  <g class="filet" fill="none" stroke-width="4" stroke-linejoin="miter">
+    <path d="M15 15H49V49H15Z"></path>
+    <path d="M32 8L56 32L32 56L8 32Z"></path>
+    <circle cx="32" cy="32" r="5.5"></circle>
+  </g>
+</svg>

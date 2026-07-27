@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.17.0 · 2026-07-27
+- Nouvelle apparence, avec trois habillages au choix : Vélin, Ardoise et Colophon, chacun en clair et en sombre. L'habillage se choisit séparément pour chaque mode
+- Le mode clair devient celui par défaut, et à la première visite l'application suit le réglage clair ou sombre de votre appareil. Un choix déjà enregistré est conservé
+- La police de lecture se change dans Paramètres : chaque habillage vient avec la sienne, vous pouvez en prendre une autre sans changer d'habillage
+- Les pages du mushaf s'affichent enfin sur fond sombre la nuit, avec la palette sombre officielle de la calligraphie, au lieu du bloc de papier clair qui trouait l'écran
+- Sur téléphone, la navigation passe en bas de l'écran, sous la portée du pouce, et la barre du haut se replie pendant la lecture. Le défilement automatique de la récitation ne la replie jamais
+- Nouveau réglage « Animations », à trois états : suivre le système, réduites ou complètes. Les changements d'écran sont animés, et le soulignage de la récitation n'est jamais concerné
+- Nouveau logo dessiné et nouvelles icônes d'application
+- Le texte du Qur'an, sa calligraphie et ses couleurs de tajwid sont inchangés
+
 ## 1.16.3 · 2026-07-26
 - Ménage interne avant la refonte graphique à venir : une règle de style et une fonction JavaScript devenues inutiles sont retirées, rien ne change à l'usage
 - Le prototype de découpage audio, mis de côté depuis longtemps, ne fait plus partie du dépôt public

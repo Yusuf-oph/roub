@@ -4,17 +4,73 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Roub' · mémorisation du Qur'an</title>
-<meta name="theme-color" content="#0e1320">
+<!-- Le clair est devenu le défaut : la barre du navigateur suit --bg de Vélin
+     dans chaque mode. Deux déclarations, celle qui porte media ne s'applique
+     que si le système est en sombre. -->
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#f4efe3">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#14130f">
+<link rel="stylesheet" href="roub-themes.css">
 <link rel="stylesheet" href="styles.css">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<!-- ⚠ NOMS DE FICHIERS NEUFS : les navigateurs cachent les icônes de PWA par
+     URL, écraser les anciennes en gardant leur nom laisserait les appareils
+     déjà installés sur l'ancienne image, parfois très longtemps. -->
+<link rel="apple-touch-icon" href="icons/roub-touch-180.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="icon" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="icon" type="image/svg+xml" href="icons/roub-marque.svg">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/roub-192.png">
 </head>
 <body>
+<!-- L'ENTRELACS déclaré UNE fois, référencé partout : barre du haut (44 px) et
+     en-tête de l'accueil (84 px). Copie conforme de tools/logo/roub-logo.svg.
+     Écrit dans la page plutôt que chargé en <img> : currentColor n'agit que
+     sur un SVG inline ou un masque CSS, et il ne peut pas manquer hors
+     connexion. Les masques portent des identifiants préfixés, ils vivent dans
+     le document entier où l'application injecte beaucoup de balisage.
+     ⚠⚠ NE JAMAIS METTRE `display:none` SUR CE PORTEUR. Payé le 27/07 : dans cet
+     état le navigateur N'APPLIQUE PAS les masques référencés, et ce sont eux qui
+     découpent les rubans à chaque croisement. Le logo se dessine alors sans son
+     entrelacement, les traits se traversant à plat : la géométrie est juste, le
+     dessin est faux. D'où ce masquage par 0 × 0 hors flux, qui cache le porteur
+     sans désactiver ses masques. Vérification : rendre tools/logo/roub-logo.svg
+     seul et comparer les pixels, l'écart doit être NUL.
+     ⚠ 44 px est un SEUIL MESURÉ, pas un goût : en dessous, le trait (1,35 unité
+     sur une grille de 64) et l'écart entre les deux lignes du ruban passent
+     sous le pixel, et l'anticrénelage écrase le double filet en un trait gris.
+     C'est ce qui fixe --topbar-h à 64 px. Sous ce seuil, servir la réduction en
+     filet simple, roub-logo-compact.svg. -->
+<svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true"><defs><mask
+    id="logo-carre" maskUnits="userSpaceOnUse" x="0" y="0" width="64" height="64"><rect
+    width="64" height="64" fill="#fff"/><polygon points="24.791,15.775 16.659,15.775 23.209,9.225 31.341,9.225" fill="#000"/><polygon
+    points="54.775,31.341 54.775,23.209 48.225,16.659 48.225,24.791" fill="#000"/><polygon
+    points="40.791,54.775 32.659,54.775 39.209,48.225 47.341,48.225" fill="#000"/><polygon
+    points="15.775,47.341 15.775,39.209 9.225,32.659 9.225,40.791" fill="#000"/></mask><mask
+    id="logo-losange" maskUnits="userSpaceOnUse" x="0" y="0" width="64" height="64"><rect
+    width="64" height="64" fill="#fff"/><polygon points="47.507,15.375 41.757,9.625 32.493,9.625 38.243,15.375" fill="#000"/><polygon
+    points="48.625,47.507 54.375,41.757 54.375,32.493 48.625,38.243" fill="#000"/><polygon
+    points="31.507,54.375 25.757,48.625 16.493,48.625 22.243,54.375" fill="#000"/><polygon
+    points="9.625,31.507 15.375,25.757 15.375,16.493 9.625,22.243" fill="#000"/></mask></defs><symbol
+    id="logo-roub" viewBox="0 0 64 64"><g fill="none" stroke="currentColor"
+    stroke-width="1.35" stroke-linejoin="miter"><g mask="url(#logo-carre)"><path
+    d="M11.1 11.1H52.9V52.9H11.1Z"/><path d="M13.9 13.9H50.1V50.1H13.9Z"/></g><g
+    mask="url(#logo-losange)"><path d="M32 3.1L60.9 32L32 60.9L3.1 32Z"/><path
+    d="M32 5.9L58.1 32L32 58.1L5.9 32Z"/></g><path
+    d="M32 18.5L35.954 22.454L41.546 22.454L41.546 28.046L45.5 32L41.546 35.954L41.546 41.546L35.954 41.546L32 45.5L28.046 41.546L22.454 41.546L22.454 35.954L18.5 32L22.454 28.046L22.454 22.454L28.046 22.454Z"/></g></symbol></svg>
 <div class="topbar">
-  <div class="logo"><span class="mark">۞</span><b>Roub'</b></div>
+  <!-- L'ENTRELACS à double filet, copie conforme de tools/logo/roub-logo.svg.
+       Écrit dans la page et non chargé en <img> : il hérite ainsi de
+       currentColor et ne peut pas manquer hors connexion. Décoratif, le nom
+       étant juste à côté en toutes lettres.
+       ⚠ 44 px est un SEUIL MESURÉ, pas un goût : en dessous, le trait (1,35
+       unité sur une grille de 64) et l'écart entre les deux lignes du ruban
+       passent sous le pixel, et l'anticrénelage écrase le double filet en un
+       trait gris. C'est pourquoi --topbar-h vaut 64 px. Sous ce seuil, servir
+       roub-logo-compact.svg, qui est la réduction en filet simple.
+       Les identifiants des masques sont préfixés : ils vivent dans le document
+       entier, où l'application injecte beaucoup de balisage. -->
+  <div class="logo"><span class="mark" aria-hidden="true"><svg viewBox="0 0 64 64"><use
+      href="#logo-roub"/></svg></span><b>Roub'</b></div>
   <div class="nav">
     <button data-page="home">Accueil</button>
     <button data-page="revision">Révision</button>
@@ -23,7 +79,17 @@
     <button data-page="sources">Sources</button>
   </div>
   <div class="spacer"></div>
-  <button class="iconbtn" id="theme-toggle" title="basculer clair/sombre">☀/🌙</button>
+  <!-- Émoji et les DEUX côte à côte, choix de Yusuf (27/07) : le bouton dit
+       ainsi qu'il bascule entre deux choses, sans avoir à deviner si le symbole
+       montre l'état courant ou sa cible. Le sélecteur U+FE0F force la
+       présentation EN COULEUR ; sans lui, ☀ sort en glyphe noir sur plusieurs
+       plateformes, c'est-à-dire le rendu terne qu'on ne veut pas. -->
+  <button class="iconbtn" id="theme-toggle" title="basculer clair/sombre"
+    aria-label="basculer entre le mode clair et le mode sombre">
+    <span class="i-soleil" aria-hidden="true">☀️</span>
+    <span class="sep" aria-hidden="true"></span>
+    <span class="i-lune" aria-hidden="true">🌙</span>
+  </button>
 </div>
 <div class="wrap" id="main"></div>
 

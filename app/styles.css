@@ -1,46 +1,25 @@
-/* quran-hifz : thème sombre par défaut + clair */
+/* quran-hifz — feuille des composants.
+
+   ⚠ STRUCTURE INVERSÉE LE 27/07. Deux choses ont changé :
+
+   1. Les treize variables d'interface, les échelles typographique et
+      d'espacement, les rayons et le mouvement ont quitté ce fichier : ils
+      vivent dans roub-themes.css, en trois thèmes (Vélin, Ardoise, Colophon)
+      fois deux modes. Ce fichier ne garde que ce qui n'est PAS thémé.
+
+   2. `data-theme` ne vaut PLUS light/dark : il porte le nom du THÈME
+      (velin | ardoise | colophon). Le mode est porté par `data-mode`
+      (light | dark ; ABSENT = on suit la préférence du système).
+      Et le CLAIR est devenu la base, le sombre l'exception : sans quoi le tout
+      premier rendu, avant que app.js ne pose l'attribut, clignoterait en
+      sombre chez la majorité des visiteurs.
+
+   Les douze couleurs de tajwid restent ici, et restent gelées : leur rôle est
+   pédagogique. Elles ne s'affichent JAMAIS sur le papier du mushaf, dont les
+   couleurs viennent des polices QCF v4 (COLRv1) et non du CSS. */
+
 :root {
-  --bg: #0e1320;
-  --bg2: #161d2e;
-  --bg3: #1d2740;
-  --panel: #151c2c;
-  --border: #2a3550;
-  --text: #e8ecf5;
-  --muted: #93a0bb;
-  --accent: #38b489;
-  --accent2: #d9b36c;
-  --danger: #e06c6c;
-  --ok: #46c28e;
-  --star: #ffcf5c;
-  --shadow: 0 6px 24px rgba(0, 0, 0, .35);
-  /* tajwid */
-  --tj-gray: #8b95a8;
-  --tj-ghunna: #52c979;
-  --tj-ikhfa: #8fd6a8;
-  --tj-idgham: #2e9e63;
-  --tj-idgham-wo: #7fa6c9;
-  --tj-iqlab: #e8a04c;
-  --tj-qalqala: #5fa8f5;
-  --tj-madd2: #f0a3a3;
-  --tj-madd4: #ef7d7d;
-  --tj-madd45: #f25454;
-  --tj-madd6: #c9302f;
-  --tj-special: #b98cf0;
-}
-:root[data-theme="light"] {
-  --bg: #f6f4ee;
-  --bg2: #efece2;
-  --bg3: #e7e2d3;
-  --panel: #fffdf7;
-  --border: #ddd6c4;
-  --text: #26303f;
-  --muted: #6b7687;
-  --accent: #157a5b;
-  --accent2: #9c7c3c;
-  --danger: #b8433f;
-  --ok: #1e8a5f;
-  --star: #d99a1b;
-  --shadow: 0 4px 16px rgba(60, 50, 20, .12);
+  /* tajwid — jeu CLAIR, la base */
   --tj-gray: #9aa1ad;
   --tj-ghunna: #1c8f47;
   --tj-ikhfa: #4faf74;
@@ -55,6 +34,41 @@
   --tj-special: #8a53ce;
 }
 
+/* tajwid — jeu SOMBRE. Deux déclarations pour la même chose : l'attribut pour
+   un choix explicite, la requête média pour « suivre le système ». À
+   spécificité égale, la seconde passe après, donc elle gagne — sans conséquence
+   ici puisque les deux posent les mêmes valeurs. */
+:root[data-mode="dark"] {
+  --tj-gray: #8b95a8;
+  --tj-ghunna: #52c979;
+  --tj-ikhfa: #8fd6a8;
+  --tj-idgham: #2e9e63;
+  --tj-idgham-wo: #7fa6c9;
+  --tj-iqlab: #e8a04c;
+  --tj-qalqala: #5fa8f5;
+  --tj-madd2: #f0a3a3;
+  --tj-madd4: #ef7d7d;
+  --tj-madd45: #f25454;
+  --tj-madd6: #c9302f;
+  --tj-special: #b98cf0;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-mode="light"]) {
+    --tj-gray: #8b95a8;
+    --tj-ghunna: #52c979;
+    --tj-ikhfa: #8fd6a8;
+    --tj-idgham: #2e9e63;
+    --tj-idgham-wo: #7fa6c9;
+    --tj-iqlab: #e8a04c;
+    --tj-qalqala: #5fa8f5;
+    --tj-madd2: #f0a3a3;
+    --tj-madd4: #ef7d7d;
+    --tj-madd45: #f25454;
+    --tj-madd6: #c9302f;
+    --tj-special: #b98cf0;
+  }
+}
+
 @font-face {
   font-family: "UthmanicHafs";
   src: url("fonts/UthmanicHafs.woff2") format("woff2"),
@@ -67,11 +81,99 @@ html, body { margin: 0; padding: 0; }
 body {
   background: var(--bg);
   color: var(--text);
-  font: 15px/1.55 "Segoe UI", system-ui, sans-serif;
+  /* --font-ui est Noto Sans dans les trois directions ; la pile de repli reste
+     derrière, elle sert tant que le woff2 n'est pas arrivé et sous file://
+     si un fichier manque. */
+  font: var(--fs-400, 15px)/1.55 var(--font-ui, "Segoe UI", system-ui, sans-serif);
   min-height: 100vh;
 }
+/* Les surfaces de LECTURE prennent la police de prose du thème, celle que la
+   rangée « Police de lecture » commande. La ligne de partage est l'usage, pas
+   le composant : ce qu'on LIT prend la prose, ce qu'on MANŒUVRE garde la police
+   d'interface. Le texte coranique garde UthmanicHafs, hors périmètre.
+   ⚠ Corrigé le 27/07 : cette liste ne comptait au départ que .prose, .tl et .tr,
+   si bien que les onglets Tajwid, Difficultés et Vocabulaire, qui sont pourtant
+   du texte suivi, restaient en police d'interface. Sur Colophon, Charis
+   n'apparaissait donc nulle part sur ces écrans. Repéré par Yusuf à l'œil, et
+   confirmé à la mesure. Leçon : après avoir câblé un jeton, VÉRIFIER OÙ IL
+   S'APPLIQUE RÉELLEMENT, écran par écran, plutôt que de supposer la liste
+   complète. */
+.prose, .tl, .tr,
+.note-card, .tfr .tfr-body, .accueil-corps, .fc-card .fc-txt, .fc-card .fc-sub,
+.vocab-table td, .aide-styles {
+  font-family: var(--font-prose, inherit);
+}
+/* ... et ce qu'on manœuvre revient à la police d'interface, même à l'intérieur
+   d'une carte de lecture : pastilles de règle, renvois de verset, source. */
+.note-card .vref, .note-card .src, .pill, .badge { font-family: var(--font-ui, inherit); }
 a { color: var(--accent); text-decoration: none; }
 button { font: inherit; cursor: pointer; }
+
+/* ---------- transitions d'écran ----------
+   Fondu croisé, les deux mouvements partant ensemble : la sortie s'efface sur
+   --dur-screen-exit sans bouger, l'entrée monte de --move-screen sur
+   --dur-screen. La sortie est la plus courte (~60 %) pour que l'ancien écran
+   ait disparu avant que le nouveau ne soit posé : sans cela, deux textes se
+   superposent à mi-course et c'est illisible.
+   Le mix-blend-mode est remis à normal : le navigateur pose plus-lighter pour
+   son fondu croisé par défaut, ce qui délave nos deux animations. */
+::view-transition-old(root), ::view-transition-new(root) { mix-blend-mode: normal; }
+::view-transition-old(root) { animation: ecran-sortie var(--dur-screen-exit) var(--ease-screen) both; }
+::view-transition-new(root) { animation: ecran-entree var(--dur-screen) var(--ease-screen) both; }
+@keyframes ecran-sortie { to { opacity: 0; } }
+@keyframes ecran-entree { from { opacity: 0; transform: translateY(var(--move-screen)); } }
+/* repli sans l'API : seule l'entrée est animable */
+#main.ecran-entre { animation: ecran-entree var(--dur-screen) var(--ease-screen) both; }
+
+/* Le chrome ne participe PAS au fondu : lui donner un nom l'extrait de la photo
+   de la page, sinon il se fond en lui-même alors qu'il ne bouge pas, ce qui se
+   voit et fait bon marché. Les deux vivent hors de #main, donc ils traversent
+   la navigation sans être reconstruits.
+   ⚠ Le nom NE SUFFIT PAS (mesuré le 27/07) : le navigateur applique alors au
+   couple ancien/nouveau son fondu croisé par défaut, 250 ms en plus-lighter,
+   et l'élément clignote en s'additionnant à lui-même. Il faut éteindre
+   l'animation des deux photos : identiques, elles se superposent sans bouger. */
+.topbar { view-transition-name: chrome-haut; }
+.nav { view-transition-name: chrome-bas; }
+::view-transition-old(chrome-haut), ::view-transition-new(chrome-haut),
+::view-transition-old(chrome-bas), ::view-transition-new(chrome-bas) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+/* le réglage explicite l'emporte sur le système : un sélecteur d'attribut sur
+   :root bat une règle nue placée en requête média, celles-ci n'ajoutant aucune
+   spécificité. Le pendant "complete" est traité dans roub-themes.css, à la
+   source, faute de pouvoir restaurer ici des valeurs propres à chaque thème. */
+:root[data-anim="reduite"] {
+  --dur-micro: 0ms; --dur-panel: 0ms;
+  --dur-screen: 80ms; --dur-screen-exit: 80ms;
+  --ease-screen: linear; --move-screen: 0px;
+}
+
+/* Police de lecture. Choisir un thème sélectionne d'office la sienne ; ces
+   surcharges ne servent qu'à celui qui veut en changer, et "auto" n'en pose
+   aucune. Elles gagnent contre les blocs de thème par l'ordre des fichiers,
+   à spécificité égale : styles.css est chargée après roub-themes.css.
+   Seule la PROSE change : --font-ui est Noto Sans dans les trois directions,
+   et le texte coranique garde UthmanicHafs, qui n'est pas dans le périmètre. */
+:root[data-police="gentium"]  { --font-prose: "Gentium Book", Georgia, "Times New Roman", serif; }
+:root[data-police="notosans"] { --font-prose: "Noto Sans", system-ui, -apple-system, sans-serif; }
+:root[data-police="charis"]   { --font-prose: "Charis", Georgia, "Times New Roman", serif; }
+
+/* ⚠ PIÈGE DE L'ÉCHELLE : --fs-500 n'est PAS un cran entre 400 et 600.
+   Chez Colophon il vaut 0,94 rem, donc MOINS que son --fs-400 à 1,03 rem, et
+   c'est voulu : chez lui un titre de sous-section se compose en capitales
+   espacées, pas en gros corps. Une règle écrite en supposant 500 > 400 ne
+   casserait que Colophon. On ne s'en sert donc QUE pour des sous-titres, et on
+   leur donne chez lui le traitement pour lequel ce cran a été dessiné. C'est
+   aussi le seul consommateur de --ls-caps. */
+:root[data-theme="colophon"] .juz-title h2,
+:root[data-theme="colophon"] .rub-head h1,
+:root[data-theme="colophon"] h2.sec {
+  text-transform: uppercase;
+  letter-spacing: var(--ls-caps);
+}
 
 /* ---------- barre haute ---------- */
 .topbar {
@@ -81,48 +183,109 @@ button { font: inherit; cursor: pointer; }
   background: color-mix(in srgb, var(--bg) 88%, transparent);
   backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--border);
+  /* Repli au défilement (mobile seulement : les seuils valent 0 en large, cf.
+     §7 de roub-themes.css). La barre est COLLANTE, donc sa réserve de hauteur
+     est prise une fois pour toutes en haut du document : la translater ne
+     déplace jamais le contenu, et la ligne en cours de lecture ne saute pas.
+     Retour plus rapide que la disparition : on récupère la barre plus vite
+     qu'on ne la perd, c'est l'asymétrie voulue par la direction artistique. */
+  transition: transform var(--topbar-show-dur) var(--topbar-ease);
+}
+:root.topbar-repliee .topbar {
+  transform: translateY(-100%);
+  transition-duration: var(--topbar-hide-dur);
 }
 .logo { display: flex; align-items: center; gap: 10px; cursor: pointer; }
-.logo .mark {
-  width: 34px; height: 34px; border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, var(--accent2), var(--accent) 70%);
-  display: grid; place-items: center;
-  color: #fff; font-family: "UthmanicHafs", serif; font-size: 19px;
-}
-.logo b { font-size: 16px; letter-spacing: .3px; }
+/* L'entrelacs nu, à la taille prescrite par la direction artistique (27/07) :
+   44 px en large, 40 px en mobile, et c'est --topbar-h qui s'adapte à lui, pas
+   l'inverse. Il est monochrome et hérite de la couleur du contexte, donc il
+   suit les deux modes sans seconde variante. */
+.logo .mark { display: block; color: var(--accent); }
+.logo .mark svg { width: 44px; height: 44px; display: block; }
+.logo b { font-size: var(--fs-400); letter-spacing: .3px; }
 .nav { display: flex; gap: 4px; margin-left: 10px; flex-wrap: wrap; }
 .nav button {
   background: none; border: none; color: var(--muted);
-  padding: 7px 12px; border-radius: 8px; font-weight: 600;
+  padding: 7px 12px; border-radius: var(--r-sm); font-weight: 600;
 }
 .nav button.on { background: var(--bg3); color: var(--text); }
 .nav button:hover { color: var(--text); }
 .topbar .spacer { flex: 1; }
 .iconbtn {
   background: var(--bg3); color: var(--text);
-  border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px;
+  border: 1px solid var(--border); border-radius: var(--r-sm); padding: 6px 10px;
+  display: grid; place-items: center;
+}
+.ab-reglages svg { width: 18px; height: 18px; display: block; }
+/* La bascule porte des ÉMOJI, et les DEUX à la fois (choix de Yusuf, 27/07) :
+   le bouton dit ainsi qu'il bascule entre deux choses. Les émoji sont dessinés
+   par la police du système, donc ni currentColor ni stroke ne s'y appliquent,
+   c'est normal. Interligne à 1 pour qu'ils ne fassent pas grandir le bouton. */
+#theme-toggle { display: flex; align-items: center; gap: 5px; }
+.iconbtn .i-soleil, .iconbtn .i-lune { font-size: 17px; line-height: 1; }
+/* Séparateur : un filet oblique DESSINÉ, pas un caractère « / ». Il suit la
+   couleur du thème, garde la même finesse à toute taille et ne dépend d'aucune
+   police, là où la barre oblique d'une fonte varie d'épaisseur et d'inclinaison
+   d'un appareil à l'autre. Assez présent pour séparer, assez discret pour ne
+   pas concurrencer les deux émoji. */
+#theme-toggle .sep {
+  width: 1.5px; height: 15px; border-radius: 1px;
+  background: color-mix(in srgb, var(--muted) 55%, transparent);
+  transform: rotate(18deg);
 }
 
-.wrap { max-width: 1080px; margin: 0 auto; padding: 22px 18px 80px; }
+/* Le chrome bas est fixe (barre audio partout, plus la navigation en mobile) :
+   le contenu lui réserve --bottom-h, toujours, y compris quand aucun verset ne
+   joue. Une barre qui apparaîtrait en poussant le texte ferait sauter la ligne
+   en cours de lecture.
+   Deux jetons sont rétablis ici parce que roub-themes.css les a écrits en
+   supposant un lecteur audio DANS LE FLUX en large : il est fixe depuis
+   toujours, et --bottom-h y valait donc 0. Les 62 px ne sont pas la hauteur
+   mesurée de la barre (53 px) mais cette hauteur PLUS son air : avec les 18 px
+   ajoutés plus bas, la réserve fait 80 px, exactement ce que le fichier posait
+   en dur avant la refonte. On exprime ensuite la réserve une bonne fois, en
+   fonction des deux barres :
+   elle se recalcule seule au point de rupture, sans dupliquer la formule.
+   ⚠ Cascade : styles.css est chargée APRÈS roub-themes.css, donc un `:root` nu
+   l'emporte même sur son bloc @media. La valeur mobile de --audiobar-h est donc
+   reposée dans le bloc mobile en fin de fichier, jamais ici. */
+:root {
+  --audiobar-h: 62px;
+  --bottom-h: calc(var(--audiobar-h) + var(--navbar-h) + env(safe-area-inset-bottom, 0px));
+}
+.wrap {
+  max-width: 1080px; margin: 0 auto;
+  padding: var(--sp-5) var(--gutter) calc(var(--bottom-h) + var(--sp-4));
+}
 
 /* ---------- accueil ---------- */
-.hero { margin: 8px 0 20px; }
-.hero h1 { margin: 0 0 4px; font-size: 24px; }
+/* 84 px, POSÉ À CÔTÉ du titre : le logo et le texte forment un seul bloc
+   d'en-tête. L'entrelacs est monochrome, il prend la couleur qu'on lui donne. */
+.hero {
+  margin: 8px 0 20px;
+  display: flex; align-items: flex-start; gap: var(--sp-4);
+}
+.hero-logo { flex: none; width: 84px; height: 84px; color: var(--accent); }
+/* le paragraphe d'en-tête est du texte suivi : il se borne à la colonne de
+   lecture comme le reste, sinon il court sur toute la largeur de l'écran */
+.hero-txt { min-width: 0; }
+.hero-txt p { max-width: var(--measure, none); }
+.hero h1 { margin: 0 0 4px; font-size: var(--fs-600); }
 .hero p { margin: 0; color: var(--muted); }
 .juz-title {
   display: flex; align-items: baseline; gap: 10px;
   margin: 26px 0 12px; padding-bottom: 6px;
   border-bottom: 1px solid var(--border);
 }
-.juz-title h2 { margin: 0; font-size: 19px; }
-.juz-title span { color: var(--muted); font-size: 13px; }
+.juz-title h2 { margin: 0; font-size: var(--fs-500); }
+.juz-title span { color: var(--muted); font-size: var(--fs-300); }
 .rub-grid {
   display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 12px;
 }
 .rub-card {
   background: var(--panel); border: 1px solid var(--border);
-  border-radius: 12px; padding: 14px; cursor: pointer;
+  border-radius: var(--r); padding: 14px; cursor: pointer;
   transition: transform .12s, border-color .12s;
   display: flex; flex-direction: column; gap: 6px;
 }
@@ -131,29 +294,29 @@ button { font: inherit; cursor: pointer; }
 .rub-card.off:hover { transform: none; border-color: var(--border); }
 .rub-card .head { display: flex; justify-content: space-between; align-items: center; }
 .rub-card .num { font-weight: 700; }
-.rub-card .range { color: var(--muted); font-size: 13px; }
-.rub-card .titre { font-size: 14px; min-height: 20px; }
-.rub-card .foot { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--muted); }
-.stars { color: var(--star); letter-spacing: 1px; font-size: 13px; }
+.rub-card .range { color: var(--muted); font-size: var(--fs-300); }
+.rub-card .titre { font-size: var(--fs-300); min-height: 20px; }
+.rub-card .foot { display: flex; justify-content: space-between; align-items: center; font-size: var(--fs-200); color: var(--muted); }
+.stars { color: var(--star); letter-spacing: 1px; font-size: var(--fs-300); }
 .stars .off { opacity: .28; }
 .badge {
-  display: inline-block; padding: 2px 8px; border-radius: 20px;
-  background: var(--bg3); font-size: 11.5px; color: var(--muted);
+  display: inline-block; padding: 2px 8px; border-radius: var(--r-pill);
+  background: var(--bg3); font-size: var(--fs-100); color: var(--muted);
 }
 .badge.due { background: color-mix(in srgb, var(--accent) 22%, transparent); color: var(--accent); font-weight: 600; }
 
 /* ---------- page rub ---------- */
 .rub-head { margin-bottom: 14px; }
-.rub-head .back { color: var(--muted); font-size: 13px; cursor: pointer; }
-.rub-head h1 { margin: 4px 0 2px; font-size: 22px; }
-.rub-head .sub { color: var(--muted); font-size: 14px; }
+.rub-head .back { color: var(--muted); font-size: var(--fs-300); cursor: pointer; }
+.rub-head h1 { margin: 4px 0 2px; font-size: var(--fs-500); }
+.rub-head .sub { color: var(--muted); font-size: var(--fs-300); }
 .tabs {
   display: flex; gap: 4px; margin: 14px 0; flex-wrap: wrap;
   border-bottom: 1px solid var(--border); padding-bottom: 8px;
 }
 .tabs button {
   background: none; border: 1px solid transparent; color: var(--muted);
-  padding: 6px 12px; border-radius: 8px; font-weight: 600; font-size: 13.5px;
+  padding: 6px 12px; border-radius: var(--r-sm); font-weight: 600; font-size: var(--fs-300);
 }
 .tabs button.on { background: var(--bg3); color: var(--text); border-color: var(--border); }
 
@@ -164,33 +327,33 @@ button { font: inherit; cursor: pointer; }
 }
 .chip {
   border: 1px solid var(--border); background: var(--panel); color: var(--muted);
-  padding: 5px 11px; border-radius: 20px; font-size: 12.5px; font-weight: 600;
+  padding: 5px 11px; border-radius: var(--r-pill); font-size: var(--fs-200); font-weight: 600;
 }
 .chip.on { color: var(--accent); border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); }
 
 /* versets */
 .surah-head {
   text-align: center; margin: 20px 0 10px;
-  padding: 12px; background: var(--bg2); border-radius: 12px;
+  padding: 12px; background: var(--bg2); border-radius: var(--r);
   border: 1px solid var(--border);
 }
-.surah-head .nom { font-weight: 700; font-size: 16px; }
+.surah-head .nom { font-weight: 700; font-size: var(--fs-400); }
 .surah-head .basmala { font-family: "UthmanicHafs", serif; font-size: 26px; margin-top: 6px; }
 .verse {
-  padding: 14px 14px 12px; border-radius: 12px; margin-bottom: 10px;
+  padding: 14px 14px 12px; border-radius: var(--r); margin-bottom: 10px;
   background: var(--panel); border: 1px solid var(--border);
 }
 .verse.playing { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
 .verse .vhead {
   display: flex; align-items: center; gap: 8px; margin-bottom: 6px;
-  color: var(--muted); font-size: 12px;
+  color: var(--muted); font-size: var(--fs-200);
 }
 .verse .vnum {
-  background: var(--bg3); border-radius: 6px; padding: 1px 8px;
+  background: var(--bg3); border-radius: var(--r-sm); padding: 1px 8px;
   font-weight: 700; color: var(--text);
 }
 .verse .vhead button {
-  background: none; border: none; color: var(--muted); font-size: 14px; padding: 2px 6px;
+  background: none; border: none; color: var(--muted); font-size: var(--fs-300); padding: 2px 6px;
 }
 .verse .vhead button:hover { color: var(--accent); }
 .ar {
@@ -202,8 +365,8 @@ button { font: inherit; cursor: pointer; }
 .ar.masked, .tl.masked, .tr.masked { filter: blur(7px); cursor: pointer; transition: filter .15s; }
 .ar.masked:hover, .tl.masked:hover, .tr.masked:hover { filter: blur(5px); }
 .ar.masked.revealed, .tl.masked.revealed, .tr.masked.revealed { filter: none; }
-.tl { margin-top: 6px; font-size: 15.5px; line-height: 1.7; }
-.tr { margin-top: 6px; color: var(--muted); font-size: 13.5px; font-style: italic; }
+.tl { margin-top: 6px; font-size: var(--fs-400); line-height: 1.7; }
+.tr { margin-top: 6px; color: var(--muted); font-size: var(--fs-300); font-style: italic; }
 
 /* mode mushaf : texte continu justifié, rosaces de fin de verset */
 .mushaf {
@@ -212,15 +375,15 @@ button { font: inherit; cursor: pointer; }
   font-size: 30px; line-height: 2.35;
   color: var(--text);
   background: var(--panel); border: 1px solid var(--border);
-  border-radius: 12px; padding: 20px 24px; margin-bottom: 14px;
+  border-radius: var(--r); padding: 20px 24px; margin-bottom: 14px;
 }
-.mushaf .mver { cursor: pointer; border-radius: 6px; transition: background .12s; }
+.mushaf .mver { cursor: pointer; border-radius: var(--r-sm); transition: background .12s; }
 .mushaf .mver:hover { background: color-mix(in srgb, var(--accent) 9%, transparent); }
 .mushaf .mver.playing { background: color-mix(in srgb, var(--accent) 20%, transparent); }
 .vend {
   display: inline-block; min-width: 27px; height: 27px; line-height: 25px;
   border: 1.5px solid var(--accent2); border-radius: 50%;
-  color: var(--accent2); font-size: 14.5px; text-align: center;
+  color: var(--accent2); font-size: var(--fs-300); text-align: center;
   margin: 0 7px; vertical-align: middle;
 }
 @media (max-width: 640px) {
@@ -231,7 +394,7 @@ button { font: inherit; cursor: pointer; }
 /* pages exactes du mushaf de Médine (polices QCF par page) */
 .qpage {
   background: var(--panel); border: 1px solid var(--border);
-  border-radius: 14px; padding: 20px 22px 10px;
+  border-radius: var(--r-lg); padding: 20px 22px 10px;
   margin: 0 auto 18px; max-width: 640px;
 }
 .qline {
@@ -239,26 +402,55 @@ button { font: inherit; cursor: pointer; }
   white-space: nowrap; line-height: 1.85;
   font-size: clamp(19px, 4.4vw, 31px);
 }
-.qw { cursor: pointer; border-radius: 5px; transition: background .12s; }
+.qw { cursor: pointer; border-radius: var(--r-sm); transition: background .12s; }
 .qw:hover { background: color-mix(in srgb, var(--accent) 10%, transparent); }
 .qw.playing { background: color-mix(in srgb, var(--accent) 22%, transparent); }
 .qw.dim { opacity: .34; }
 .qpage-num {
-  text-align: center; color: var(--muted); font-size: 12.5px;
+  text-align: center; color: var(--muted); font-size: var(--fs-200);
   margin-top: 8px; letter-spacing: 2px;
 }
-/* pages colorées (COLRv1) : glyphes de base noirs -> fond papier fixe,
-   lisible dans les deux thèmes, comme un mushaf imprimé */
+/* Pages colorées (COLRv1). Le papier clair fixe n'est PLUS une fatalité : les
+   polices officielles du KFGQPC embarquent six palettes, dont une conçue pour
+   fond sombre (base blanche). On sert donc la variante claire n° 2 en mode
+   clair, et la sombre n° 1 en mode sombre, sur --bg3. Voir injectQcfFonts()
+   dans app.js pour les déclarations @font-palette-values.
+   Rappel : les couleurs CSS --tj-* ne s'appliquent JAMAIS ici, elles sont dans
+   la police. */
 .qpage.colored { background: #faf6ec; border-color: #d8d0bc; }
 .qpage.colored .qpage-num { color: #8a8570; }
 .qpage.colored .qw.playing { background: rgba(56, 180, 137, .3); }
+.qpage.colored .qline { font-palette: --mushafClair; }
+
+/* mode sombre : le bloc rejoint le thème au lieu de trouer l'écran. Le blanc pur
+   de la palette officielle donnait 18,6:1, qui fatigue à la lecture longue ;
+   l'encre adoucie sur --bg3 ramène à 13,0 en Vélin, 12,6 en Ardoise et
+   Colophon. Le fond est thémé : le brun de Vélin jurerait sous Ardoise. */
+:root[data-mode="dark"] .qpage.colored {
+  background: var(--bg3); border-color: var(--border);
+}
+:root[data-mode="dark"] .qpage.colored .qline { font-palette: --mushafSombre; }
+:root[data-mode="dark"] .qpage.colored .qpage-num { color: var(--muted); }
+:root[data-mode="dark"] .qpage.colored .qw.playing {
+  background: color-mix(in srgb, var(--accent) 30%, transparent);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-mode="light"]) .qpage.colored {
+    background: var(--bg3); border-color: var(--border);
+  }
+  :root:not([data-mode="light"]) .qpage.colored .qline { font-palette: --mushafSombre; }
+  :root:not([data-mode="light"]) .qpage.colored .qpage-num { color: var(--muted); }
+  :root:not([data-mode="light"]) .qpage.colored .qw.playing {
+    background: color-mix(in srgb, var(--accent) 30%, transparent);
+  }
+}
 
 /* progression (Lot E) */
 .pbar {
-  position: relative; height: 6px; border-radius: 4px;
+  position: relative; height: 6px; border-radius: var(--r-sm);
   background: var(--bg3); overflow: hidden; margin: 4px 0 2px;
 }
-.pbar > div { position: absolute; top: 0; bottom: 0; left: 0; border-radius: 4px; }
+.pbar > div { position: absolute; top: 0; bottom: 0; left: 0; border-radius: var(--r-sm); }
 .pb-seen { background: color-mix(in srgb, var(--accent) 35%, transparent); }
 .pb-mature { background: var(--accent); }
 
@@ -266,7 +458,7 @@ button { font: inherit; cursor: pointer; }
 .evalbtn {
   background: none; border: 1.5px solid var(--border); border-radius: 50%;
   width: 22px; height: 22px; line-height: 1; padding: 0;
-  font-size: 12px; color: transparent; flex: none;
+  font-size: var(--fs-200); color: transparent; flex: none;
 }
 .evalbtn.e0:hover { border-color: var(--muted); }
 .evalbtn.e1 { color: var(--danger); border-color: var(--danger); }
@@ -274,7 +466,7 @@ button { font: inherit; cursor: pointer; }
 .evalbtn.e3 { color: var(--ok); border-color: var(--ok); }
 .evalnote {
   background: none; border: none; color: var(--muted);
-  font-size: 13px; padding: 0 4px; flex: none;
+  font-size: var(--fs-300); padding: 0 4px; flex: none;
 }
 .evalnote:hover { color: var(--accent); }
 .vend.e1 { border-color: var(--danger); color: var(--danger); }
@@ -291,13 +483,13 @@ button { font: inherit; cursor: pointer; }
 #maj-banner {
   position: fixed; top: 0; left: 0; right: 0; z-index: 100;
   display: flex; align-items: center; justify-content: center; gap: 12px;
-  padding: 9px 14px; font-size: 14px;
+  padding: 9px 14px; font-size: var(--fs-300);
   background: var(--accent); color: #fff;
   box-shadow: 0 2px 12px rgba(0, 0, 0, .3);
 }
 #maj-banner button {
   background: #fff; color: var(--accent); border: none;
-  border-radius: 8px; padding: 5px 14px; font-weight: 700;
+  border-radius: var(--r-sm); padding: 5px 14px; font-weight: 700;
 }
 
 /* couleurs tajwid */
@@ -323,40 +515,45 @@ button { font: inherit; cursor: pointer; }
   padding: 9px 16px;
   display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
 }
-.audiobar .now { font-size: 13px; color: var(--muted); min-width: 70px; }
+.audiobar .now { font-size: var(--fs-300); color: var(--muted); min-width: 70px; }
 .audiobar button {
   background: var(--bg3); color: var(--text);
-  border: 1px solid var(--border); border-radius: 8px; padding: 6px 11px;
-  font-size: 13px;
+  border: 1px solid var(--border); border-radius: var(--r-sm); padding: 6px 11px;
+  font-size: var(--fs-300);
 }
 .audiobar button.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 700; }
 .audiobar button.on { border-color: var(--accent); color: var(--accent); }
 .audiobar select {
   background: var(--bg3); color: var(--text); border: 1px solid var(--border);
-  border-radius: 8px; padding: 5px 8px; font-size: 13px;
+  border-radius: var(--r-sm); padding: 5px 8px; font-size: var(--fs-300);
 }
+/* Commandes secondaires : réglées une fois, pas touchées en lisant. En large
+   elles restent dépliées dans la barre et le bouton n'existe pas. */
+.ab-second { display: flex; align-items: center; gap: 10px; }
+.ab-second label { font-size: var(--fs-200); color: var(--muted); }
+.ab-reglages { display: none; }
 
 /* ---------- sections notes ---------- */
 .note-sec { margin-bottom: 18px; }
-.note-sec h3 { margin: 0 0 8px; font-size: 16px; }
+.note-sec h3 { margin: 0 0 8px; font-size: var(--fs-400); }
 .note-card {
   background: var(--panel); border: 1px solid var(--border);
-  border-radius: 12px; padding: 13px 15px; margin-bottom: 10px;
+  border-radius: var(--r); padding: 13px 15px; margin-bottom: 10px;
 }
 .note-card .nc-head { font-weight: 700; margin-bottom: 4px; }
 .note-card .vref {
-  display: inline-block; background: var(--bg3); border-radius: 6px;
-  padding: 0 7px; font-size: 12px; color: var(--accent); font-weight: 700;
+  display: inline-block; background: var(--bg3); border-radius: var(--r-sm);
+  padding: 0 7px; font-size: var(--fs-200); color: var(--accent); font-weight: 700;
   cursor: pointer; margin-left: 4px;
 }
 .note-card .ar-inline {
   font-family: "UthmanicHafs", serif; font-size: 21px; direction: rtl;
   unicode-bidi: isolate;
 }
-.note-card .src { color: var(--muted); font-size: 12px; margin-top: 6px; }
+.note-card .src { color: var(--muted); font-size: var(--fs-200); margin-top: 6px; }
 .pill-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
 .pill {
-  font-size: 12px; padding: 3px 10px; border-radius: 14px;
+  font-size: var(--fs-200); padding: 3px 10px; border-radius: var(--r-lg);
   background: var(--bg3); color: var(--muted); border: 1px solid var(--border);
   cursor: pointer;
 }
@@ -365,14 +562,14 @@ button { font: inherit; cursor: pointer; }
 /* encart « tajwid de cette sourate » (parcours progressif) */
 .tajcur {
   margin: 2px 0 14px; padding: 7px 12px;
-  border: 1px solid var(--border); border-radius: 10px; background: var(--bg2);
+  border: 1px solid var(--border); border-radius: var(--r); background: var(--bg2);
 }
-.tajcur summary { cursor: pointer; font-size: 13px; color: var(--muted); }
+.tajcur summary { cursor: pointer; font-size: var(--fs-300); color: var(--muted); }
 .tajcur summary b { color: var(--accent); font-weight: 700; }
 .tajcur .fb-note { margin: 8px 0 2px; }
 .pill.new { border-color: var(--accent); color: var(--text); }
 .tag-new {
-  font-size: 10px; color: var(--accent); margin-left: 5px;
+  font-size: var(--fs-100); color: var(--accent); margin-left: 5px;
   text-transform: uppercase; letter-spacing: .4px;
 }
 
@@ -390,29 +587,29 @@ button { font: inherit; cursor: pointer; }
 .audio-ko { color: var(--danger); font-weight: 600; }
 .audio-repli { color: var(--accent2); }
 .pages-ko {
-  margin: 10px 0; padding: 9px 12px; border-radius: 10px;
-  border: 1px solid var(--danger); color: var(--danger); font-size: 13.5px;
+  margin: 10px 0; padding: 9px 12px; border-radius: var(--r);
+  border: 1px solid var(--danger); color: var(--danger); font-size: var(--fs-300);
 }
 
 /* bloc d'accueil (remplace le LISEZMOI pour qui n'ouvre jamais le dépôt) */
 .accueil {
-  border: 1px solid var(--border); border-radius: 12px; background: var(--panel);
+  border: 1px solid var(--border); border-radius: var(--r); background: var(--panel);
   padding: 10px 14px; margin-bottom: 18px;
 }
-.accueil summary { cursor: pointer; color: var(--accent); font-weight: 600; font-size: 14px; }
-.accueil-corps { font-size: 14px; line-height: 1.6; color: var(--text); }
+.accueil summary { cursor: pointer; color: var(--accent); font-weight: 600; font-size: var(--fs-300); }
+.accueil-corps { font-size: var(--fs-300); line-height: 1.6; color: var(--text); }
 .accueil-corps p { margin: 10px 0; }
 
 /* aide contextuelle « Lequel choisir ? » : elle vit dans un .lab de Paramètres,
    dont la règle « .lab b { display:block } » casserait les phrases */
 .param-row .lab .aide-repli { margin-top: 8px; }
 .param-row .lab .aide-repli > summary {
-  cursor: pointer; color: var(--accent); font-size: 13px; font-weight: 600;
+  cursor: pointer; color: var(--accent); font-size: var(--fs-300); font-weight: 600;
 }
-.aide-styles { font-size: 13.5px; line-height: 1.6; color: var(--text); margin-top: 6px; }
+.aide-styles { font-size: var(--fs-300); line-height: 1.6; color: var(--text); margin-top: 6px; }
 .aide-styles b { display: inline !important; color: var(--text); }
 .aide-styles p { margin: 8px 0; }
-.aide-styles .src { color: var(--muted); font-size: 12.5px; }
+.aide-styles .src { color: var(--muted); font-size: var(--fs-200); }
 
 /* termes techniques cliquables (tutoriels) */
 .gloss {
@@ -422,8 +619,8 @@ button { font: inherit; cursor: pointer; }
 .gloss.on { background: color-mix(in srgb, var(--accent) 14%, transparent); }
 .gloss-bulle {
   display: block; margin: 8px 0; padding: 10px 12px;
-  border: 1px solid var(--accent); border-radius: 10px; background: var(--bg2);
-  font-size: 14px; line-height: 1.5;
+  border: 1px solid var(--accent); border-radius: var(--r); background: var(--bg2);
+  font-size: var(--fs-300); line-height: 1.5;
 }
 /* seul le TITRE de la bulle est en bloc : les gras du texte restent en ligne
    (sinon chaque terme en gras casse la phrase en morceaux) */
@@ -432,27 +629,27 @@ button { font: inherit; cursor: pointer; }
 }
 .gloss-bulle b { display: inline; }
 .gloss-bulle p { margin: 0; }
-.gloss-bulle .src { color: var(--muted); font-size: 12px; margin-top: 6px; }
+.gloss-bulle .src { color: var(--muted); font-size: var(--fs-200); margin-top: 6px; }
 
 .preload-list { margin-top: 8px; display: flex; flex-direction: column; gap: 5px; }
 .preload-item {
   display: flex; align-items: center; justify-content: space-between; gap: 10px;
-  font-size: 13px; color: var(--muted);
+  font-size: var(--fs-300); color: var(--muted);
 }
 .preload-item b { color: var(--text); font-weight: 600; }
 
-.tfr-attr { color: var(--muted); font-size: 12px; margin: 2px 0 10px; }
+.tfr-attr { color: var(--muted); font-size: var(--fs-200); margin: 2px 0 10px; }
 .tfr-surah {
-  color: var(--accent2); font-weight: 700; font-size: 13px;
+  color: var(--accent2); font-weight: 700; font-size: var(--fs-300);
   margin: 14px 0 6px; text-transform: uppercase; letter-spacing: .4px;
 }
 .tfr {
-  border: 1px solid var(--border); border-radius: 10px;
+  border: 1px solid var(--border); border-radius: var(--r);
   background: var(--bg2); padding: 7px 12px; margin-bottom: 8px;
 }
-.tfr summary { cursor: pointer; font-size: 13.5px; color: var(--muted); }
+.tfr summary { cursor: pointer; font-size: var(--fs-300); color: var(--muted); }
 .tfr summary b { color: var(--accent); font-weight: 700; margin-right: 6px; }
-.tfr .tfr-body { margin-top: 8px; font-size: 14.5px; line-height: 1.55; white-space: pre-line; }
+.tfr .tfr-body { margin-top: 8px; font-size: var(--fs-300); line-height: 1.55; white-space: pre-line; }
 .tfr .tfr-foot { margin-top: 8px; display: flex; align-items: center; gap: 8px; }
 
 /* vocabulaire */
@@ -461,53 +658,60 @@ button { font: inherit; cursor: pointer; }
   padding: 8px 10px; border-bottom: 1px solid var(--border);
   text-align: left; vertical-align: top;
 }
-.vocab-table th { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .4px; }
+.vocab-table th { color: var(--muted); font-size: var(--fs-200); text-transform: uppercase; letter-spacing: .4px; }
 .vocab-table .var { font-family: "UthmanicHafs", serif; font-size: 22px; direction: rtl; text-align: right; white-space: nowrap; }
-.vocab-table .vtl { color: var(--accent); font-size: 13.5px; }
+.vocab-table .vtl { color: var(--accent); font-size: var(--fs-300); }
 
 /* ---------- flashcards ---------- */
 .deck-opts { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; align-items: center; }
 .fc-stage { max-width: 660px; margin: 0 auto; }
 .fc-card {
   background: var(--panel); border: 1px solid var(--border);
-  border-radius: 16px; padding: 26px 22px; min-height: 210px;
+  border-radius: var(--r-lg); padding: 26px 22px; min-height: 210px;
   display: flex; flex-direction: column; justify-content: center; gap: 12px;
   text-align: center; box-shadow: var(--shadow);
 }
-.fc-card .fc-type { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .6px; }
+.fc-card .fc-type { color: var(--muted); font-size: var(--fs-200); text-transform: uppercase; letter-spacing: .6px; }
 .fc-card .ar { text-align: center; font-size: 32px; }
-.fc-card .fc-tl { font-size: 16px; }
-.fc-card .fc-txt { font-size: 15.5px; }
-.fc-card .fc-sub { color: var(--muted); font-size: 13.5px; }
+.fc-card .fc-tl { font-size: var(--fs-400); }
+.fc-card .fc-txt { font-size: var(--fs-400); }
+.fc-card .fc-sub { color: var(--muted); font-size: var(--fs-300); }
 .fc-card hr { border: none; border-top: 1px dashed var(--border); margin: 6px 0; width: 100%; }
 .fc-actions { display: flex; gap: 8px; justify-content: center; margin-top: 16px; flex-wrap: wrap; }
 .fc-actions button {
   border: 1px solid var(--border); background: var(--panel); color: var(--text);
-  border-radius: 10px; padding: 9px 16px; font-weight: 700; min-width: 92px;
+  border-radius: var(--r); padding: 9px 16px; font-weight: 700; min-width: 92px;
 }
 .fc-actions .again { color: var(--danger); border-color: var(--danger); }
 .fc-actions .hard { color: var(--accent2); border-color: var(--accent2); }
 .fc-actions .good { color: var(--ok); border-color: var(--ok); }
 .fc-actions .easy { color: var(--accent); border-color: var(--accent); }
 .fc-actions .reveal { background: var(--accent); border-color: var(--accent); color: #fff; min-width: 200px; }
-.fc-meta { text-align: center; color: var(--muted); font-size: 13px; margin-top: 12px; }
+.fc-meta { text-align: center; color: var(--muted); font-size: var(--fs-300); margin-top: 12px; }
 .fc-audio-btn {
   background: var(--bg3); border: 1px solid var(--border); color: var(--text);
-  border-radius: 24px; padding: 8px 18px; font-size: 15px; align-self: center;
+  border-radius: var(--r-pill); padding: 8px 18px; font-size: var(--fs-400); align-self: center;
 }
 
 /* ---------- tutoriels ---------- */
 .tuto-table { width: 100%; border-collapse: collapse; margin: 10px 0 18px; }
 .tuto-table th, .tuto-table td { padding: 6px 10px; border-bottom: 1px solid var(--border); text-align: left; }
-.tuto-table th { color: var(--muted); font-size: 12px; }
+.tuto-table th { color: var(--muted); font-size: var(--fs-200); }
 .tuto-table .var { font-family: "UthmanicHafs", serif; font-size: 22px; }
 .legend-item { display: flex; align-items: center; gap: 10px; margin: 5px 0; }
 .legend-item .sw {
-  width: 30px; height: 16px; border-radius: 4px; flex: none;
+  width: 30px; height: 16px; border-radius: var(--r-sm); flex: none;
 }
-h2.sec { font-size: 18px; margin: 22px 0 8px; }
+h2.sec { font-size: var(--fs-500); margin: 22px 0 8px; }
 /* pages de tutoriels : lecture longue, donc justifié et bien aéré */
-.prose { line-height: 1.75; }
+/* --measure borne la colonne de lecture en ch, l'unité qui compte pour du texte
+   suivi : 66 signes chez Vélin, 72 chez Ardoise, 62 chez Colophon. En mobile il
+   vaut 100 %, donc la règle se neutralise seule là où l'écran est déjà étroit.
+   Elle porte sur les PARAGRAPHES et les listes, pas sur le bloc entier : un
+   tableau ou une planche n'a aucune raison de se serrer à la largeur d'une
+   ligne de texte, et l'usage typographique les laisse déborder la mesure. */
+.prose { line-height: var(--lh-prose, 1.75); }
+.prose p, .prose li { max-width: var(--measure, none); }
 .prose p { margin: 12px 0; text-align: justify; hyphens: auto; }
 .prose ul { margin: 10px 0; padding-left: 22px; }
 .prose li { margin: 7px 0; text-align: justify; hyphens: auto; }
@@ -527,7 +731,7 @@ h2.sec { font-size: 18px; margin: 22px 0 8px; }
 /* notices bibliographiques ISO 690 : retrait négatif de première ligne, comme
    dans une bibliographie imprimée, pour que l'auteur ressorte à l'œil */
 .prose .biblio {
-  text-align: initial; font-size: 13.5px; line-height: 1.6;
+  text-align: initial; font-size: var(--fs-300); line-height: 1.6;
   margin: 6px 0; padding-left: 22px; text-indent: -22px; color: var(--muted);
 }
 .prose .biblio i { color: var(--fg); }
@@ -536,18 +740,18 @@ h2.sec { font-size: 18px; margin: 22px 0 8px; }
 .param-row {
   display: flex; justify-content: space-between; align-items: center; gap: 14px;
   background: var(--panel); border: 1px solid var(--border);
-  border-radius: 12px; padding: 13px 16px; margin-bottom: 10px;
+  border-radius: var(--r); padding: 13px 16px; margin-bottom: 10px;
 }
 .param-row .lab b { display: block; }
-.param-row .lab span { color: var(--muted); font-size: 13px; }
+.param-row .lab span { color: var(--muted); font-size: var(--fs-300); }
 .param-row select, .param-row input[type="range"] {
   background: var(--bg3); color: var(--text); border: 1px solid var(--border);
-  border-radius: 8px; padding: 6px 10px;
+  border-radius: var(--r-sm); padding: 6px 10px;
 }
 .switch { position: relative; width: 44px; height: 24px; flex: none; }
 .switch input { opacity: 0; width: 0; height: 0; }
 .switch .sl {
-  position: absolute; inset: 0; border-radius: 24px; background: var(--bg3);
+  position: absolute; inset: 0; border-radius: var(--r-pill); background: var(--bg3);
   border: 1px solid var(--border); transition: .15s; cursor: pointer;
 }
 .switch .sl::before {
@@ -560,39 +764,108 @@ h2.sec { font-size: 18px; margin: 22px 0 8px; }
 /* ---------- feedback ---------- */
 .fb-box {
   margin-top: 26px; background: var(--bg2); border: 1px dashed var(--border);
-  border-radius: 12px; padding: 14px 16px;
+  border-radius: var(--r); padding: 14px 16px;
 }
 .fb-box .fb-stars { font-size: 22px; cursor: pointer; letter-spacing: 3px; color: var(--muted); }
 .fb-box .fb-stars .lit { color: var(--star); }
 .fb-box textarea {
   width: 100%; margin-top: 8px; background: var(--panel); color: var(--text);
-  border: 1px solid var(--border); border-radius: 8px; padding: 8px; min-height: 54px;
+  border: 1px solid var(--border); border-radius: var(--r-sm); padding: 8px; min-height: 54px;
   font: inherit; resize: vertical;
 }
 .fb-box .fb-send {
   margin-top: 8px; background: var(--accent); color: #fff; border: none;
-  border-radius: 8px; padding: 7px 16px; font-weight: 700;
+  border-radius: var(--r-sm); padding: 7px 16px; font-weight: 700;
 }
-.fb-box .fb-note { color: var(--muted); font-size: 12px; margin-left: 10px; }
+.fb-box .fb-note { color: var(--muted); font-size: var(--fs-200); margin-left: 10px; }
 
 .empty { color: var(--muted); text-align: center; padding: 40px 0; }
-.footer-pad { height: 70px; }
+/* la réserve du chrome bas est portée par .wrap, qui couvre TOUTES les pages
+   (pageParams n'émet pas de footer-pad) : ce cale-pied ne sert plus qu'à aérer */
+.footer-pad { height: 6px; }
 
 @media (max-width: 640px) {
+  /* ⚠ reposé ici, et pas dans le :root du haut de fichier : styles.css est
+     chargée après roub-themes.css, donc un :root nu écraserait aussi la valeur
+     mobile de sa §7. C'est la valeur du dessinateur, et elle n'est tenable que
+     parce que les trois réglages secondaires passent derrière ce bouton (option A
+     tranchée le 27/07) : la barre revient à UNE rangée. */
+  :root { --audiobar-h: 64px; }
+
   .ar { font-size: 25px; }
-  .wrap { padding: 14px 12px 90px; }
-  /* bandeau en 2 rangées : logo + thème, puis navigation défilante */
-  .topbar { flex-wrap: wrap; padding: 8px 10px; gap: 6px; row-gap: 4px; }
-  .logo .mark { width: 30px; height: 30px; font-size: 15px; }
-  .logo b { font-size: 15px; }
-  .iconbtn { padding: 5px 8px; font-size: 13px; }
-  .nav {
-    order: 3; width: 100%; margin-left: 0;
-    flex-wrap: nowrap; overflow-x: auto;
-    scrollbar-width: none; -webkit-overflow-scrolling: touch;
+  /* --gutter tombe seul à 16px en mobile (§7), inutile de recopier une valeur */
+  .wrap { padding: var(--sp-4) var(--gutter) calc(var(--bottom-h) + var(--sp-4)); }
+
+  /* Barre du haut : UNE seule rangée, logo et bascule. Les cinq entrées de
+     navigation descendent en barre basse : ce qu'on touche en lisant reste
+     sous le pouce, ce qu'on ne touche pas se replie. */
+  .topbar {
+    flex-wrap: nowrap; padding: 0 12px; gap: 10px;
+    height: var(--topbar-h); box-sizing: border-box;
   }
-  .nav::-webkit-scrollbar { display: none; }
-  .nav button { padding: 6px 10px; font-size: 13.5px; white-space: nowrap; flex: none; }
-  .hero h1 { font-size: 20px; }
+  /* 40 px : sous le seuil de 44, mais un mobile est à 2× ou plus, donc le trait
+     fait 1,68 px réel et le double filet se lit encore (note du dessinateur) */
+  .logo .mark svg { width: 40px; height: 40px; }
+  .logo b { font-size: var(--fs-400); }
+  .iconbtn { padding: 5px 8px; font-size: var(--fs-300); }
+
+  /* Navigation en barre basse. Elle ne se replie jamais, ne glisse jamais :
+     c'est l'une des deux seules choses dont la position doit être apprise une
+     fois pour toutes. */
+  .nav {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 55;
+    margin: 0; gap: 0; flex-wrap: nowrap;
+    height: calc(var(--navbar-h) + env(safe-area-inset-bottom, 0px));
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    background: color-mix(in srgb, var(--bg2) 94%, transparent);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid var(--border);
+  }
+  .nav button {
+    flex: 1 1 0; min-width: 0; min-height: var(--tap-min);
+    padding: 0 3px; border-radius: 0;
+    font-size: var(--fs-100); font-weight: 600; white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis;
+  }
+  /* l'onglet actif se marque par un filet, pas par une pastille : sur des
+     boutons pleine hauteur, un fond arrondi flotte dans la barre */
+  .nav button.on {
+    background: none; color: var(--accent);
+    box-shadow: inset 0 2px 0 var(--accent);
+  }
+
+  /* la barre audio s'empile AU-DESSUS de la navigation, sur UNE rangée */
+  .audiobar {
+    bottom: calc(var(--navbar-h) + env(safe-area-inset-bottom, 0px));
+    min-height: var(--audiobar-h); box-sizing: border-box;
+    padding: 8px 12px; gap: 8px; flex-wrap: nowrap;
+  }
+  /* aucune cible tactile sous --tap-min, commandes audio comprises */
+  .audiobar button, .audiobar select { min-height: var(--tap-min); }
+  .ab-reglages { display: block; min-width: var(--tap-min); font-size: var(--fs-400); }
+  /* le panneau sort AU-DESSUS de la barre : il est hors flux, donc il ne fait
+     pas grandir le chrome bas et la réserve du contenu ne bouge pas */
+  .ab-second {
+    display: none;
+    position: absolute; right: 10px; bottom: calc(100% + 8px);
+    flex-wrap: wrap; gap: 10px; padding: 10px 12px;
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--r); box-shadow: var(--shadow);
+  }
+  .audiobar.reglages-ouverts .ab-second { display: flex; }
+
+  /* Les rangées de réglages sont en flex avec la commande à droite : sur 390 px
+     la colonne d'explication tombe à trois mots par ligne, et la refonte l'a
+     aggravé en portant le corps de 15 à 17 px. On empile : l'explication en
+     pleine largeur, la commande dessous, alignée à droite comme sur grand
+     écran. */
+  .param-row { flex-direction: column; align-items: stretch; gap: 10px; }
+  .param-row select, .param-row input[type="range"] { align-self: flex-end; min-width: 60%; }
+  .param-row .switch { align-self: flex-end; }
+
+  /* en mobile le logo repasse AU-DESSUS du titre : côte à côte, il mangerait
+     un quart de la largeur utile */
+  .hero { flex-direction: column; gap: var(--sp-3); }
+  .hero h1 { font-size: var(--fs-500); }
   .fc-actions button { min-width: 72px; padding: 8px 10px; }
 }

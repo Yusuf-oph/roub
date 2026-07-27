@@ -3,7 +3,7 @@
    - coquille (html/css/js/données/police de texte) : precache versionné ;
    - audio Husary + polices de pages QCF : cache à la demande, immuable ;
    - version.json : réseau d'abord (détection de mise à jour). */
-const VERSION = "1.16.3+2026-07-26";
+const VERSION = "1.17.0+2026-07-27";
 const SHELL_CACHE = "roub-shell-" + VERSION;
 const MEDIA_CACHE = "roub-media-v1";
 
@@ -11,15 +11,27 @@ const MEDIA_CACHE = "roub-media-v1";
 const SHELL = [
   "./",
   "index.html",
+  "roub-themes.css",
   "styles.css",
   "app.js",
   "manifest.webmanifest",
   "version.json",
   "fonts/UthmanicHafs.woff2",
+  "fonts/Charis-Bold.woff2",
+  "fonts/Charis-Italic.woff2",
+  "fonts/Charis-Regular.woff2",
+  "fonts/GentiumBook-Bold.woff2",
+  "fonts/GentiumBook-Italic.woff2",
+  "fonts/GentiumBook-Regular.woff2",
+  "fonts/NotoSans-Bold.woff2",
+  "fonts/NotoSans-Italic.woff2",
+  "fonts/NotoSans-Regular.woff2",
+  "fonts/NotoSans-SemiBold.woff2",
   "anki/roub-cartes.apkg",
-  "icons/apple-touch-icon.png",
-  "icons/icon-192.png",
-  "icons/icon-512.png",
+  "icons/roub-192.png",
+  "icons/roub-512.png",
+  "icons/roub-marque.svg",
+  "icons/roub-touch-180.png",
   "data/glossaire.js",
   "data/meta.js",
   "data/pages.js",

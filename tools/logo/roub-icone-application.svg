@@ -1,0 +1,15 @@
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="Roub&#39;">
+  <rect width="512" height="512" fill="#14432f"></rect>
+  <g transform="translate(256 256) scale(5.44) translate(-32 -32)">
+    <defs>
+      <mask id="carreIcone" maskUnits="userSpaceOnUse" x="0" y="0" width="64" height="64"><rect width="64" height="64" fill="#fff"></rect><polygon points="25.139,16.275 15.311,16.275 22.861,8.725 32.689,8.725" fill="#000"></polygon><polygon points="55.275,32.689 55.275,22.861 47.725,15.311 47.725,25.139" fill="#000"></polygon><polygon points="41.139,55.275 31.311,55.275 38.861,47.725 48.689,47.725" fill="#000"></polygon><polygon points="16.275,48.689 16.275,38.861 8.725,31.311 8.725,41.139" fill="#000"></polygon></mask>
+      <mask id="losangeIcone" maskUnits="userSpaceOnUse" x="0" y="0" width="64" height="64"><rect width="64" height="64" fill="#fff"></rect><polygon points="48.814,15.975 41.864,9.025 31.186,9.025 38.136,15.975" fill="#000"></polygon><polygon points="48.025,48.814 54.975,41.864 54.975,31.186 48.025,38.136" fill="#000"></polygon><polygon points="32.814,54.975 25.864,48.025 15.186,48.025 22.136,54.975" fill="#000"></polygon><polygon points="9.025,32.814 15.975,25.864 15.975,15.186 9.025,22.136" fill="#000"></polygon></mask>
+    </defs>
+    <g fill="none" stroke="#f4efe3" stroke-width="1.75" stroke-linejoin="miter">
+      <g mask="url(#carreIcone)"><path d="M10.8 10.8H53.2V53.2H10.8Z"></path><path d="M14.2 14.2H49.8V49.8H14.2Z"></path></g>
+      <g mask="url(#losangeIcone)"><path d="M32 2.8L61.2 32L32 61.2L2.8 32Z"></path><path d="M32 6.2L57.8 32L32 57.8L6.2 32Z"></path></g>
+      <path d="M32 18.5L35.954 22.454L41.546 22.454L41.546 28.046L45.5 32L41.546 35.954L41.546 41.546L35.954 41.546L32 45.5L28.046 41.546L22.454 41.546L22.454 35.954L18.5 32L22.454 28.046L22.454 22.454L28.046 22.454Z"></path>
+    </g>
+  </g>
+</svg>
