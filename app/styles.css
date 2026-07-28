@@ -508,15 +508,29 @@ button { font: inherit; cursor: pointer; }
   src: url("fonts/QCF_SurahHeader.woff2") format("woff2");
   font-display: swap;
 }
-.calli { display: block; line-height: 1.35; }
-.calli.sn-hd { font-family: "SurahNameHD", serif; font-size: 40px; }
+/* La calligraphie et le nom français se touchaient : ces polices ont des
+   métriques verticales serrées, l'interligne ne suffit pas à les séparer.
+   L'écart est donné en `em` pour qu'il suive le corps, qui varie du simple au
+   quintuple entre un titre sur téléphone et une bande sur grand écran. Borné
+   des deux côtés : en `em` pur il valait 7 px sous un petit titre, ce qui reste
+   collé, et 35 px sous la grande bande, où le nom français décrochait. */
+.calli { display: block; line-height: 1.35; margin-bottom: clamp(8px, .18em, 16px); }
+/* Ces deux polices dessinent un objet LARGE et court : leur corps ne se règle
+   pas comme celui d'un texte, il se calcule depuis la largeur visée. Mesuré :
+   la bande rend 3,30 px de large par pixel de corps. D'où les 194 px de corps
+   en butée, qui lui font 641 px et coiffent exactement la page du mushaf, large
+   de 640. En dessous elle suit l'écran.
+   ⚠ Le 24 n'est pas arbitraire : la largeur utile vaut l'écran moins 58 px de
+   gouttières, donc la bande tient tant que 0,792 × écran ≤ écran − 58, soit
+   au-delà de 279 px. À 26 elle rognait déjà de 3 px sur un écran de 390. */
+.calli.sn-hd { font-family: "SurahNameHD", serif; font-size: min(11vw, 62px); }
 .calli.sn-band {
-  font-family: "SurahHeader", serif; font-size: 64px;
+  font-family: "SurahHeader", serif;
+  font-size: min(24vw, 194px);
   color: var(--text);
-  /* la bande est large : sur 390 px elle déborderait sans cette réduction */
   max-width: 100%; overflow: hidden;
 }
-.tfr-surah .calli.sn-hd { font-size: 30px; margin-bottom: 2px; }
+.tfr-surah .calli.sn-hd { font-size: 30px; }
 /* dans le tafsir, l'intitulé reste la ligne en capitales : la calligraphie s'y
    ajoute au-dessus sans reprendre sa graisse ni son interlettrage */
 .tfr-surah .nom { text-transform: none; letter-spacing: normal; }

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.23.2 · 2026-07-29
+- La calligraphie des noms de sourates suit désormais la largeur de la page au lieu d'une taille fixe. Sur la page imprimée, le bandeau coiffe exactement la page du mushaf au lieu de flotter au milieu ; ailleurs, le titre grandit avec l'écran
+- Un espace sépare enfin la calligraphie du nom français, qui se touchaient
+
 ## 1.23.1 · 2026-07-29
 - Correction : en changeant d'écran, l'encadré de l'onglet quitté restait affiché quelques dixièmes de seconde par-dessus le nouveau, et l'on voyait deux onglets marqués à la fois. La barre du haut et celle du bas ne gardent plus d'image de leur état précédent pendant la transition
 
