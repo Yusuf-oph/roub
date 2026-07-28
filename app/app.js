@@ -9,7 +9,7 @@ const META = window.META || { rubs: [] };
 const REGLES = window.REGLES || [];
 const NOTES = window.NOTES || {};
 const CARTES = window.CARTES || {};
-const PAGES = window.PAGES || {};   // pagination mushaf de Médine (layout v1, N&B)
+/* la pagination v1 (impression 1405 H) est ARCHIVÉE : archive/mushaf-1405H/ */
 const PAGES2 = window.PAGES2 || {}; // layout v2/v4, polices COLRv1 colorées tajwid
 
 const $ = (sel, el) => (el || document).querySelector(sel);
@@ -1119,14 +1119,14 @@ const tajState = { filtre: "toutes" };
 
 /* LE point de décision du rendu. Il reproduit aujourd'hui le comportement
    historique à l'identique : notre police de texte partout, sauf sur les pages
-   du mushaf, qui emploient les glyphes de l'édition officielle, colorés (QCF v4,
-   mise en page « QPC v4 tajweed ») ou non (QCF v1, impression 1405 H). */
+   du mushaf, qui emploient les glyphes colorés de l'édition officielle (QCF v4,
+   mise en page « QPC v4 tajweed »). L'édition en noir et blanc de 1405 H a été
+   retirée le 29/07 et archivée dans `archive/mushaf-1405H/`. */
 /* Un rendu n'est utilisable que si ses données sont là : une copie partielle du
    dépôt, ou un juz non embarqué, ne doit pas produire une page blanche. */
 function renduDispo(r) {
   if (r === "khatt") return !!window.KHATT;
   if (r === "glyphesV4") return !!Object.keys(PAGES2).length;
-  if (r === "glyphesV1") return !!Object.keys(PAGES).length;
   return r === "uthmani";
 }
 /* Les rendus offerts par une présentation. La page imprimée n'accepte que les
@@ -1134,13 +1134,12 @@ function renduDispo(r) {
    reconstruire les lignes, ce qui n'est pas fait. La barre le dit au lieu de
    proposer un choix qui ne marcherait pas. */
 function rendusDe(pres) {
-  /* ⚠ « Mushaf 1405 H » est MIS DE CÔTÉ dans les présentations suivies, décision
-     de Yusuf du 28/07 sur rendu : hors de sa page, cette calligraphie sort trop
-     petite. Elle reste offerte sur la PAGE IMPRIMÉE, où c'est le mode noir et
-     blanc historique, à sa taille. Ce n'est pas une suppression : rien n'est
-     retiré du code ni des données, il suffit de remettre "glyphesV1" dans la
-     seconde liste le jour où ce chantier est ouvert. */
-  const ids = pres === "pages" ? ["glyphesV4", "glyphesV1"]
+  /* « Mushaf 1405 H » (glyphesV1) était le second choix de la page imprimée. Il
+     a été RETIRÉ le 29/07 à la demande de Yusuf, faute d'usage, et ARCHIVÉ dans
+     `archive/mushaf-1405H/` : données, polices, script de génération et marche
+     à suivre pour le remettre. La page imprimée n'offre donc plus qu'un rendu,
+     et sa puce d'écriture ne présente plus de choix. */
+  const ids = pres === "pages" ? ["glyphesV4"]
                                : ["uthmani", "khatt", "glyphesV4"];
   return ids.filter(renduDispo);
 }
@@ -1160,27 +1159,25 @@ function rendUtilise() {
    - « Digital Khatt » : non. Il a sa propre orthographe, donc nos portées, qui
      sont des positions dans le texte uthmani, ne s'y appliquent pas ; et la
      police n'a aucune couche de couleur.
-   - « Mushaf 1405 H » : non, cette édition est en noir et blanc.
    D'où une puce grisée plutôt qu'absente : une option qui disparaît laisse
    croire à un bug, une option grisée s'explique au survol. */
 function couleursPossibles() {
   return ["glyphesV4", "uthmani"].includes(rendUtilise());
 }
 
-/* Index verset -> { page, glyphes[] }, construit une fois par édition et gardé :
-   le parcourir à chaque rendu coûterait 8654 entrées pour rien. */
-const IDX_GLYPHES = {};
-function indexGlyphes(v4) {
-  const cle = v4 ? "v4" : "v1";
-  if (IDX_GLYPHES[cle]) return IDX_GLYPHES[cle];
-  const DATA = v4 ? PAGES2 : PAGES, idx = {};
-  for (const p of Object.keys(DATA).map(Number).sort((a, b) => a - b))
-    for (const ln of Object.keys(DATA[p]).map(Number).sort((a, b) => a - b))
-      for (const w of DATA[p][ln]) {
+/* Index verset -> { page, glyphes[] }, construit une fois et gardé : le
+   parcourir à chaque rendu coûterait 8654 entrées pour rien. */
+let IDX_GLYPHES = null;
+function indexGlyphes() {
+  if (IDX_GLYPHES) return IDX_GLYPHES;
+  const idx = {};
+  for (const p of Object.keys(PAGES2).map(Number).sort((a, b) => a - b))
+    for (const ln of Object.keys(PAGES2[p]).map(Number).sort((a, b) => a - b))
+      for (const w of PAGES2[p][ln]) {
         const e = idx[w.k] || (idx[w.k] = { page: p, g: [] });
         e.g.push(w.g);
       }
-  return (IDX_GLYPHES[cle] = idx);
+  return (IDX_GLYPHES = idx);
 }
 
 /* Un verset rendu avec les GLYPHES de l'édition officielle, hors de la page.
@@ -1191,15 +1188,15 @@ function indexGlyphes(v4) {
    ⚠ Les glyphes sont des caractères PUA, de direction LTR : dans un bloc rtl,
    l'algorithme bidi les rendrait dans le mauvais ordre. D'où le flex
    `row-reverse`, exactement comme `.qline`. */
-function versetGlyphesHtml(v, v4) {
-  const e = indexGlyphes(v4)[v.k];
+function versetGlyphesHtml(v) {
+  const e = indexGlyphes()[v.k];
   if (!e) return arHtml(v);
   let h = "";
   e.g.forEach((g, i) => {
     h += `<span class="wd"${i < e.g.length - 1 ? ` data-w="${i}"` : ""}>${g}</span>`;
   });
-  return `<span class="ar-gl${v4 ? " colored" : ""}${v4 && !PARAMS.taj ? " mono" : ""}" `
-       + `style="font-family:'${(v4 ? "t" : "p") + e.page}'">${h}</span>`;
+  return `<span class="ar-gl colored${PARAMS.taj ? "" : " mono"}" `
+       + `style="font-family:'t${e.page}'">${h}</span>`;
 }
 
 /* Le texte d'un verset dans les présentations SUIVIES (verset par verset et
@@ -1215,7 +1212,7 @@ function versetGlyphesHtml(v, v4) {
    deux côtés (823 sur 823 aujourd'hui), et `verifie.py` le rejoue. */
 function texteHtml(v) {
   const r = rendUtilise();
-  if (r === "glyphesV4" || r === "glyphesV1") return versetGlyphesHtml(v, r === "glyphesV4");
+  if (r === "glyphesV4") return versetGlyphesHtml(v);
   if (r !== "khatt") return arHtml(v);
   const mots = window.KHATT[v.k];
   if (!mots) return arHtml(v);
@@ -1246,10 +1243,6 @@ const anum = n => String(n).replace(/\d/g, d => "٠١٢٣٤٥٦٧٨٩"[+d]);
 /* polices par page du mushaf (chargées à la demande par le navigateur) */
 (function injectQcfFonts() {
   let css = "";
-  for (const n of Object.keys(PAGES)) {
-    const f = "QCF_P" + String(n).padStart(3, "0");
-    css += `@font-face{font-family:"p${n}";src:url("fonts/qcf/${f}.woff2") format("woff2");font-display:block;}`;
-  }
   /* Les QCF v4 sont des polices COLRv1 : la couleur de chaque glyphe est DANS
      la police, le CSS n'y a aucune prise. Elles embarquent SIX palettes
      officielles du KFGQPC, et non une seule (relevé dans la table CPAL le
@@ -1340,8 +1333,6 @@ const RENDUS = [
    "la calligraphie du mushaf composée en vrai texte (Amine Anane, licence OFL)"],
   ["glyphesV4", "Mushaf",
    "la calligraphie officielle du KFGQPC, un dessin par mot ; seule à pouvoir porter les couleurs tajwid, qui sont dans la police"],
-  ["glyphesV1", "Mushaf 1405 H",
-   "l'impression de 1405 H, autre calligraphie et autre pagination, sans couleurs"],
 ];
 function chipsRendu(pres) {
   const offerts = rendusDe(pres), actif = rendUtilise();
@@ -1498,8 +1489,7 @@ function bandeauSourateHtml(s) {
 }
 
 function pagesHtml(R) {
-  const DATA = rendUtilise() === "glyphesV4" && Object.keys(PAGES2).length ? PAGES2 : PAGES;
-  const fpfx = DATA === PAGES2 ? "t" : "p";
+  const DATA = PAGES2;                 // seule édition depuis le retrait de la v1
   const inRub = new Set(R.verses.map(v => v.k));
   const pnums = Object.keys(DATA).map(Number).sort((a, b) => a - b)
     .filter(p => Object.values(DATA[p]).some(line => line.some(w => inRub.has(w.k))));
@@ -1528,10 +1518,9 @@ function pagesHtml(R) {
       if (s !== 1 && s !== 9) h += `<div class="basmala">${arEsc(BASMALA)}</div>`;
       h += `</div>` + bandeauSourateHtml(s);   // la bande se pose SUR la page, pas dans le cadre
     }
-    h += `<div class="qpage${fpfx === "t" ? " colored" : ""}`
-       + `${fpfx === "t" && !PARAMS.taj ? " mono" : ""}">`;
+    h += `<div class="qpage colored${PARAMS.taj ? "" : " mono"}">`;
     for (const ln of Object.keys(lines).map(Number).sort((a, b) => a - b)) {
-      h += `<div class="qline" style="font-family:'${fpfx}${p}'">`;
+      h += `<div class="qline" style="font-family:'t${p}'">`;
       for (const w of lines[ln]) {
         const wi = (vus[w.k] = (vus[w.k] || 0) + 1) - 1;
         const dw = wi < nGlyphes[w.k] - 1 ? ` data-w="${wi}"` : "";   // pas la marque de fin
@@ -3398,7 +3387,7 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "1.23.3";   // réécrit par tools/release.py
+const BUILD_VERSION = "1.24.0";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {
@@ -3467,9 +3456,6 @@ async function showUpdateBanner(reg) {
 function preloadUrls(quoi) {
   const urls = [];
   if (quoi === "pages") {
-    for (const p of Object.keys(PAGES)) {
-      urls.push("fonts/qcf/QCF_P" + String(p).padStart(3, "0") + ".woff2");
-    }
     for (const p of Object.keys(PAGES2)) urls.push("fonts/qcf4/p" + p + ".woff2");
     return urls;
   }

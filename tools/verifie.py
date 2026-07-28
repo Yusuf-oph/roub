@@ -72,7 +72,7 @@ for (const sub of ['quran', 'notes', 'cartes', 'tafsirfr', 'segments']) {
 process.stdout.write(JSON.stringify({
   META: window.META, REGLES: window.REGLES || [], QURAN: window.QURAN || {},
   NOTES: window.NOTES || {}, CARTES: window.CARTES || {},
-  PAGES: window.PAGES || {}, PAGES2: window.PAGES2 || {},
+  PAGES2: window.PAGES2 || {},
   TAJCUR: window.TAJCUR || {}, TAFSIRFR: window.TAFSIRFR || {},
   SEGMENTS: window.SEGMENTS || {},
   KHATT: window.KHATT || {},
@@ -316,9 +316,9 @@ def main():
             check_inline_refs(c.get("a", ""), ctx)
     print(f"F. cartes rédigées : {len(seen)} ids uniques")
 
-    # G. pagination mushaf (v1 N&B + v2/v4 colorée)
+    # G. pagination mushaf (v2/v4 colorée ; la v1 N&B est archivée depuis le 29/07,
+    #    cf. archive/mushaf-1405H/)
     for label, key, font_of in (
-        ("v1", "PAGES", lambda p: os.path.join(APP, "fonts", "qcf", "QCF_P%03d.woff2" % int(p))),
         ("v2-colorée", "PAGES2", lambda p: os.path.join(APP, "fonts", "qcf4", f"p{int(p)}.woff2")),
     ):
         PG = data.get(key, {})

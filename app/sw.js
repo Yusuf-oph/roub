@@ -3,7 +3,7 @@
    - coquille (html/css/js/données/police de texte) : precache versionné ;
    - audio Husary + polices de pages QCF : cache à la demande, immuable ;
    - version.json : réseau d'abord (détection de mise à jour). */
-const VERSION = "1.23.3+2026-07-29";
+const VERSION = "1.24.0+2026-07-29";
 const SHELL_CACHE = "roub-shell-" + VERSION;
 const MEDIA_CACHE = "roub-media-v1";
 
@@ -39,7 +39,6 @@ const SHELL = [
   "data/khatt.js",
   "data/meta.js",
   "data/noms-sourates.js",
-  "data/pages.js",
   "data/pages2.js",
   "data/regles.js",
   "data/sync-config.js",

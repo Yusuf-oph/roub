@@ -41,7 +41,9 @@ propre et n'est pas présenté comme une position savante.
 ## 2. Calligraphie et pages du mushaf
 
 - **Polices QCF (Qur'anic Complex Fonts) du KFGQPC**, un glyphe par mot :
-  version 1 en noir et blanc, version 4 en couleurs tajwid (COLRv1).
+  version 4, en couleurs tajwid (COLRv1). L'édition en noir et blanc de 1405 H
+  (QCF version 1) a été employée jusqu'au 29 juillet 2026, puis retirée faute
+  d'usage ; elle est conservée dans `archive/mushaf-1405H/`.
 - **Police UthmanicHafs** (KFGQPC) pour le texte courant.
 - **Noms de sourates**, deux polices du KFGQPC également, pour deux emplois
   distincts : **`QCF_FullSurah_HD_COLOR-v1`** (version 1.000, novembre 2023)

@@ -15,9 +15,12 @@ python tools/build_data.py
 # 2. audio Husary du nouveau juz (adapter la liste des clés dans le one-liner
 #    de téléchargement, ou réutiliser le script de la session du 2026-07-23)
 
-# 3. pagination mushaf (effacer tools/cache/words_v1.json d'abord)
-python tools/build_pages.py 1 2 3
-#    + télécharger les polices QCF_P###.woff2 des nouvelles pages dans app/fonts/qcf/
+# 3. pagination mushaf : SEULE l'édition colorée (QPC v4) est employée depuis le
+#    29/07. Sa pagination est app/data/pages2.js, ses polices app/fonts/qcf4/.
+#    L'édition N&B de 1405 H et son script build_pages.py sont dans
+#    archive/mushaf-1405H/, avec la marche à suivre pour les remettre.
+#    + télécharger les polices p###.woff2 des nouvelles pages dans app/fonts/qcf4/
+#    + rejouer tools/build_polices_noms.py (glyphes des noms de sourates)
 
 # 4. déclarer les nouveaux roub' dans app/data/meta.js (+ étoiles, dispo),
 #    créer les placeholders notes/cartes, ajouter dans app/index.html les

@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.24.0 · 2026-07-29
+- Le mode « Mushaf 1405 H » est retiré : la page imprimée n'affiche plus que l'édition en couleurs. Cette seconde édition, en noir et blanc, ne servait plus. Elle n'est pas perdue pour autant, elle est archivée dans le dépôt avec sa marche à suivre pour la rétablir
+- Télécharger les pages du mushaf pour la lecture hors ligne coûte 4,5 Mo de moins, ces polices n'étant plus nécessaires
+- Une fois installée sur téléphone, l'application s'ouvre maintenant en plein écran, sans la barre de l'heure. Il faut la réinstaller pour que le changement prenne effet
+
 ## 1.23.3 · 2026-07-29
 - Le bandeau de la sourate se place désormais entre le cadre du titre et la page du mushaf, dont il prend exactement la largeur, collé à l'un et à l'autre. Il flottait jusqu'ici au milieu du cadre, dans un grand vide creusé par son propre interligne
 

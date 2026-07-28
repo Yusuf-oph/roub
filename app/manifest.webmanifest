@@ -6,7 +6,8 @@
   "dir": "ltr",
   "start_url": "./",
   "scope": "./",
-  "display": "standalone",
+  "display_override": ["fullscreen", "standalone"],
+  "display": "fullscreen",
   "background_color": "#f4efe3",
   "theme_color": "#f4efe3",
   "icons": [
