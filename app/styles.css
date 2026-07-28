@@ -524,11 +524,32 @@ button { font: inherit; cursor: pointer; }
    gouttières, donc la bande tient tant que 0,792 × écran ≤ écran − 58, soit
    au-delà de 279 px. À 26 elle rognait déjà de 3 px sur un écran de 390. */
 .calli.sn-hd { font-family: "SurahNameHD", serif; font-size: min(11vw, 62px); }
+/* La bande vit ENTRE le cadre du titre et la page, dont elle est la coiffe.
+   ⚠ Son interligne est le vrai piège, et c'est lui qui donnait ce grand vide :
+   mesurée au canvas, l'encre de ce glyphe ne fait que **0,392 em de haut** et
+   elle est parfaitement centrée sur la ligne de base (38 px au-dessus, 38 en
+   dessous, à 194 px de corps). Une ligne normale réservait donc 194 px, voire
+   262 avec l'interligne du bloc, pour 76 px de dessin. D'où `line-height: .42`,
+   qui colle la boîte sur l'encre, et l'absence d'`overflow: hidden`, qui
+   rognerait maintenant le haut et le bas du dessin.
+   Largeur : 3,258 em mesurés, d'où 632 px de bande sous une page de 640. */
+/* La boîte porte EXACTEMENT la largeur de la page (⚠ ce 640 doit suivre celui
+   de `.qpage`), et le corps s'en déduit par unité de conteneur : 3,258 em de
+   largeur mesurés, donc `100cqw / 3.258` donne une bande large de 100 % du
+   conteneur, au pixel, sans gouttière codée en dur. */
+.sn-band-boite {
+  max-width: 640px; margin: 0 auto;
+  container-type: inline-size;
+}
+/* collée en haut au cadre du titre, en bas à la page */
+.surah-head:has(+ .sn-band-boite) { margin-bottom: 0; }
 .calli.sn-band {
   font-family: "SurahHeader", serif;
-  font-size: min(24vw, 194px);
+  font-size: calc(100cqw / 3.258);
   color: var(--text);
-  max-width: 100%; overflow: hidden;
+  line-height: .42;
+  text-align: center;
+  margin: 0;
 }
 .tfr-surah .calli.sn-hd { font-size: 30px; }
 /* dans le tafsir, l'intitulé reste la ligne en capitales : la calligraphie s'y

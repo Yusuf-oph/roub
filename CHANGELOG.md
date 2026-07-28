@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.23.3 · 2026-07-29
+- Le bandeau de la sourate se place désormais entre le cadre du titre et la page du mushaf, dont il prend exactement la largeur, collé à l'un et à l'autre. Il flottait jusqu'ici au milieu du cadre, dans un grand vide creusé par son propre interligne
+
 ## 1.23.2 · 2026-07-29
 - La calligraphie des noms de sourates suit désormais la largeur de la page au lieu d'une taille fixe. Sur la page imprimée, le bandeau coiffe exactement la page du mushaf au lieu de flotter au milieu ; ailleurs, le titre grandit avec l'écran
 - Un espace sépare enfin la calligraphie du nom français, qui se touchaient

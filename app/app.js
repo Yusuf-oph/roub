@@ -1487,6 +1487,16 @@ function nomSourateHtml(s, police) {
     + `<div class="nom">Sourate ${esc(SURAH_NAMES[s] || s)}</div>`;
 }
 
+/* La bande de la page imprimée ne vit PAS dans l'encadré du titre : elle se
+   place ENTRE lui et la page, dont elle est la coiffe (Yusuf, 29/07). Dans
+   l'encadré elle flottait au milieu d'un grand vide, sans rapport visible avec
+   la page qu'elle surmonte, et le vide venait de son propre interligne : à
+   194 px de corps, la ligne fait 262 px de haut pour un dessin de 60. */
+function bandeauSourateHtml(s) {
+  const g = (window.NOMS_SOURATES || {})[s];
+  return g ? `<div class="sn-band-boite"><div class="calli sn-band" aria-hidden="true">${g}</div></div>` : "";
+}
+
 function pagesHtml(R) {
   const DATA = rendUtilise() === "glyphesV4" && Object.keys(PAGES2).length ? PAGES2 : PAGES;
   const fpfx = DATA === PAGES2 ? "t" : "p";
@@ -1514,9 +1524,9 @@ function pagesHtml(R) {
       }
     }
     for (const s of starts.sort((a, b) => a - b)) {
-      h += `<div class="surah-head">${nomSourateHtml(s, "sn-band")}`;
+      h += `<div class="surah-head"><div class="nom">Sourate ${esc(SURAH_NAMES[s] || s)}</div>`;
       if (s !== 1 && s !== 9) h += `<div class="basmala">${arEsc(BASMALA)}</div>`;
-      h += `</div>`;
+      h += `</div>` + bandeauSourateHtml(s);   // la bande se pose SUR la page, pas dans le cadre
     }
     h += `<div class="qpage${fpfx === "t" ? " colored" : ""}`
        + `${fpfx === "t" && !PARAMS.taj ? " mono" : ""}">`;
@@ -3388,7 +3398,7 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "1.23.2";   // réécrit par tools/release.py
+const BUILD_VERSION = "1.23.3";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {
