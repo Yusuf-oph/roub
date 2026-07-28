@@ -69,6 +69,11 @@
        roub-logo-compact.svg, qui est la réduction en filet simple.
        Les identifiants des masques sont préfixés : ils vivent dans le document
        entier, où l'application injecte beaucoup de balisage. -->
+  <!-- Le retour vit ICI et non dans l'en-tête du roub' (Yusuf, 28/07) : c'est là
+       qu'on le cherche partout ailleurs, et l'en-tête y gagne une ligne entière.
+       Masqué hors d'un roub', où il n'aurait nulle part où revenir. -->
+  <button class="tb-back" id="tb-back" hidden
+    title="revenir à tous les roub'" aria-label="revenir à tous les roub'">←</button>
   <div class="logo"><span class="mark" aria-hidden="true"><svg viewBox="0 0 64 64"><use
       href="#logo-roub"/></svg></span><b>Roub'</b></div>
   <div class="nav">

@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.22.0 · 2026-07-29
+- Le haut de page rend 66 px de plus au texte. Le retour vers la liste des roub' quitte l'en-tête pour la barre grise du haut, là où on le cherche, et les six onglets tiennent maintenant sur une seule ligne qui défile au doigt au lieu de deux rangées
+- Un dégradé au bord des onglets signale qu'il y en a d'autres, et seulement du côté où il en reste vraiment. L'onglet ouvert est toujours ramené dans le champ, y compris le dernier
+- Sur grand écran, les six onglets tiennent sans défiler et l'affichage ne change pas
+- Mis bout à bout avec la version précédente, le premier verset d'un roub' remonte de 572 à 400 px sur un téléphone de 390 px de large
+
 ## 1.21.0 · 2026-07-28
 - Sur téléphone, la barre d'options ne garde que les trois présentations : Versets, Texte continu et Page imprimée. L'écriture, l'affichage et le masquage passent derrière une clé, comme les réglages de la barre de récitation. La barre tombe de quatre lignes à une seule et le texte commence 106 px plus haut
 - Le panneau des options recouvre le texte au lieu de le repousser, et il reste ouvert tant qu'on règle : enchaîner plusieurs réglages ne le referme plus à chaque fois

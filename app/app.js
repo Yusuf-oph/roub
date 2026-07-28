@@ -876,8 +876,37 @@ function render() {
   /* les pages de lecture suivie resserrent leur cadre autour de la colonne ;
      les autres, qu'on balaie, gardent toute la largeur (cf. styles.css) */
   main.classList.toggle("page-lecture", page === "tutoriels" || page === "sources");
+  $("#tb-back").hidden = page !== "rub";
   bindMain();
+  ongletsDefilants();
   verifierPolicesPages();
+}
+
+/* Les six onglets tiennent sur UNE ligne qui défile (choix de Yusuf le 28/07,
+   sur planche : deux lignes coûtaient 84 px et le premier verset tombait à
+   466 px). Deux garde-fous, sans quoi Vocabulaire et Cartes deviendraient
+   introuvables : un dégradé au bord qui dit qu'il y a une suite, et l'onglet
+   actif ramené dans le champ.
+   ⚠ Le calage est fait à la main et NON par scrollIntoView, qui fait défiler
+   l'ancêtre scrollable le plus proche : la page aurait sauté à chaque rendu,
+   soit exactement le défaut corrigé le 28/07 sur les réglages. */
+function ongletsDefilants() {
+  const t = $(".tabs");
+  if (!t) return;
+  /* ⚠ en RECTANGLES et non en offsetLeft : celui-ci se mesure depuis l'ancêtre
+     positionné le plus proche, que .tabs n'est pas, donc le calcul portait une
+     origine étrangère et le dernier onglet tombait hors du champ. */
+  const actif = t.querySelector("button.on");
+  if (actif) {
+    const rt = t.getBoundingClientRect(), ra = actif.getBoundingClientRect();
+    t.scrollLeft += (ra.left - rt.left) - (rt.width - ra.width) / 2;
+  }
+  const majFondu = () => {
+    t.classList.toggle("debut-cache", t.scrollLeft > 1);
+    t.classList.toggle("fin-cachee", t.scrollWidth - t.clientWidth - t.scrollLeft > 1);
+  };
+  majFondu();
+  t.addEventListener("scroll", majFondu, { passive: true });
 }
 
 /* ⚠ Remonter en haut appartient à la NAVIGATION, pas au rendu. C'était dans
@@ -1261,8 +1290,8 @@ const anum = n => String(n).replace(/\d/g, d => "٠١٢٣٤٥٦٧٨٩"[+d]);
 function pageRub(rid, tab) {
   const R = QURAN[rid];
   const meta = RUBS.find(r => r.id === rid) || {};
+  /* pas de fil d'Ariane ici : il est monté dans la barre du haut (#tb-back) */
   let h = `<div class="rub-head">
-    <span class="back" data-goto-home>← Tous les roub'</span>
     <h1>Juz ${R.juz} · Roub' ${R.rub} ${starsHtml(meta.stars || 0)}</h1>
     <div class="sub">${esc(meta.titre || "")} · ${R.debut} → ${R.fin} · ${R.n} versets</div>
   </div>`;
@@ -3345,7 +3374,7 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "1.21.0";   // réécrit par tools/release.py
+const BUILD_VERSION = "1.22.0";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {
@@ -3469,6 +3498,8 @@ const PRELOAD_MO = { pages: 10, husary64: 121, husary128: 240, muallim: 265, muj
   }
 }
 applyTheme();
+/* le retour est HORS de #main : bindMain() ne le voit pas, il se câble une fois */
+$("#tb-back").addEventListener("click", () => nav("home"));
 $("#theme-toggle").addEventListener("click", () => {
   /* on part du mode EFFECTIF : si l'on suivait le système, le premier clic doit
      basculer par rapport à ce qui est affiché, pas par rapport à "auto" */

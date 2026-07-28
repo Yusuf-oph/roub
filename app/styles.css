@@ -268,6 +268,16 @@ button { font: inherit; cursor: pointer; }
 .nav button.on { background: var(--bg3); color: var(--text); }
 .nav button:hover { color: var(--text); }
 .topbar .spacer { flex: 1; }
+/* Le retour du roub', monté de l'en-tête vers la barre. Le gap de .topbar
+   l'espace du logo ; la marge négative le ramène au bord, où le pouce le
+   trouve sans viser. */
+.tb-back {
+  background: none; border: 0; color: var(--text); cursor: pointer;
+  font-size: var(--fs-500); line-height: 1; padding: 4px 6px; margin-left: -6px;
+  border-radius: var(--r-sm);
+}
+.tb-back:hover { background: var(--bg3); }
+.tb-back[hidden] { display: none; }
 .iconbtn {
   background: var(--bg3); color: var(--text);
   border: 1px solid var(--border); border-radius: var(--r-sm); padding: 6px 10px;
@@ -402,12 +412,32 @@ button { font: inherit; cursor: pointer; }
 
 /* ---------- page rub ---------- */
 .rub-head { margin-bottom: 14px; }
-.rub-head .back { color: var(--muted); font-size: var(--fs-300); cursor: pointer; }
 .rub-head h1 { margin: 4px 0 2px; font-size: var(--fs-500); }
 .rub-head .sub { color: var(--muted); font-size: var(--fs-300); }
+/* Une seule ligne qui défile, au lieu de deux rangées : 84 px de haut en 390 px
+   pour six onglets, c'était le deuxième poste du chrome après la barre
+   d'options. Aucun media query : en large rien ne déborde, donc rien ne défile
+   et les dégradés ne s'allument pas. */
 .tabs {
-  display: flex; gap: 4px; margin: 14px 0; flex-wrap: wrap;
+  display: flex; gap: 4px; margin: 14px 0; flex-wrap: nowrap;
+  overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none;
   border-bottom: 1px solid var(--border); padding-bottom: 8px;
+}
+.tabs::-webkit-scrollbar { display: none; }
+.tabs button { flex: 0 0 auto; }
+/* Les dégradés disent qu'il y a une suite, et ne mentent pas : ils ne
+   s'allument que du côté où il reste vraiment quelque chose (cf. ongletsDefilants). */
+.tabs.fin-cachee {
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 36px), transparent);
+          mask-image: linear-gradient(to right, #000 calc(100% - 36px), transparent);
+}
+.tabs.debut-cache {
+  -webkit-mask-image: linear-gradient(to left, #000 calc(100% - 36px), transparent);
+          mask-image: linear-gradient(to left, #000 calc(100% - 36px), transparent);
+}
+.tabs.debut-cache.fin-cachee {
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 36px, #000 calc(100% - 36px), transparent);
+          mask-image: linear-gradient(to right, transparent, #000 36px, #000 calc(100% - 36px), transparent);
 }
 .tabs button {
   background: none; border: 1px solid transparent; color: var(--muted);
