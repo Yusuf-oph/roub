@@ -142,11 +142,19 @@ button { font: inherit; cursor: pointer; }
    ⚠ Le nom NE SUFFIT PAS (mesuré le 27/07) : le navigateur applique alors au
    couple ancien/nouveau son fondu croisé par défaut, 250 ms en plus-lighter,
    et l'élément clignote en s'additionnant à lui-même. Il faut éteindre
-   l'animation des deux photos : identiques, elles se superposent sans bouger. */
+   l'animation des photos.
+   ⚠⚠ MAIS ÉTEINDRE NE SUFFIT PAS NON PLUS (signalé par Yusuf le 29/07). La
+   règle précédente disait « identiques, elles se superposent sans bouger » :
+   c'était vrai quand le chrome ne changeait pas d'un écran à l'autre. Il change
+   désormais — l'onglet actif s'y marque, et la flèche de retour y apparaît sur
+   un roub'. Sans animation, l'ANCIENNE photo n'a aucune raison de s'effacer :
+   elle reste posée, opaque, par-dessus la nouvelle, et l'on voit DEUX onglets
+   encadrés pendant toute la transition. On la retire donc franchement, et seule
+   la nouvelle s'affiche, tout de suite et sans fondu. */
 .topbar { view-transition-name: chrome-haut; }
 .nav { view-transition-name: chrome-bas; }
-::view-transition-old(chrome-haut), ::view-transition-new(chrome-haut),
-::view-transition-old(chrome-bas), ::view-transition-new(chrome-bas) {
+::view-transition-old(chrome-haut), ::view-transition-old(chrome-bas) { display: none; }
+::view-transition-new(chrome-haut), ::view-transition-new(chrome-bas) {
   animation: none;
   mix-blend-mode: normal;
 }

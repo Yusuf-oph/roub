@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.23.1 · 2026-07-29
+- Correction : en changeant d'écran, l'encadré de l'onglet quitté restait affiché quelques dixièmes de seconde par-dessus le nouveau, et l'on voyait deux onglets marqués à la fois. La barre du haut et celle du bas ne gardent plus d'image de leur état précédent pendant la transition
+
 ## 1.23.0 · 2026-07-29
 - Les noms de sourates s'affichent en calligraphie. Dans Versets et Texte continu, c'est le nom précédé de سورة ; sur la page imprimée, c'est le bandeau orné du mushaf, comme sur le papier. Les deux dessins viennent du Complexe du Roi Fahd, comme la calligraphie du texte. Le nom français reste affiché dans tous les cas
 - Les cinq entrées de la navigation portent maintenant une icône : une maison, un livre, une toque, des rouages et un livre ouvert annoté. Les libellés restent, une icône seule se devine mais ne se lit pas
