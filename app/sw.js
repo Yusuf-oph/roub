@@ -3,7 +3,7 @@
    - coquille (html/css/js/données/police de texte) : precache versionné ;
    - audio Husary + polices de pages QCF : cache à la demande, immuable ;
    - version.json : réseau d'abord (détection de mise à jour). */
-const VERSION = "1.18.1+2026-07-28";
+const VERSION = "1.19.0+2026-07-28";
 const SHELL_CACHE = "roub-shell-" + VERSION;
 const MEDIA_CACHE = "roub-media-v1";
 
@@ -20,6 +20,7 @@ const SHELL = [
   "fonts/Charis-Bold.woff2",
   "fonts/Charis-Italic.woff2",
   "fonts/Charis-Regular.woff2",
+  "fonts/DigitalKhatt.woff2",
   "fonts/GentiumBook-Bold.woff2",
   "fonts/GentiumBook-Italic.woff2",
   "fonts/GentiumBook-Regular.woff2",
@@ -33,6 +34,7 @@ const SHELL = [
   "icons/roub-marque.svg",
   "icons/roub-touch-180.png",
   "data/glossaire.js",
+  "data/khatt.js",
   "data/meta.js",
   "data/pages.js",
   "data/pages2.js",

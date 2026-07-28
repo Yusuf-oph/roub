@@ -46,6 +46,14 @@ propre et n'est pas présenté comme une position savante.
 - Mise en page ligne à ligne reprise de l'API quran.com (`code_v1`/`code_v2`,
   numéros de page et de ligne) : les pages de l'application correspondent
   exactement aux pages du mushaf imprimé.
+- **Police Digital Khatt** (*DigitalKhatt New Madina*), d'**Amine Anane**,
+  distribuée par la Quranic Universal Library (Tarteel) sous **SIL Open Font
+  License 1.1** (texte de la licence : `app/fonts/OFL-DigitalKhatt.txt`). Elle
+  reprend le trait du mushaf imprimé tout en composant du **vrai texte**, là où
+  les polices QCF dessinent un glyphe par mot. Le texte qu'elle affiche est
+  celui publié avec elle (ressource « Digital Khatt V2 » de QUL), et non le
+  texte uthmani du dépôt : les deux ne diffèrent que par des détails de ḍabṭ,
+  mais les mélanger donnerait un rendu faux.
 
 ## 3. Traduction française
 

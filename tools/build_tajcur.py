@@ -9,11 +9,16 @@ par défaut : Fâtiḥa puis An-Nâs en remontant vers An-Naba).
     python tools/build_tajcur.py [chemin/curriculum.json]
 
 Limites assumées (contrôlées par verifie.py section H) :
-- Les fiches izhar, izhar-shafawi, lam-allah, ra-tafkhim et madd-arid ne
-  sont PAS dérivables des spans (izhâr = absence de transformation, non
-  balisée ; madd 'âriḍ = pause de fin de verset, non balisée ; lâm d'Allah
-  et râ' non balisés par l'API) : elles n'apparaissent jamais dans les
-  encarts.
+- Les fiches izhar, izhar-shafawi, lam-allah et ra-tafkhim ne sont PAS
+  dérivables des spans (izhâr = absence de transformation, donc non balisée ;
+  lâm d'Allah et râ' non balisés par l'annotation employée) : elles
+  n'apparaissent jamais dans les encarts.
+  ⚠ UNE fiche en est sortie le 28/07 : madd-arid, qui y était à tort (il EST
+  balisé, par `madda_permissible`). madd-munfasil devait en sortir aussi grâce
+  à la ressource 87 de QUL, mais elle a été écartée : elle est moins complète
+  que quran.com, et c'est le mushaf officiel qui a tranché (cf. build_data.py).
+  Les deux entrées `madda_obligatory_*` restent dans la table : elles ne
+  coûtent rien et serviront le jour où la scission se fera proprement.
 - Les classes slnt, idgham_mutajanisayn et idgham_mutaqaribayn n'ont pas
   de fiche : ignorées (SANS_FICHE).
 """
@@ -37,8 +42,29 @@ SPAN2FICHE = {
     "iqlab": "iqlab",
     "qalaqah": "qalqala",
     "madda_normal": "madd-tabii",
-    "madda_permissible": "madd-munfasil",
+    # ⚠ CORRIGÉ le 28/07 : `madda_permissible` était mappé sur madd-munfasil, à
+    # tort. MESURE qui tranche : ses 418 portées tombent sur le DERNIER mot du
+    # verset dans 418 cas sur 418 (100 %), sur la voyelle longue qui précède la
+    # dernière lettre (نُو de يُؤْمِنُونَ, حِي de ٱلرَّحِيمِ). C'est le madd
+    # 'âriḍ li-s-soukoûn. Contre-épreuve : `madda_obligatory` ne touche le
+    # dernier mot que 5 fois sur 463 (1,1 %). La légende TJ_LEGEND de app.js
+    # disait juste depuis toujours (« 2-4-6 temps, fin de verset notamment »),
+    # c'est cette table qui se trompait.
+    "madda_permissible": "madd-arid",
+    # `madda_obligatory` réunit le muttasil ET le munfasil : quran.com ne les
+    # sépare pas (vérifié sur 2:13 ٱلسُّفَهَآءُ = muttasil et 2:4 بِمَآ أُنزِلَ =
+    # munfasil, même classe). La ressource 87 de QUL, elle, les distingue
+    # (`madda_obligatory_mottasel` 247 / `_monfasel` 210) : c'est la voie pour
+    # rendre madd-munfasil dérivable un jour. En l'état la table étant 1:1,
+    # madd-munfasil n'a pas de classe propre et rejoint les non dérivables.
     "madda_obligatory": "madd-muttasil",
+    # ⚠ NE PAS y remettre `madda_obligatory_mottasel` / `_monfasel` tant que les
+    # données ne les portent pas : `verifie.py` construit sa table inverse en
+    # gardant la DERNIÈRE entrée, si bien que les fiches muttasil et munfasil
+    # pointeraient vers des classes absentes et leurs exemples s'afficheraient
+    # sans couleur. Essayé le 28/07, deux erreurs immédiates. La scission n'aura
+    # lieu que le jour où l'annotation la portera vraiment (cf. build_data.py,
+    # pourquoi la ressource 87 de QUL a été écartée).
     "madda_necessary": "madd-lazim",
     "idgham_mutajanisayn": "idgham-mutajanisayn",
     "slnt": "lettre-muette",

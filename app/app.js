@@ -36,7 +36,7 @@ const PARAMS = Object.assign({
   mode: "auto", themeClair: "velin", themeSombre: "velin",
   police: "auto", anim: "auto", taille: "normale", largeur: "normale",
   translit: "fr", showTl: true, showTr: true,
-  taj: true, speed: 1, newLimit: 15, silentMarks: true,
+  taj: true, speed: 1, newLimit: 15, silentMarks: true, rendu: "uthmani",
   recitation: "husary64", karaoke: true,
 }, store.get("quran-params", {}));
 
@@ -587,7 +587,7 @@ addEventListener("scroll", surDefilement, { passive: true });
 addEventListener("resize", () => { relireJetonsChrome(); placerNav(); surDefilement(); });
 
 function clearWords() {
-  $$(".wd.on, .wd.done").forEach(el => el.classList.remove("on", "done"));
+  $$(".wd.on, .wd.done, .qw.on, .qw.done").forEach(el => el.classList.remove("on", "done"));
   motSuivi = -1;
 }
 function wordTick() {
@@ -603,7 +603,15 @@ function wordTick() {
      les segments : garder le mot précédent évite un clignotement à chaque blanc */
   let cur = -1;
   for (let i = 0; i < sg.length; i++) if (t >= sg[i][2]) cur = sg[i][0];
-  const els = $$(`.verse[data-k="${player.curKey}"] .wd, .mver[data-k="${player.curKey}"] .wd`);
+  /* ⚠ Ajouté le 28/07 : `.qw[data-w]` fait entrer la PAGE IMPRIMÉE dans le
+     soulignage, où il n'existait pas — seul le verset s'y teintait. Sur les
+     glyphes la granularité est le MOT et non la lettre, puisqu'un glyphe DESSINE
+     un mot entier : c'est exactement ce que donnent les segments audio, donc
+     rien n'est perdu. Le filtre `[data-w]` exclut la marque de fin de verset,
+     qui n'a pas d'index et ne se récite pas. */
+  const els = $$(`.verse[data-k="${player.curKey}"] .wd,`
+    + ` .mver[data-k="${player.curKey}"] .wd,`
+    + ` .qw[data-k="${player.curKey}"][data-w]`);
   let elCourant = null;
   els.forEach(el => {
     const w = +el.dataset.w;
@@ -815,10 +823,13 @@ function render() {
   const main = $("#main");
   const { c } = route();
   // lien profond optionnel vers un mode d'affichage : #rub/j1r1/memoriser/pages
-  if (page === "rub" && c) {
-    if (["versets", "continu", "pages"].includes(c)) memoState.mode = c;
-    if (c === "pagescouleur") { memoState.mode = "pages"; memoState.pagesColor = true; }
-  }
+  if (page === "rub" && c && ROUTE_AFFICHAGE[c]) {
+    if (c !== jetonApplique) {
+      jetonApplique = c;
+      memoState.rendu = null;
+      Object.assign(memoState, ROUTE_AFFICHAGE[c]);
+    }
+  } else if (page !== "rub") jetonApplique = null;
   if (page === "rub" && QURAN[a]) main.innerHTML = pageRub(a, b || "memoriser");
   else if (page === "revision") main.innerHTML = pageRevision();
   else if (page === "tutoriels") main.innerHTML = pageTutoriels(a || "translit");
@@ -850,22 +861,31 @@ function renderNavigation() {
 
 /* les pages du mushaf sont dessinées par des polices chargées à la demande :
    hors connexion et sans préchargement, elles s'affichent VIDES. On le dit. */
+/* Les polices de page ne sont PAS dans la coquille du service worker : elles se
+   chargent à la demande et se mettent en cache au passage. Un appareil qui ne
+   les a jamais vues et qui est hors connexion afficherait donc du vide, sans un
+   mot. C'est exactement la classe d'échec muet que le projet traque.
+   ⚠ Élargi le 28/07 : la vérification ne couvrait que la PAGE imprimée
+   (`.qpage`), or les glyphes servent désormais aussi la présentation verset par
+   verset (`.ar-gl`), qui était donc muette elle aussi. */
 async function verifierPolicesPages() {
-  const page = $(".qpage");
-  if (!page || !document.fonts) return;
-  const ligne = page.querySelector(".qline");
-  if (!ligne) return;
-  const fam = getComputedStyle(ligne).fontFamily.replace(/["']/g, "").split(",")[0].trim();
+  if (!document.fonts) return;
+  const cible = $(".qline") || $(".ar-gl");
+  if (!cible) return;
+  const fam = getComputedStyle(cible).fontFamily.replace(/["']/g, "").split(",")[0].trim();
   try { await document.fonts.load(`24px "${fam}"`); } catch (e) { /* échec = non chargée */ }
   if (document.fonts.check(`24px "${fam}"`)) return;
   if ($(".pages-ko")) return;
   const avis = document.createElement("div");
   avis.className = "pages-ko";
-  avis.textContent = "Les polices de ces pages ne sont pas encore sur cet appareil "
-    + "et ne peuvent pas être chargées maintenant : reviens en ligne, ou "
-    + "précharge « Pages du mushaf » dans Paramètres. Les autres affichages "
-    + "(versets, texte continu) fonctionnent hors connexion.";
-  page.parentNode.insertBefore(avis, page);
+  avis.textContent = "La calligraphie du mushaf n'est pas encore sur cet appareil "
+    + "et ne peut pas être chargée maintenant : reviens en ligne, ou précharge "
+    + "« Calligraphie du mushaf » dans Paramètres. Les rendus « Texte » et "
+    + "« Digital Khatt » fonctionnent hors connexion.";
+  /* on l'insère AVANT le bloc concerné, page ou verset, pour qu'elle se lise
+     avant le vide qu'elle explique */
+  const bloc = cible.closest(".qpage") || cible.closest(".verse") || cible;
+  bloc.parentNode.insertBefore(avis, bloc);
 }
 
 /* ---------------- accueil ---------------- */
@@ -878,8 +898,11 @@ function accueilHtml() {
     <summary>Bienvenue · comment ça marche, qui sommes-nous, quelles sources</summary>
     <div class="accueil-corps">
       <p><b>Comment ça marche.</b> Choisis un roub' ci-dessous : l'onglet
-      <b>Mémoriser</b> affiche le texte (versets, texte continu ou pages exactes
-      du mushaf) avec l'audio et le soulignage mot à mot, et l'onglet
+      <b>Mémoriser</b> affiche le texte avec l'audio et le soulignage mot à mot :
+      tu choisis la <b>présentation</b> (verset par verset, texte continu, ou la
+      page imprimée telle quelle) et la <b>calligraphie</b> (notre police de
+      lecture, Digital Khatt, ou les dessins de l'édition officielle du mushaf,
+      seuls à porter les couleurs tajwid). L'onglet
       <b>Tafsir</b> le commentaire verset par verset. Les 24 roub' sont tous
       ouverts, et l'onglet <b>Tajwid</b> de chacun liste les règles que son texte
       contient, avec un exemple pris dans ce roub'. Les notes rédigées (points
@@ -1009,10 +1032,143 @@ const TABS = [
   ["tajwid", "Tajwid"], ["tafsir", "Tafsir"],
   ["vocab", "Vocabulaire"], ["cartes", "Cartes"],
 ];
+/* DEUX AXES INDÉPENDANTS, et c'est tout l'objet de la refonte du rendu coranique :
+   la PRÉSENTATION (comment le texte est disposé : verset par verset, suivi, ou à
+   la page du mushaf) et le RENDU (avec quoi il est dessiné : notre police de
+   texte, ou les glyphes de l'édition officielle). Le sélecteur historique
+   mélangeait les deux en quatre entrées, ce qui rendait impossible d'offrir la
+   page imprimée en vrai texte, ou le verset par verset aux couleurs du mushaf.
+   Ici on installe le vocabulaire et le point de décision UNIQUE, sans changer un
+   pixel : les rendus supplémentaires se brancheront dans `rendUtilise()`, et
+   nulle part ailleurs. Rien n'est persisté, c'est l'état d'écran d'aujourd'hui. */
 const memoState = { maskAr: false, maskTl: false, maskTr: false,
-  mode: "versets", pagesColor: false };
-/* filtre de l'onglet Tajwid : état de vue, non persisté, comme memoState.mode */
+  presentation: "versets", rendu: null };
+/* filtre de l'onglet Tajwid : état de vue, non persisté, comme la présentation */
 const tajState = { filtre: "toutes" };
+
+/* LE point de décision du rendu. Il reproduit aujourd'hui le comportement
+   historique à l'identique : notre police de texte partout, sauf sur les pages
+   du mushaf, qui emploient les glyphes de l'édition officielle, colorés (QCF v4,
+   mise en page « QPC v4 tajweed ») ou non (QCF v1, impression 1405 H). */
+/* Un rendu n'est utilisable que si ses données sont là : une copie partielle du
+   dépôt, ou un juz non embarqué, ne doit pas produire une page blanche. */
+function renduDispo(r) {
+  if (r === "khatt") return !!window.KHATT;
+  if (r === "glyphesV4") return !!Object.keys(PAGES2).length;
+  if (r === "glyphesV1") return !!Object.keys(PAGES).length;
+  return r === "uthmani";
+}
+/* Les rendus offerts par une présentation. La page imprimée n'accepte que les
+   glyphes : composer sa mise en page avec une police de texte demanderait de
+   reconstruire les lignes, ce qui n'est pas fait. La barre le dit au lieu de
+   proposer un choix qui ne marcherait pas. */
+function rendusDe(pres) {
+  /* ⚠ « Mushaf 1405 H » est MIS DE CÔTÉ dans les présentations suivies, décision
+     de Yusuf du 28/07 sur rendu : hors de sa page, cette calligraphie sort trop
+     petite. Elle reste offerte sur la PAGE IMPRIMÉE, où c'est le mode noir et
+     blanc historique, à sa taille. Ce n'est pas une suppression : rien n'est
+     retiré du code ni des données, il suffit de remettre "glyphesV1" dans la
+     seconde liste le jour où ce chantier est ouvert. */
+  const ids = pres === "pages" ? ["glyphesV4", "glyphesV1"]
+                               : ["uthmani", "khatt", "glyphesV4"];
+  return ids.filter(renduDispo);
+}
+function rendUtilise() {
+  const offerts = rendusDe(memoState.presentation);
+  const voulu = memoState.rendu || PARAMS.rendu;
+  if (offerts.includes(voulu)) return voulu;
+  /* le rendu choisi n'existe pas ici : on prend le premier offert, sans écrire
+     quoi que ce soit. Revenir à une présentation suivie retrouve son choix. */
+  return offerts[0] || "uthmani";
+}
+/* Quels rendus peuvent porter les couleurs tajwid, et pourquoi.
+   - « Mushaf » (glyphes v4) : oui, elles sont DANS la police (palettes du KFGQPC).
+   - « Texte » : oui, par les portées du texte et le CSS. ⚠ Les douze valeurs
+     employées jusqu'ici n'avaient AUCUNE source : elles doivent prendre celles
+     du KFGQPC (décision de Yusuf du 28/07, cf. le plan, étape 8).
+   - « Digital Khatt » : non. Il a sa propre orthographe, donc nos portées, qui
+     sont des positions dans le texte uthmani, ne s'y appliquent pas ; et la
+     police n'a aucune couche de couleur.
+   - « Mushaf 1405 H » : non, cette édition est en noir et blanc.
+   D'où une puce grisée plutôt qu'absente : une option qui disparaît laisse
+   croire à un bug, une option grisée s'explique au survol. */
+function couleursPossibles() {
+  return ["glyphesV4", "uthmani"].includes(rendUtilise());
+}
+
+/* Index verset -> { page, glyphes[] }, construit une fois par édition et gardé :
+   le parcourir à chaque rendu coûterait 8654 entrées pour rien. */
+const IDX_GLYPHES = {};
+function indexGlyphes(v4) {
+  const cle = v4 ? "v4" : "v1";
+  if (IDX_GLYPHES[cle]) return IDX_GLYPHES[cle];
+  const DATA = v4 ? PAGES2 : PAGES, idx = {};
+  for (const p of Object.keys(DATA).map(Number).sort((a, b) => a - b))
+    for (const ln of Object.keys(DATA[p]).map(Number).sort((a, b) => a - b))
+      for (const w of DATA[p][ln]) {
+        const e = idx[w.k] || (idx[w.k] = { page: p, g: [] });
+        e.g.push(w.g);
+      }
+  return (IDX_GLYPHES[cle] = idx);
+}
+
+/* Un verset rendu avec les GLYPHES de l'édition officielle, hors de la page.
+   Trois règles reprises telles quelles de `pagesHtml`, dont dépend tout le reste :
+   un verset tient toujours sur UNE page (vérifié sur les 823), donc une seule
+   police ; l'index de mot est un simple compteur ; et le DERNIER glyphe est la
+   marque de fin de verset, qui ne se récite pas et ne reçoit donc pas d'index.
+   ⚠ Les glyphes sont des caractères PUA, de direction LTR : dans un bloc rtl,
+   l'algorithme bidi les rendrait dans le mauvais ordre. D'où le flex
+   `row-reverse`, exactement comme `.qline`. */
+function versetGlyphesHtml(v, v4) {
+  const e = indexGlyphes(v4)[v.k];
+  if (!e) return arHtml(v);
+  let h = "";
+  e.g.forEach((g, i) => {
+    h += `<span class="wd"${i < e.g.length - 1 ? ` data-w="${i}"` : ""}>${g}</span>`;
+  });
+  return `<span class="ar-gl${v4 ? " colored" : ""}${v4 && !PARAMS.taj ? " mono" : ""}" `
+       + `style="font-family:'${(v4 ? "t" : "p") + e.page}'">${h}</span>`;
+}
+
+/* Le texte d'un verset dans les présentations SUIVIES (verset par verset et
+   texte continu). Même structure que `arHtml` : un `.wd[data-w]` par mot récité,
+   sur quoi s'appuient le soulignage pendant la récitation et le double-clic
+   « lecture à partir d'ici ».
+   ⚠ Digital Khatt a SA PROPRE orthographe, publiée avec la police : on ne lui
+   applique donc PAS `arDisplay()`, dont les deux graphies (soukoun de Médine,
+   mîm de l'iqlâb) ne corrigent que des façons de faire d'UthmanicHafs. Les
+   mélanger donnerait un rendu faux.
+   L'alignement des index est garanti à la génération : `build_khatt.py` refuse
+   de produire quoi que ce soit si un verset n'a pas le même nombre de mots des
+   deux côtés (823 sur 823 aujourd'hui), et `verifie.py` le rejoue. */
+function texteHtml(v) {
+  const r = rendUtilise();
+  if (r === "glyphesV4" || r === "glyphesV1") return versetGlyphesHtml(v, r === "glyphesV4");
+  if (r !== "khatt") return arHtml(v);
+  const mots = window.KHATT[v.k];
+  if (!mots) return arHtml(v);
+  return mots.map((m, i) => `<span class="wd" data-w="${i}">${esc(m)}</span>`).join(" ");
+}
+
+/* Les quatre jetons de lien profond et l'état qu'ils décrivent. Ils sont
+   documentés dans le README et le LISEZMOI, et les captures s'en servent : leur
+   sens ne change pas. ⚠ « pages » ne remet PAS les couleurs à zéro, il ne touche
+   que la présentation, exactement comme avant. */
+const ROUTE_AFFICHAGE = {
+  versets: { presentation: "versets" },
+  continu: { presentation: "continu" },
+  pages: { presentation: "pages" },
+  /* le jeton historique force le rendu POUR CETTE VUE, sans écrire la
+     préférence : un lien profond ne doit pas modifier les réglages de qui le
+     suit. D'où `memoState.rendu`, effacé dès qu'on touche une puce. */
+  pagescouleur: { presentation: "pages", rendu: "glyphesV4" },
+};
+/* dernier jeton appliqué. ⚠ SANS lui, `render()` réimposait la route à CHAQUE
+   appel, et les puces d'affichage restaient inertes tant qu'un jeton figurait
+   dans l'adresse : défaut antérieur, relevé en mesurant l'étape 1. Un jeton
+   décrit une NAVIGATION, il ne doit s'appliquer qu'au changement. */
+let jetonApplique = null;
 let tjObs = null;      // observateur du sommaire de l'onglet Tajwid (cf. bindMain)
 const anum = n => String(n).replace(/\d/g, d => "٠١٢٣٤٥٦٧٨٩"[+d]);
 
@@ -1043,6 +1199,15 @@ const anum = n => String(n).replace(/\d/g, d => "٠١٢٣٤٥٦٧٨٩"[+d]);
     css += `@font-face{font-family:"t${n}";src:url("fonts/qcf4/p${n}.woff2") format("woff2");font-display:block;}`
          + `@font-palette-values --mushafClair{font-family:"t${n}";base-palette:2}`
          + `@font-palette-values --mushafSombre{font-family:"t${n}";base-palette:1;`
+         + `override-colors:0 ${ENCRE_SOMBRE}}`
+    /* Les jeux « tajwid ÉTEINT », publiés par le KFGQPC avec les autres et
+       appariés aux leurs : la 5 est le pendant monochrome de la 2, la 4 celui
+       de la 1. Vérifié entrée par entrée le 28/07 : dans les palettes 3, 4 et 5
+       les index 1 à 9 n'ont plus qu'une seule couleur, et les entrées de rosace
+       restent identiques à celles de leur palette colorée. Couper les couleurs
+       ne coûte donc AUCUNE police et n'invente aucune valeur. */
+         + `@font-palette-values --mushafMonoClair{font-family:"t${n}";base-palette:5}`
+         + `@font-palette-values --mushafMonoSombre{font-family:"t${n}";base-palette:4;`
          + `override-colors:0 ${ENCRE_SOMBRE}}`;
   }
   if (!css) return;
@@ -1095,37 +1260,68 @@ function tajCurHtml(s) {
     pas cochée dans l'onglet Tajwid d'un roub'. Cliquer une règle ouvre sa fiche.</p></details>`;
 }
 
+/* Les rendus offerts aux présentations SUIVIES. La page imprimée n'est pas
+   concernée : elle impose ses glyphes, c'est sa définition. L'ordre va du plus
+   sobre au plus fidèle à l'imprimé. */
+const RENDUS = [
+  ["uthmani", "Texte", "notre police de lecture, UthmanicHafs du KFGQPC"],
+  ["khatt", "Digital Khatt",
+   "la calligraphie du mushaf composée en vrai texte (Amine Anane, licence OFL)"],
+  ["glyphesV4", "Mushaf",
+   "la calligraphie officielle du KFGQPC, un dessin par mot ; seule à pouvoir porter les couleurs tajwid, qui sont dans la police"],
+  ["glyphesV1", "Mushaf 1405 H",
+   "l'impression de 1405 H, autre calligraphie et autre pagination, sans couleurs"],
+];
+function chipsRendu(pres) {
+  const offerts = rendusDe(pres), actif = rendUtilise();
+  return RENDUS.filter(([id]) => offerts.includes(id)).map(([id, nom, aide]) =>
+    `<button class="chip ${actif === id ? "on" : ""}" data-rendu="${id}"`
+    + ` title="${esc(aide)}">${esc(nom)}</button>`).join(" ");
+}
+/* La puce des couleurs, commune aux trois présentations. Grisée quand le rendu
+   courant ne peut pas les porter, avec la raison dans l'infobulle. */
+function chipCouleurs() {
+  const ok = couleursPossibles();
+  return `<button class="chip ${ok && PARAMS.taj ? "on" : ""}${ok ? "" : " off"}"`
+    + ` data-opt="taj"${ok ? "" : " disabled"}`
+    + ` title="${esc(ok ? "les couleurs tajwid de l'édition officielle du KFGQPC"
+        : "ce rendu ne porte pas de couleurs : choisir « Mushaf couleurs » pour les voir")}"`
+    + `>Couleurs tajwid</button>`;
+}
+
 function secMemoriser(R) {
-  const mode = memoState.mode;
+  /* `data-pres` et non `data-mode` : `applyTheme()` pose déjà un `data-mode`
+     sur <html> pour le thème clair ou sombre. La requête est portée sur `main`,
+     donc les deux ne se croisaient pas, mais deux attributs de même nom pour
+     deux notions étrangères est un piège qui finit par se refermer. */
+  const pres = memoState.presentation;
   let h = `<div class="memo-opts">
-    <button class="chip ${mode === "versets" ? "on" : ""}" data-mode="versets">Versets</button>
-    <button class="chip ${mode === "continu" ? "on" : ""}" data-mode="continu">Texte continu</button>
-    <button class="chip ${mode === "pages" ? "on" : ""}" data-mode="pages">Pages du mushaf</button>
-    <span style="width:10px"></span>`;
-  if (mode === "versets") {
+    <button class="chip ${pres === "versets" ? "on" : ""}" data-pres="versets">Versets</button>
+    <button class="chip ${pres === "continu" ? "on" : ""}" data-pres="continu">Texte continu</button>
+    <button class="chip ${pres === "pages" ? "on" : ""}" data-pres="pages">Page imprimée</button>
+    <span class="sep"></span>
+    ${chipsRendu(pres)}
+    <span class="sep"></span>
+    ${chipCouleurs()}
+    <button class="chip ${PARAMS.silentMarks ? "on" : ""}" data-opt="silentMarks" title="les ronds ۟ au-dessus des lettres écrites mais non prononcées">Ronds muets</button>`;
+  if (pres === "versets") {
     h += `
-    <button class="chip ${PARAMS.taj ? "on" : ""}" data-opt="taj">Couleurs tajwid</button>
-    <button class="chip ${PARAMS.silentMarks ? "on" : ""}" data-opt="silentMarks" title="les ronds ۟ au-dessus des lettres écrites mais non prononcées">Ronds muets</button>
     <button class="chip ${PARAMS.showTl ? "on" : ""}" data-opt="showTl">Translittération</button>
     <button class="chip ${PARAMS.showTr ? "on" : ""}" data-opt="showTr">Traduction</button>
     <button class="chip ${memoState.maskAr ? "on" : ""}" data-mask="maskAr">Masquer l'arabe</button>
     <button class="chip ${memoState.maskTl ? "on" : ""}" data-mask="maskTl">Masquer la translit.</button>`;
-  } else if (mode === "continu") {
-    h += `<button class="chip ${PARAMS.taj ? "on" : ""}" data-opt="taj">Couleurs tajwid</button>
-    <button class="chip ${PARAMS.silentMarks ? "on" : ""}" data-opt="silentMarks" title="les ronds ۟ au-dessus des lettres écrites mais non prononcées">Ronds muets</button>
-    <span class="fb-note">clic sur un verset : l'écouter ; double-clic sur un mot : lecture à partir de ce mot</span>`;
+  } else if (pres === "continu") {
+    h += `<span class="fb-note">clic sur un verset : l'écouter ; double-clic sur un mot : lecture à partir de ce mot</span>`;
   } else {
-    h += `<button class="chip ${memoState.pagesColor ? "on" : ""}" data-pgcolor
-      title="calligraphie colorée tajwid (édition officielle v4) ou noir et blanc classique">Couleurs tajwid</button>
-    <span class="fb-note">mise en page exacte du mushaf de Médine ·
+    h += `<span class="fb-note">mise en page exacte du mushaf de Médine ·
       clic sur un mot : écouter le verset ; double-clic : lecture à partir de ce mot ;
       les versets hors de ce roub' sont estompés</span>`;
   }
   h += `</div>`;
   let lastS = null;
-  if (mode === "pages") {
+  if (pres === "pages") {
     h += pagesHtml(R);
-  } else if (mode === "continu") {
+  } else if (pres === "continu") {
     let open = false;
     R.verses.forEach((v, i) => {
       if (v.s !== lastS) {
@@ -1133,11 +1329,11 @@ function secMemoriser(R) {
         if (open) { h += `</div>`; open = false; }
         h += `<div class="surah-head"><div class="nom">Sourate ${esc(SURAH_NAMES[v.s] || v.s)}</div>`;
         if (basmalaFor(v)) h += `<div class="basmala">${arEsc(BASMALA)}</div>`;
-        h += `</div>` + tajCurHtml(v.s) + `<div class="mushaf">`;
+        h += `</div>` + tajCurHtml(v.s) + `<div class="mushaf${rendUtilise() === "khatt" ? " khatt" : ""}">`;
         open = true;
       }
       h += `<span class="mver" data-k="${v.k}" data-i="${i}" title="${v.k}${(EVAL[v.k] || {}).n ? " · " + EVAL_LABELS[EVAL[v.k].n] : ""}">` +
-        arHtml(v) + `<span class="vend e${(EVAL[v.k] || {}).n || 0}">${anum(v.a)}</span></span> `;
+        texteHtml(v) + `<span class="vend e${(EVAL[v.k] || {}).n || 0}">${anum(v.a)}</span></span> `;
     });
     if (open) h += `</div>`;
   } else {
@@ -1155,7 +1351,7 @@ function secMemoriser(R) {
           <span class="spacer" style="flex:1"></span>
           ${evalBtn(v.k, true)}
         </div>
-        <div class="ar ${memoState.maskAr ? "masked" : ""}" data-reveal>${arHtml(v)}</div>
+        <div class="ar${rendUtilise() === "khatt" ? " khatt" : ""} ${memoState.maskAr ? "masked" : ""}" data-reveal>${texteHtml(v)}</div>
         ${PARAMS.showTl ? `<div class="tl ${memoState.maskTl ? "masked" : ""}" data-reveal>${esc(tlOf(v))}</div>` : ""}
         ${PARAMS.showTr ? `<div class="tr">${esc(v.tr)}</div>` : ""}
       </div>`;
@@ -1191,7 +1387,7 @@ function secMemoriser(R) {
 }
 
 function pagesHtml(R) {
-  const DATA = memoState.pagesColor && Object.keys(PAGES2).length ? PAGES2 : PAGES;
+  const DATA = rendUtilise() === "glyphesV4" && Object.keys(PAGES2).length ? PAGES2 : PAGES;
   const fpfx = DATA === PAGES2 ? "t" : "p";
   const inRub = new Set(R.verses.map(v => v.k));
   const pnums = Object.keys(DATA).map(Number).sort((a, b) => a - b)
@@ -1221,7 +1417,8 @@ function pagesHtml(R) {
       if (s !== 1 && s !== 9) h += `<div class="basmala">${arEsc(BASMALA)}</div>`;
       h += `</div>`;
     }
-    h += `<div class="qpage${fpfx === "t" ? " colored" : ""}">`;
+    h += `<div class="qpage${fpfx === "t" ? " colored" : ""}`
+       + `${fpfx === "t" && !PARAMS.taj ? " mono" : ""}">`;
     for (const ln of Object.keys(lines).map(Number).sort((a, b) => a - b)) {
       h += `<div class="qline" style="font-family:'${fpfx}${p}'">`;
       for (const w of lines[ln]) {
@@ -1720,6 +1917,10 @@ verset, le texte publié à celui de la source.</p>
 <p>Polices <b>QCF</b> du KFGQPC, un glyphe par mot (version 1 en noir et blanc,
 version 4 en couleurs tajwid), et police <b>UthmanicHafs</b> pour le texte
 courant. La mise en page ligne à ligne reprend celle du mushaf imprimé.</p>
+<p>Police <b>Digital Khatt</b> d'<b>Amine Anane</b>, sous licence SIL Open Font
+1.1, proposée comme rendu de lecture : elle reprend le trait du mushaf imprimé
+tout en composant du vrai texte. Le texte qu'elle affiche est celui publié avec
+elle par la Quranic Universal Library.</p>
 
 <h3>Traduction française</h3>
 <p><b>Muhammad Hamidullah</b>, <i>Le Noble Coran et la traduction en langue
@@ -1803,6 +2004,11 @@ Disponible à l'adresse : https://api.quran.com/api/v4/</p>
 <p class="biblio">COMPLEXE DU ROI FAHD POUR L'IMPRESSION DU NOBLE CORAN
 (KFGQPC). <i>Polices QCF, versions 1 et 4</i>, et <i>police UthmanicHafs</i>
 [polices numériques]. Médine.</p>
+
+<p class="biblio">ANANE, Amine. <i>DigitalKhatt New Madina</i> [police
+numérique]. Version 0.1. Sous licence SIL Open Font License 1.1. Distribuée par
+Quranic Universal Library (Tarteel) [en ligne]. Disponible à l'adresse :
+https://qul.tarteel.ai/resources/font/247</p>
 
 <p class="biblio">AL-GHAZĀLĪ, Abū Ḥāmid Muḥammad ibn Muḥammad aṭ-Ṭūsī
 (m. 505 H). <i>Iḥyāʾ ʿulūm ad-dīn</i>. Beyrouth : Dār al-Maʿrifa, 4 vol. T. II,
@@ -2181,25 +2387,33 @@ function tutoTranslit() {
   return h;
 }
 
+/* La légende des couleurs, refaite le 28/07 sur les RÔLES OFFICIELS du KFGQPC.
+   Elle en compte huit là où nous avions douze catégories : le mushaf REGROUPE.
+   Le dire est plus honnête que de montrer six pastilles du même vert avec six
+   noms différents, ce qui ferait croire à un défaut d'affichage. */
 const TJ_LEGEND = [
-  ["tj-gray", "Lettres muettes", "Lettre écrite mais non prononcée : hamzat wasl que la liaison efface, alif orthographique (souvent surmonté du rond fermé ۟), lam de l'article devant une lettre solaire. Masquables via l'option « ronds muets »."],
-  ["tj-ghunna", "Ghunna", "Nasalisation de 2 temps sur نّ ou مّ (le son passe par le nez)."],
-  ["tj-ikhfa", "Ikhfâ'", "Nûn sakina ou tanwin « caché » : nasalisation légère devant 15 lettres. Même principe pour le mîm devant ب."],
-  ["tj-idgham", "Idghâm avec ghunna", "Le nûn/tanwin fusionne dans la lettre suivante (ي ن م و) avec nasalisation. Même principe pour un mîm dans un mîm."],
-  ["tj-idgham-wo", "Idghâm sans ghunna", "Le nûn/tanwin fusionne dans ل ou ر, sans nasalisation : le n disparaît complètement."],
-  ["tj-iqlab", "Iqlâb", "Nûn sakina ou tanwin devant ب : prononcé comme un mîm léger."],
-  ["tj-qalqala", "Qalqala", "Rebond sonore sur ق ط ب ج د porteuses d'un soukoun (écrit ۡ, petite tête de khâ', comme dans le mushaf de Médine : le rond fermé, lui, signale une lettre muette)."],
-  ["tj-madd2", "Madd naturel (2 temps)", "Allongement simple de la voyelle longue."],
-  ["tj-madd4", "Madd permissible (2-4-6 temps)", "Allongement facultatif, souvent 4 temps (fin de verset notamment)."],
-  ["tj-madd45", "Madd obligatoire (4-5 temps)", "Voyelle longue suivie d'une hamza (dans le mot ou au mot suivant)."],
-  ["tj-madd6", "Madd nécessaire (6 temps)", "Allongement maximal (lettre suivie de shadda ou soukoun, lettres isolées d'ouverture)."],
-  ["tj-special", "Idghâm mutajânisayn / mutaqâribayn", "Fusion de deux lettres proches (ex. د dans ت)."],
+  ["tj-hamzat", "Hamzat wasl", "La hamza de liaison : elle se prononce si l'on commence là, et s'efface dès qu'on enchaîne depuis le mot d'avant."],
+  ["tj-muette", "Lettre non prononcée, ou fondue dans la suivante", "Une seule couleur pour tout ce qui ne se dit pas : l'alif orthographique (souvent surmonté du rond ۟), le lâm de l'article devant une lettre solaire, et le noûn ou le mîm qui disparaît dans la lettre suivante (idghâm). Les ronds sont masquables dans les options."],
+  ["tj-ghunna", "Ghunna, la nasalisation", "Une seule couleur pour toutes ses formes : ghunna sur نّ et مّ, ikhfâ', ikhfâ' shafawi, iqlâb, et la nasalisation de l'idghâm. Le mushaf colorie le SON, pas le nom de la règle."],
+  ["tj-qalqala", "Qalqala", "Rebond sonore sur ق ط ب ج د porteuses d'un soukoun."],
+  ["tj-madd2", "Madd naturel, 2 temps", "L'allongement simple d'une voyelle longue."],
+  ["tj-madd-arid", "Madd 'âriḍ, 2, 4 ou 6 temps", "Dans la dernière syllabe avant une pause, le plus souvent en fin de verset : la durée est au choix, mais constante dans une même récitation."],
+  ["tj-madd-hamza", "Madd par hamza, 4 à 5 temps", "Voyelle longue suivie d'une hamza, dans le même mot (muttasil) ou au mot suivant (munfasil). Le mushaf leur donne la même couleur ; l'onglet Tajwid, lui, les distingue."],
+  ["tj-madd-lazim", "Madd lâzim, 6 temps", "Voyelle longue suivie d'un soukoun ou d'une shadda inséparables, et les lettres isolées d'ouverture de sourate."],
+  ["tj-tafkhim", "Tafkhîm, l'emphase", "Visible dans la page imprimée : les lettres d'élévation خص ضغط قظ, le râ' emphatique et le lâm du nom d'Allâh. ⚠ L'annotation employée par les autres affichages ne la marque pas : cette couleur n'apparaît donc que sur la calligraphie « Mushaf »."],
 ];
 
+
 function tutoTajwid() {
-  let h = `<p>Le texte arabe est colorié comme dans les mushafs tajwid : chaque couleur
-    signale une règle à appliquer. La liste des règles présentes dans un roub', avec les
-    versets exacts, est dans l'onglet « Tajwid » du roub'.</p>`;
+  let h = `<p>Le texte arabe est colorié comme dans le mushaf de Médine : chaque couleur
+    signale une règle à appliquer. <b>Ce sont les couleurs officielles du Complexe du
+    Roi Fahd</b>, relevées dans ses propres polices, et non des teintes choisies par
+    l'application. La liste des règles présentes dans un roub', avec les versets exacts,
+    est dans l'onglet « Tajwid » du roub'.</p>
+    <p>Il y a <b>huit couleurs pour davantage de règles</b>, et ce n'est pas une
+    approximation : le mushaf colorie ce qui arrive au <b>son</b>, pas le nom de la
+    règle. Toutes les nasalisations partagent donc le vert, et tout ce qui ne se
+    prononce pas partage le gris.</p>`;
   for (const [cls, nom, desc] of TJ_LEGEND) {
     h += `<div class="legend-item"><span class="sw" style="background:var(--${cls.replace("tj-", "tj-")})"></span>
       <span><b style="color:var(--${cls})">${esc(nom)}</b> : ${esc(desc)}</span></div>`;
@@ -2462,7 +2676,7 @@ function pageParams() {
       quota de cache peut limiter le préchargement.
       <span id="preload-status"></span></span></div>
       <div class="preload-list">
-      ${[["pages", "Pages du mushaf"]].concat(Object.entries(RECITS).map(([k, r]) => [k, r.nom]))
+      ${[["pages", "Calligraphie du mushaf"]].concat(Object.entries(RECITS).map(([k, r]) => [k, r.nom]))
         .map(([k, nom]) => `<div class="preload-item"><span>${esc(nom)} <b>~${PRELOAD_MO[k]} Mo</b></span>
           <button class="iconbtn" data-preload="${k}" ${("serviceWorker" in navigator) && navigator.serviceWorker.controller ? "" : "disabled title='disponible sur la version en ligne (après un premier chargement)'"}>Précharger</button></div>`).join("")}
       </div></div>`)}
@@ -2604,13 +2818,16 @@ function bindMain() {
     memoState[el.dataset.mask] = !memoState[el.dataset.mask];
     render();
   }));
-  $$("[data-mode]", main).forEach(el => el.addEventListener("click", () => {
-    memoState.mode = el.dataset.mode;
+  $$("[data-pres]", main).forEach(el => el.addEventListener("click", () => {
+    memoState.presentation = el.dataset.pres;
     render();
   }));
-  $$("[data-pgcolor]", main).forEach(el => el.addEventListener("click", () => {
-    memoState.pagesColor = !memoState.pagesColor;
-    render();
+  /* le rendu est une PRÉFÉRENCE de lecture, donc persistée, à la différence
+     de la présentation qui reste un état d'écran. */
+  $$("[data-rendu]", main).forEach(el => el.addEventListener("click", () => {
+    PARAMS.rendu = el.dataset.rendu;
+    memoState.rendu = null;      // un choix explicite prime sur le lien profond
+    saveParams(); render();
   }));
 
   /* auto-évaluation (mise à jour en place, sans re-render pour garder le scroll) */
@@ -3060,7 +3277,7 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "1.18.1";   // réécrit par tools/release.py
+const BUILD_VERSION = "1.19.0";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {

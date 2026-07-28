@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.19.0 · 2026-07-28
+- La calligraphie du texte coranique se choisit désormais : notre police de lecture, Digital Khatt (qui reprend le trait du mushaf imprimé tout en restant du vrai texte), ou les dessins de l'édition officielle du Complexe du Roi Fahd. Le choix vaut pour les trois présentations et il est retenu
+- Les couleurs du tajwid sont maintenant celles du mushaf de Médine, relevées dans les polices officielles du Complexe du Roi Fahd. Elles remplacent nos anciennes teintes, qui n'avaient aucune source. Le mushaf colorie ce qui arrive au son : toutes les nasalisations partagent donc le vert, et tout ce qui ne se prononce pas partage le gris
+- Sur la page imprimée, le soulignage suit enfin la récitation mot à mot ; il ne marquait jusqu'ici que le verset entier
+- Correction importante de la page imprimée en couleurs : sur 38 pages, les lignes ne se coupaient pas là où le mushaf les coupe. Elles suivent désormais l'édition dont la calligraphie est tirée
+- Une règle était mal nommée depuis le début : ce que l'application appelait « madd munfasil » est en réalité le madd 'âriḍ li-s-soukoûn, l'allongement de la dernière syllabe avant une pause. La légende des couleurs, elle, disait juste
+- Le mode « Pages du mushaf » s'appelle désormais « Page imprimée » : ce qu'il décrit est une présentation, pas une édition
+
+## 1.19.0 · 2026-07-28
+- La calligraphie du texte coranique se choisit désormais : notre police de lecture, Digital Khatt (qui reprend le trait du mushaf imprimé tout en restant du vrai texte), ou les dessins de l'édition officielle du Complexe du Roi Fahd. Le choix vaut pour les trois présentations et il est retenu
+- Les couleurs du tajwid sont maintenant celles du mushaf de Médine, relevées dans les polices officielles du Complexe du Roi Fahd. Elles remplacent nos anciennes teintes, qui n'avaient aucune source. Le mushaf colorie ce qui arrive au son : toutes les nasalisations partagent donc le vert, et tout ce qui ne se prononce pas partage le gris
+- Sur la page imprimée, le soulignage suit enfin la récitation mot à mot ; il ne marquait jusqu'ici que le verset entier
+- Correction importante de la page imprimée en couleurs : sur 38 pages, les lignes ne se coupaient pas là où le mushaf les coupe. Elles suivent désormais l'édition dont la calligraphie est tirée
+- Une règle était mal nommée depuis le début : ce que l'application appelait « madd munfasil » est en réalité le madd 'âriḍ li-s-soukoûn, l'allongement de la dernière syllabe avant une pause. La légende des couleurs, elle, disait juste
+- Le mode « Pages du mushaf » s'appelle désormais « Page imprimée » : ce qu'il décrit est une présentation, pas une édition
+
 ## 1.18.1 · 2026-07-28
 - La présentation de l'équipe est réécrite : Roub' est né de l'idée originale d'Anis, conceptualisé et réalisé par Yusuf, avec les ajustements pédagogiques d'Israa
 - Le bloc d'accueil et le LISEZMOI annonçaient encore que l'onglet Tajwid n'existait que pour le roub' 1 : c'est corrigé, il est disponible pour les 24 roub' depuis la version précédente

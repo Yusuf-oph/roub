@@ -21,6 +21,10 @@ Vérifie :
   J. segments/ : segments mot à mot des 4 styles de récitation (couverture,
      temps cohérents, CALAGE index de mot déclaré ↔ mots du texte sur les 823
      versets, câblage index.html/SW/release)
+  K bis. couleurs tajwid : chaque classe de portée a bien une couleur en CSS
+  K. khatt.js : texte Digital Khatt, couverture et CALAGE du découpage en
+     mots sur celui de arHtml (dont dépendent l'audio et le double-clic),
+     police et licence présentes, câblage index.html/release
 """
 import json
 import os
@@ -37,6 +41,12 @@ CLASSES = {"ham_wasl", "laam_shamsiyah", "slnt", "ghunnah", "ikhafa",
            "ikhafa_shafawi", "idgham_ghunnah", "idgham_shafawi",
            "idgham_wo_ghunnah", "idgham_mutajanisayn", "idgham_mutaqaribayn",
            "iqlab", "qalaqah", "madda_normal", "madda_permissible",
+           # ⚠ `madda_obligatory` réunit le muttasil ET le munfasil. La
+           # ressource 87 de QUL les sépare, et l'essai du 28/07 a été ÉCARTÉ
+           # sur mesure : elle est moins complète (cf. build_data.py). Le jour
+           # où la scission se fera, il faudra ajouter ici les deux classes ET
+           # les remettre dans SPAN2FICHE, les deux ensemble : cette section
+           # contrôle justement que les deux tables restent synchronisées.
            "madda_obligatory", "madda_necessary"}
 
 ERR = []
@@ -65,6 +75,7 @@ process.stdout.write(JSON.stringify({
   PAGES: window.PAGES || {}, PAGES2: window.PAGES2 || {},
   TAJCUR: window.TAJCUR || {}, TAFSIRFR: window.TAFSIRFR || {},
   SEGMENTS: window.SEGMENTS || {},
+  KHATT: window.KHATT || {},
 }));
 """
     r = subprocess.run(["node", "-e", script, APP], capture_output=True)
@@ -79,6 +90,16 @@ def skel(s):
     for a, b in (("ٱ", "ا"), ("أ", "ا"), ("إ", "ا"), ("آ", "ا"), ("ى", "ي")):
         out = out.replace(a, b)
     return out
+
+
+# Écarts de SOURCE tolérés entre les segments audio et le texte : les corriger
+# demanderait de COUPER un segment, donc d'inventer un instant. Partagé par les
+# sections J (segments) et K (texte Digital Khatt), qui buteraient sinon toutes
+# deux dessus.
+CALAGE_CONNU = {("husary64", "2:125"), ("husary64", "2:181"), ("muallim", "2:143")}
+# Page où deux mots partagent un glyphe (2:181) : l'appariement à la mise en
+# page officielle y est dégradé, `build_pages2.py` le signale à l'exécution.
+PAGE_GLYPHE_PARTAGE = {27}
 
 
 def main():
@@ -316,7 +337,75 @@ def main():
         missing_pg = [k for k in by_key if k not in keys_in_pages]
         if missing_pg:
             err(f"pages {label} : versets absents : {missing_pg[:5]}")
-        print(f"G. pages {label} : {len(PG)} pages, {len(keys_in_pages)} versets couverts")
+
+        # ⚠ Contrôle ajouté le 28/07, et il aurait attrapé un vrai défaut : les
+        # glyphes d'une page sont numérotés dans l'ordre de lecture, donc les
+        # codes PUA d'un verset doivent CROÎTRE. Une mise en page qui ne
+        # correspond pas à la police plaçait la marque de fin de 84:21 au milieu
+        # du verset ; comme l'index de mot est un simple compteur, les `data-w`
+        # devenaient faux, et avec eux le soulignage et le double-clic.
+        seq = {}
+        for pnum in sorted(PG, key=int):
+            for ln in sorted(PG[pnum], key=int):
+                for w in PG[pnum][ln]:
+                    seq.setdefault(w["k"], []).append(w["g"])
+        desordre = [k for k, gs in seq.items()
+                    if [ord(g[0]) for g in gs] != sorted(ord(g[0]) for g in gs)]
+        if desordre:
+            err(f"pages {label} : glyphes dans le désordre sur {len(desordre)} versets "
+                f"({desordre[:4]}) : les index de mot en dépendent")
+        # glyphes = mots + 1 (le dernier est la marque de fin). L'exception est
+        # nommée : sur 2:181 deux mots partagent un glyphe, donc un index de mot
+        # de moins que de segments audio sur ce verset et lui seul.
+        GLYPHE_PARTAGE = {"2:181"}
+        mauvais = []
+        for k, gs in seq.items():
+            v = by_key.get(k)
+            if not v:
+                continue
+            mots = [m for m in re.split(r"\s+", v["uthmani"]) if m
+                    and not all(c in "ۖۗۘۙۚۛۜ۞۩" for c in m)]
+            if len(gs) - 1 != len(mots) and k not in GLYPHE_PARTAGE:
+                mauvais.append(f"{k} ({len(gs) - 1} vs {len(mots)})")
+        if mauvais:
+            err(f"pages {label} : glyphes ≠ mots + 1 sur {len(mauvais)} versets "
+                f"hors exception connue : {mauvais[:4]}")
+        # Confrontation à la mise en page OFFICIELLE, quand le cache QUL est
+        # présent : c'est ce contrôle qui aurait signalé, dès le début, que les
+        # pages colorées employaient les coupures de ligne d'une autre édition.
+        db = os.path.join(HERE, "cache", "qul", "extrait",
+                          "qpc-v4-tajweed-15-lines.db" if key == "PAGES2"
+                          else "qpc-v1-15-lines.db")
+        wbwdb = os.path.join(HERE, "cache", "qul", "extrait", "digital-khatt-v2-wbw.db")
+        if os.path.exists(db) and os.path.exists(wbwdb):
+            import sqlite3
+            loc = {i: l.rsplit(":", 1)[0] for i, l in
+                   sqlite3.connect(wbwdb).execute("select id,location from words")}
+            off = {}
+            for pg, ln, a_, b_ in sqlite3.connect(db).execute(
+                    "select page_number,line_number,first_word_id,last_word_id from pages"
+                    " where line_type='ayah' and first_word_id!=''"):
+                for i in range(int(a_), int(b_) + 1):
+                    if i in loc:
+                        off.setdefault(pg, {}).setdefault(ln, []).append(loc[i])
+            ecarts = []
+            for pnum in sorted(PG, key=int):
+                o = off.get(int(pnum))
+                if not o:
+                    continue
+                nous = {int(l): [w["k"] for w in PG[pnum][l]] for l in PG[pnum]}
+                eux = {int(l): v for l, v in o.items()}
+                if nous != eux and int(pnum) not in PAGE_GLYPHE_PARTAGE:
+                    ecarts.append(int(pnum))
+            if ecarts:
+                err(f"pages {label} : {len(ecarts)} pages ne suivent pas la mise en "
+                    f"page officielle ({ecarts[:6]}) : lignes irrégulières à l'écran")
+            print(f"G. pages {label} : {len(PG)} pages, {len(keys_in_pages)} versets, "
+                  f"ordre des glyphes, index de mot ET mise en page officielle contrôlés")
+        else:
+            print(f"G. pages {label} : {len(PG)} pages, {len(keys_in_pages)} versets couverts, "
+                  f"ordre des glyphes et index de mot contrôlés "
+                  f"(mise en page officielle non vérifiée : cache QUL absent)")
 
     # H. tajcur (parcours tajwid progressif par sourate)
     sys.path.insert(0, HERE)
@@ -393,8 +482,7 @@ def main():
     # écarts de découpage propres à la source, non corrigeables sans inventer un
     # instant (il faudrait couper un segment en deux) : tolérés, le départ au mot
     # se replie alors sur le mot connu le plus proche avant celui visé
-    CALAGE_CONNU = {("husary64", "2:125"), ("husary64", "2:181"),
-                    ("muallim", "2:143")}
+    # (CALAGE_CONNU est désormais défini en tête de main, section K s'en sert)
     if not SEG:
         err("segments : window.SEGMENTS absent (lancer tools/fetch_segments.py)")
     else:
@@ -451,6 +539,82 @@ def main():
             if host not in sw:
                 err(f"segments : hôte {host} absent du service worker (pas de cache hors-ligne)")
         print(f"J. segments : {len(SEG)} styles × {len(SEG.get('husary64') or {})} versets")
+
+    # ---------------- K bis. couleurs tajwid ----------------
+    # ⚠ Ajouté le 28/07, juste après le remappage des 17 classes sur les 8 rôles
+    # officiels du KFGQPC : une classe oubliée dans styles.css ne casse RIEN,
+    # elle s'affiche simplement en encre, sans un mot. Échec muet typique.
+    css = open(os.path.join(APP, "styles.css"), encoding="utf-8").read()
+    sans_couleur = sorted(c for c in CLASSES if f".tj-{c}" not in css)
+    if sans_couleur:
+        err(f"couleurs : classes sans règle CSS, elles s'afficheraient en encre "
+            f"sans prévenir : {sans_couleur}")
+    # et l'inverse : une variable --tj-* déclarée que plus personne n'emploie
+    declarees = set(re.findall(r"--tj-([a-z0-9-]+)\s*:", css))
+    employees = set(re.findall(r"var\(--tj-([a-z0-9-]+)\)", css))
+    orphelines = sorted(declarees - employees)
+    if orphelines:
+        print(f"   (note : --tj-{', --tj-'.join(orphelines)} déclarée(s) sans emploi)")
+    print(f"K bis. couleurs : {len(CLASSES)} classes tajwid, toutes coloriées ; "
+          f"{len(declarees)} rôles déclarés")
+
+    # ---------------- K. texte Digital Khatt ----------------
+    KHATT = data.get("KHATT") or {}
+    if KHATT:
+        PAUSES_K = "ۖۗۘۙۚۛۜ۞۩"
+
+        def mots_arhtml(ar):
+            r"""Le découpage de arHtml : /\S+/, mots de pause exclus."""
+            return [m.group(0) for m in re.finditer(r"\S+", ar)
+                    if not all(c in PAUSES_K for c in m.group(0))]
+
+        vus = {v["k"]: v for R in QURAN.values() for v in R["verses"]}
+        absents = [k for k in vus if k not in KHATT]
+        if absents:
+            err(f"khatt : {len(absents)} versets absents, dont {absents[:5]}")
+        # LE contrôle qui compte : un écart d'un seul mot décale l'index `data-w`,
+        # donc le soulignage pendant la récitation et le double-clic.
+        cales = 0
+        for k, v in vus.items():
+            if k not in KHATT:
+                continue
+            attendu = len(mots_arhtml(v["ar"]))
+            if len(KHATT[k]) != attendu:
+                err(f"khatt : {k} découpé en {len(KHATT[k])} mots contre "
+                    f"{attendu} dans arHtml, l'index de mot serait décalé")
+            else:
+                cales += 1
+        for f, quoi in (("fonts/DigitalKhatt.woff2", "police"),
+                        ("fonts/OFL-DigitalKhatt.txt", "licence OFL")):
+            if not os.path.exists(os.path.join(APP, f)):
+                err(f"khatt : {quoi} absente ({f})")
+        html = open(os.path.join(APP, "index.html"), encoding="utf-8").read()
+        if "data/khatt.js" not in html:
+            err("khatt : data/khatt.js absent de index.html")
+        sys.path.insert(0, HERE)
+        from release import shell_files
+        coquille = set(shell_files())
+        for f in ("data/khatt.js", "fonts/DigitalKhatt.woff2"):
+            if f not in coquille:
+                err(f"khatt : {f} hors de la coquille du SW, donc indisponible hors connexion")
+        # ⚠ Second calage, sur les SEGMENTS AUDIO cette fois : c'est d'eux que
+        # dépendent le soulignage et le double-clic. Un mot de trop ou de moins
+        # décalerait le repère sans rien casser d'autre.
+        SEGK = data.get("SEGMENTS") or {}
+        for style, jeu in SEGK.items():
+            mauvais = []
+            for k, mots in KHATT.items():
+                sg = jeu.get(k)
+                if not sg:
+                    continue
+                if (max(s[0] for s in sg) != len(mots) - 1
+                        and (style, k) not in CALAGE_CONNU):
+                    mauvais.append(k)
+            if mauvais:
+                err(f"khatt : {len(mauvais)} versets où l'index de mot ne colle pas "
+                    f"aux segments {style} ({mauvais[:4]}) : soulignage décalé")
+        print(f"K. khatt : {len(KHATT)} versets, {sum(len(x) for x in KHATT.values())} mots, "
+              f"{cales} calés sur arHtml et sur les {len(SEGK)} jeux de segments")
 
     print()
     if ERR:

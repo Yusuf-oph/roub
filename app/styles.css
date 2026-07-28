@@ -19,19 +19,26 @@
    couleurs viennent des polices QCF v4 (COLRv1) et non du CSS. */
 
 :root {
-  /* tajwid — jeu CLAIR, la base */
-  --tj-gray: #9aa1ad;
-  --tj-ghunna: #1c8f47;
-  --tj-ikhfa: #4faf74;
-  --tj-idgham: #0d6e3f;
-  --tj-idgham-wo: #4a7fae;
-  --tj-iqlab: #c67615;
-  --tj-qalqala: #1f6fd0;
-  --tj-madd2: #d98181;
-  --tj-madd4: #cc4f4f;
-  --tj-madd45: #c22525;
-  --tj-madd6: #8d1a19;
-  --tj-special: #8a53ce;
+  /* TAJWID — les couleurs OFFICIELLES du KFGQPC, palette 2, celle que servent
+     déjà les pages du mushaf en thème clair. Relevées dans la table CPAL des
+     polices du dépôt, jamais recopiées d'ailleurs ; la correspondance
+     index → règle est celle que quran.com publie pour ces mêmes polices
+     (arbitrage/rapport-annotations-kfgqpc.md).
+     ⚠ Les douze valeurs employées jusqu'au 28/07 n'avaient AUCUNE source :
+     inchangées depuis le premier commit, et zéro correspondance sur douze avec
+     les entrées CPAL. Décision de Yusuf : l'appli suit Médine.
+     ⚠ CONSÉQUENCE ASSUMÉE : le mushaf REGROUPE là où nous séparions. Six de nos
+     classes tombent sur le même vert, cinq sur le même gris. Les noms de
+     variable restent nos catégories ; les valeurs sont les rôles officiels. */
+  --tj-hamzat: #A6ABAB;      /* index 15 : hamzat wasl */
+  --tj-muette: #ABABAB;      /* index 2  : lettre non prononcée ou assimilée */
+  --tj-ghunna: #09B000;      /* index 6  : ghunna, sous toutes ses formes */
+  --tj-qalqala: #00B4E0;     /* index 8  : qalqala */
+  --tj-madd2: #C09725;       /* index 5  : madd naturel */
+  --tj-madd-arid: #E67B00;   /* index 4  : madd 'âriḍ li-s-soukoûn */
+  --tj-madd-hamza: #FF0000;  /* index 9  : madd par hamza (muttasil et munfasil) */
+  --tj-madd-lazim: #B7001C;  /* index 3  : madd lâzim */
+  --tj-tafkhim: #134FE1;     /* index 7  : tafkhîm (aucun consommateur pour l'instant) */
 
 }
 
@@ -40,36 +47,40 @@
    spécificité égale, la seconde passe après, donc elle gagne — sans conséquence
    ici puisque les deux posent les mêmes valeurs. */
 :root[data-mode="dark"] {
-  --tj-gray: #8b95a8;
-  --tj-ghunna: #52c979;
-  --tj-ikhfa: #8fd6a8;
-  --tj-idgham: #2e9e63;
-  --tj-idgham-wo: #7fa6c9;
-  --tj-iqlab: #e8a04c;
-  --tj-qalqala: #5fa8f5;
-  --tj-madd2: #f0a3a3;
-  --tj-madd4: #ef7d7d;
-  --tj-madd45: #f25454;
-  --tj-madd6: #c9302f;
-  --tj-special: #b98cf0;
+  --tj-hamzat: #919999;
+  --tj-muette: #999999;
+  --tj-ghunna: #26B55D;
+  --tj-qalqala: #00DEFF;
+  --tj-madd2: #FFC1E0;
+  --tj-madd-arid: #FF8E3B;
+  --tj-madd-hamza: #FF5E8E;
+  --tj-madd-lazim: #E30000;
+  --tj-tafkhim: #3C84D5;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-mode="light"]) {
-    --tj-gray: #8b95a8;
-    --tj-ghunna: #52c979;
-    --tj-ikhfa: #8fd6a8;
-    --tj-idgham: #2e9e63;
-    --tj-idgham-wo: #7fa6c9;
-    --tj-iqlab: #e8a04c;
-    --tj-qalqala: #5fa8f5;
-    --tj-madd2: #f0a3a3;
-    --tj-madd4: #ef7d7d;
-    --tj-madd45: #f25454;
-    --tj-madd6: #c9302f;
-    --tj-special: #b98cf0;
+    --tj-hamzat: #919999;
+    --tj-muette: #999999;
+    --tj-ghunna: #26B55D;
+    --tj-qalqala: #00DEFF;
+    --tj-madd2: #FFC1E0;
+    --tj-madd-arid: #FF8E3B;
+    --tj-madd-hamza: #FF5E8E;
+    --tj-madd-lazim: #E30000;
+    --tj-tafkhim: #3C84D5;
   }
 }
 
+/* Digital Khatt : la calligraphie du mushaf composée en VRAI TEXTE, par
+   opposition aux polices QCF qui dessinent un glyphe par mot. Amine Anane,
+   SIL Open Font License 1.1 (app/fonts/OFL-DigitalKhatt.txt).
+   ⚠ Elle attend SA propre orthographe : le texte vient de data/khatt.js, pas
+   du texte uthmani du dépôt, et `arDisplay()` ne lui est pas appliqué. */
+@font-face {
+  font-family: "DigitalKhatt";
+  src: url("fonts/DigitalKhatt.woff2") format("woff2");
+  font-display: swap;
+}
 @font-face {
   font-family: "UthmanicHafs";
   src: url("fonts/UthmanicHafs.woff2") format("woff2"),
@@ -494,6 +505,14 @@ button { font: inherit; cursor: pointer; }
 .qw:hover { background: color-mix(in srgb, var(--accent) 10%, transparent); }
 .qw.playing { background: color-mix(in srgb, var(--accent) 22%, transparent); }
 .qw.dim { opacity: .34; }
+/* soulignage pendant la récitation, sur la page imprimée. Mêmes marques que
+   `.wd`, à dessein : c'est le même repère, sur une autre présentation.
+   ⚠ AUCUNE transition ici : un onglet en arrière-plan fige la valeur de départ
+   d'une transition, ce qui fausse la mesure et retarde l'affichage (piège payé
+   en v1.9.2 sur box-shadow). */
+.qw.on { box-shadow: inset 0 -3px 0 var(--accent); }
+.qw.done { opacity: .5; }
+.qw.dim.done { opacity: .2; }
 .qpage-num {
   text-align: center; color: var(--muted); font-size: var(--fs-200);
   margin-top: 8px; letter-spacing: 2px;
@@ -509,6 +528,15 @@ button { font: inherit; cursor: pointer; }
 .qpage.colored .qpage-num { color: #8a8570; }
 .qpage.colored .qw.playing { background: rgba(56, 180, 137, .3); }
 .qpage.colored .qline { font-palette: --mushafClair; }
+/* couleurs coupées : on ne retire pas la couleur, on change de PALETTE pour
+   celle que le KFGQPC publie éteinte. Aucune valeur de notre cru. */
+.qpage.colored.mono .qline, .ar-gl.colored.mono { font-palette: --mushafMonoClair; }
+:root[data-mode="dark"] .qpage.colored.mono .qline,
+:root[data-mode="dark"] .ar-gl.colored.mono { font-palette: --mushafMonoSombre; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-mode="light"]) .qpage.colored.mono .qline,
+  :root:not([data-mode="light"]) .ar-gl.colored.mono { font-palette: --mushafMonoSombre; }
+}
 
 /* mode sombre : le bloc rejoint le thème au lieu de trouer l'écran. Le blanc pur
    de la palette officielle donnait 18,6:1, qui fatigue à la lecture longue ;
@@ -581,18 +609,23 @@ button { font: inherit; cursor: pointer; }
 }
 
 /* couleurs tajwid */
-.tj-ham_wasl, .tj-slnt, .tj-laam_shamsiyah { color: var(--tj-gray); }
-.tj-ghunnah { color: var(--tj-ghunna); }
-.tj-ikhafa, .tj-ikhafa_shafawi { color: var(--tj-ikhfa); }
-.tj-idgham_ghunnah, .tj-idgham_shafawi { color: var(--tj-idgham); }
-.tj-idgham_wo_ghunnah { color: var(--tj-idgham-wo); }
-.tj-iqlab { color: var(--tj-iqlab); }
+/* Nos 17 classes de portée projetées sur les rôles officiels du KFGQPC.
+   Le regroupement n'est pas un raccourci de notre part : c'est ce que le
+   mushaf colorie réellement, mesuré sur les 823 versets. */
+.tj-ham_wasl { color: var(--tj-hamzat); }
+.tj-slnt, .tj-laam_shamsiyah, .tj-idgham_wo_ghunnah,
+.tj-idgham_mutajanisayn, .tj-idgham_mutaqaribayn { color: var(--tj-muette); }
+.tj-ghunnah, .tj-ikhafa, .tj-ikhafa_shafawi,
+.tj-idgham_ghunnah, .tj-idgham_shafawi, .tj-iqlab { color: var(--tj-ghunna); }
 .tj-qalaqah { color: var(--tj-qalqala); }
 .tj-madda_normal { color: var(--tj-madd2); }
-.tj-madda_permissible { color: var(--tj-madd4); }
-.tj-madda_obligatory { color: var(--tj-madd45); }
-.tj-madda_necessary { color: var(--tj-madd6); }
-.tj-idgham_mutajanisayn, .tj-idgham_mutaqaribayn { color: var(--tj-special); }
+.tj-madda_permissible { color: var(--tj-madd-arid); }
+/* le madd par hamza : une seule couleur officielle, que la source le sépare en
+   muttasil et munfasil (QUL 87) ou non (quran.com) */
+.tj-madda_obligatory,
+.tj-madda_obligatory_mottasel,
+.tj-madda_obligatory_monfasel { color: var(--tj-madd-hamza); }
+.tj-madda_necessary { color: var(--tj-madd-lazim); }
 
 /* lecteur audio collant */
 .audiobar {
@@ -1135,3 +1168,43 @@ h2.sec { font-size: var(--fs-500); margin: 22px 0 8px; }
   .hero h1 { font-size: var(--fs-500); }
   .fc-actions button { min-width: 72px; padding: 8px 10px; }
 }
+
+/* rendu Digital Khatt : on ne change QUE la famille. L'interligne reste celui
+   du thème, mesuré inutile à retoucher : à 25 px de corps, la boîte du verset
+   fait 215 px en Digital Khatt contre 205 en UthmanicHafs, et le blanc sous
+   l'arabe 159 px contre 156. Une valeur choisie ici n'aurait corrigé qu'un
+   écart de 5 %, au prix d'un nombre sorti de nulle part. */
+.ar.khatt, .mushaf.khatt { font-family: "DigitalKhatt", "UthmanicHafs", serif; }
+
+/* Rendu par les GLYPHES de l'édition officielle hors de la page imprimée.
+   ⚠ Les glyphes sont des caractères PUA, donc de direction LTR : dans le bloc
+   rtl de `.ar`, l'algorithme bidi les remettrait dans l'ordre inverse. Le flex
+   `row-reverse` rétablit l'ordre de lecture, exactement comme `.qline` le fait
+   pour la page.
+   ⚠ Et une fois l'axe renversé, son DÉBUT est à droite : c'est donc
+   `flex-start` qui aligne le verset à droite, `flex-end` le collerait à gauche.
+   Piège payé le 28/07, invisible aux mesures d'ordre des mots. */
+.ar-gl {
+  display: flex; flex-direction: row-reverse; flex-wrap: wrap;
+  justify-content: flex-start; align-items: baseline;
+  direction: ltr; line-height: 1.95;
+}
+/* la couleur vient de la POLICE, jamais du CSS : on ne fait que choisir la
+   palette officielle, la claire n° 2 et la sombre n° 1, comme pour la page.
+   Règle doublée pour le mode explicite et pour la préférence système. */
+.ar-gl.colored { font-palette: --mushafClair; }
+:root[data-mode="dark"] .ar-gl.colored { font-palette: --mushafSombre; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-mode="light"]) .ar-gl.colored { font-palette: --mushafSombre; }
+}
+
+/* barre d'options : un filet entre les trois groupes (présentation, rendu,
+   affichage), et une puce grisée pour une option que le rendu courant ne peut
+   pas porter. Grisée et non masquée : une option qui disparaît fait croire à
+   un bug, une option grisée s'explique au survol. */
+.memo-opts .sep {
+  width: 1px; align-self: stretch; margin: 2px 4px;
+  background: var(--border);
+}
+.chip.off { opacity: .45; cursor: not-allowed; }
+.chip.off:hover { background: none; border-color: var(--border); }

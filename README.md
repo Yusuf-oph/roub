@@ -16,7 +16,7 @@ mot**, difficulté notée sur 5 étoiles, **tafsir verset par verset**
 (al-Mukhtaṣar, traduction française), cartes d'enchaînement, progression
 visible et auto-évaluation des lacunes.
 
-Les **24 roub' sont tous accessibles** : texte, pages du mushaf, audio, tafsir
+Les **24 roub' sont tous accessibles** : texte, page imprimée du mushaf, audio, tafsir
 et cartes d'enchaînement partout. Le **contenu rédigé** (points durs de
 mémorisation, particularités tajwid, vocabulaire, cartes mutashabihat et de
 sens) existe pour le **roub' 1** ; les autres portent la mention « notes à
@@ -42,7 +42,12 @@ changer d'habillage. À la première visite l'application suit le réglage clair
 ou sombre de ton appareil ; la bascule en haut à droite tranche ensuite, et
 ton choix est retenu. Les animations se règlent aussi (elles suivent par
 défaut la préférence d'accessibilité du système). Tout est dans Paramètres.
-La calligraphie du texte coranique, elle, ne change jamais.
+**La calligraphie du texte coranique se choisit** : notre police de lecture,
+**Digital Khatt** (qui reprend le trait du mushaf imprimé tout en restant du
+vrai texte), ou les **dessins de l'édition officielle du KFGQPC**, seuls à
+porter les couleurs tajwid, puisque ces couleurs sont dans la police et non dans
+l'application. Ce choix vaut pour les trois présentations : verset par verset,
+texte continu et page imprimée.
 
 ## Qui sommes-nous
 
@@ -64,7 +69,7 @@ l'export d'avis intégré à l'application, dans Paramètres).
 - **En ligne (recommandé)** : ouvrir l'URL ci-dessus. « Ajouter à l'écran
   d'accueil » pour l'installer comme une application. Le texte, les notes,
   le tafsir et l'interface sont gardés hors-ligne dès la première visite ;
-  l'audio et les pages du mushaf se préchargent **à la carte** dans
+  l'audio et la calligraphie du mushaf se préchargent **à la carte** dans
   Paramètres, chaque style de récitation séparément. Mises à jour
   automatiques (bannière en haut de page).
 - **En local, sans serveur** : Code → Download ZIP sur cette page GitHub,
@@ -76,13 +81,13 @@ l'export d'avis intégré à l'application, dans Paramètres).
 
 ![Accueil : les roub' des juz 1, 2 et 'Amma](docs/img/accueil-clair.png)
 
-### Mémoriser : tajwid colorié, translittération, traduction, audio
+### Mémoriser : présentation et calligraphie au choix, tajwid, audio
 
 ![Mémoriser un roub' : texte colorié tajwid + translittération + audio](docs/img/memoriser-clair.png)
 
-### Les vraies pages du mushaf de Médine (édition colorée tajwid)
+### La page imprimée du mushaf de Médine, telle quelle
 
-![Pages exactes du mushaf, calligraphie officielle colorée](docs/img/pages-mushaf-clair.png)
+![La page imprimée du mushaf, calligraphie officielle colorée](docs/img/pages-mushaf-clair.png)
 
 ### Révision espacée intégrée
 

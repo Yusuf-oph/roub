@@ -45,11 +45,15 @@ def parse_tajweed(html):
     html = re.sub(r"<span class=end>[^<]*</span>", "", html)
     toks = []
     cls = None
-    for part in re.split(r"(<tajweed class=[\w]+>|</tajweed>)", html):
-        m = re.match(r"<tajweed class=([\w]+)>", part)
+    # ⚠ DEUX balisages acceptés : `<tajweed>` de l'API quran.com et `<rule>` de
+    # la ressource 87 de QUL, qui porte la MÊME annotation à une granularité plus
+    # fine (elle sépare le madd muttasil du munfasil). Le reste du traitement est
+    # identique : l'alignement se fait de toute façon sur NOTRE texte uthmani.
+    for part in re.split(r"(<(?:tajweed|rule) class=[\w]+>|</(?:tajweed|rule)>)", html):
+        m = re.match(r"<(?:tajweed|rule) class=([\w]+)>", part)
         if m:
             cls = m.group(1)
-        elif part == "</tajweed>":
+        elif part in ("</tajweed>", "</rule>"):
             cls = None
         else:
             for ch in part:
@@ -117,18 +121,57 @@ def clean_trad(t):
     return re.sub(r"\s+", " ", t).strip()
 
 
+def source_tajwid():
+    """Le balisage tajwid a projeter, et d'ou il vient.
+
+    Priorite a la ressource 87 de QUL (« QPC Hafs Tajweed ») quand elle est
+    deposee : MEME annotation que celle de quran.com, mais plus fine, elle
+    separe `madda_obligatory` en `_mottasel` et `_monfasel`, ce qui rend enfin
+    le madd munfasil derivable et sort sa fiche des orphelines.
+    Repli sur l'API quran.com sinon : le fichier QUL n'est pas telechargeable
+    sans compte, la fabrication doit rester possible sans lui.
+    """
+    # ⚠ ESSAYÉ LE 28/07, PUIS ÉCARTÉ SUR MESURE. La ressource 87 de QUL sépare
+    # bien le madd muttasil du munfasil, ce que quran.com fond, et c'était la
+    # raison d'y passer. Mais elle est MOINS COMPLÈTE, et c'est le mushaf
+    # officiel qui l'a dit : sur les annotations que quran.com porte et que QUL
+    # ignore, les polices du KFGQPC colorient 96 % des madd naturel (108 sur
+    # 113), 100 % des lâm solaires (15/15) et 100 % des qalqala (17/17). Passer
+    # à QUL aurait donc effacé 125 madd naturel, 24 hamzat wasl, 17 qalqala et
+    # 15 lâm solaires que l'édition officielle confirme.
+    # Les deux sources sont également EXACTES (97 à 100 % d'accord avec la
+    # police sur ce qu'elles marquent) ; elles diffèrent en COMPLÉTUDE.
+    # Ce qu'il faudrait pour gagner la scission sans rien perdre : garder
+    # quran.com comme base et n'emprunter à QUL que l'étiquette mottasel /
+    # monfasel, en appariant les portées par POSITION et non par rang (les
+    # comptes diffèrent : 463 contre 457). C'est un chantier à part.
+    # `parse_tajweed` accepte les deux balisages, donc l'essai est rejouable en
+    # rendant simplement le dictionnaire ci-dessous.
+    return {}, "quran.com (API v4, champ text_uthmani_tajweed)"
+
+
 def main():
     verses = json.load(open(os.path.join(CACHE, "verses.json"), encoding="utf-8"))
+    qul, provenance = source_tajwid()
+    print(f"annotation tajwid : {provenance}")
     os.makedirs(OUT, exist_ok=True)
     rubs = {}
     all_classes = {}
+    perdues = []
     for v in verses:
         s, a = v["key"].split(":")
         s, a = int(s), int(a)
         sci, fr = translit_verse(v["imlaei"])
-        spans = project_spans(v["tajweed"], v["uthmani"])
+        brut = qul.get(v["key"], v["tajweed"])
+        spans = project_spans(brut, v["uthmani"])
         for _, _, c in spans:
             all_classes[c] = all_classes.get(c, 0) + 1
+        # CONTROLE DE PROJECTION : une classe presente dans le balisage source
+        # doit se retrouver dans les portees. Si elle disparait, c'est que
+        # l'alignement l'a perdue, et il vaut mieux le savoir que le publier.
+        attendues = set(re.findall(r"<(?:tajweed|rule) class=(\w+)>", brut))
+        if attendues - {c for _, _, c in spans}:
+            perdues.append((v["key"], sorted(attendues - {c for _, _, c in spans})))
         entry = {
             "k": v["key"], "s": s, "a": a,
             "ar": v["uthmani"],
@@ -167,6 +210,11 @@ def main():
             for st, en, c in e["taj"]:
                 assert 0 <= st < en <= len(e["ar"]), (e["k"], st, en)
     print("OK: spans bornés, texte canonique intact par construction")
+    if perdues:
+        print(f"⚠ PROJECTION : {len(perdues)} versets perdent une classe, "
+              f"dont {perdues[:6]}")
+    else:
+        print(f"projection : aucune classe perdue sur les {len(verses)} versets")
 
 
 if __name__ == "__main__":
