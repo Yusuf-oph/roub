@@ -62,7 +62,7 @@ window.REGLES = [
   },
   {
     id: "izhar-shafawi", nom: "Izhâr shafawi", cat: "Mîm sakina",
-    texte: "Mîm sakina suivi de toute lettre **autre que ب et م** : prononciation claire du mîm, sans nasalisation prolongée. Attention particulière devant و et ف (lettres proches des lèvres) : ne pas laisser traîner le mîm.",
+    texte: "Mîm sakina suivi de toute lettre **autre que ب et م** : prononciation claire du mîm, sans nasalisation prolongée. Attention particulière devant و et ف : le mîm risque de s'y **effacer**, car le fâ' est proche de son point d'articulation et le wâw le partage. Il doit rester nettement prononcé.",
     exemples: [
       { ref: "1:7", note: "le mîm de ʿalayhim reste net devant le wâw." },
     ],

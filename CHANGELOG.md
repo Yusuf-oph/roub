@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.20.1 · 2026-07-28
+- Correction d'une fiche de tajwid. Sur l'izhâr shafawi, la mise en garde devant les lettres و et ف disait l'inverse de celle du matn : le risque n'est pas de laisser traîner le mîm, c'est qu'il s'efface, le fâ' étant proche de son point d'articulation et le wâw le partageant
+
 ## 1.20.0 · 2026-07-28
 - L'auto-évaluation d'un verset se fait désormais par trois boutons nommés : à revoir, fragile, solide. La petite pastille ronde qui tournait sur quatre états sans jamais dire lesquels a disparu de la carte du verset. Recliquer le choix actif l'annule
 - Correction d'un défaut présent depuis les premières versions : dans la carte du verset, cette pastille ne changeait jamais de couleur, quel que soit le niveau choisi. Le niveau était bien enregistré, il ne se voyait simplement pas
