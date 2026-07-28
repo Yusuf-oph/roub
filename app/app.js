@@ -875,22 +875,24 @@ async function verifierPolicesPages() {
 function accueilHtml() {
   const vu = store.get("quran-accueil-vu", false);
   return `<details class="accueil" ${vu ? "" : "open"}>
-    <summary>Bienvenue · comment ça marche, qui écrit, quelles sources</summary>
+    <summary>Bienvenue · comment ça marche, qui sommes-nous, quelles sources</summary>
     <div class="accueil-corps">
       <p><b>Comment ça marche.</b> Choisis un roub' ci-dessous : l'onglet
       <b>Mémoriser</b> affiche le texte (versets, texte continu ou pages exactes
       du mushaf) avec l'audio et le soulignage mot à mot, et l'onglet
       <b>Tafsir</b> le commentaire verset par verset. Les 24 roub' sont tous
-      ouverts ; les notes rédigées (points durs, particularités tajwid,
-      vocabulaire, cartes) existent pour le roub' 1, et ailleurs ces onglets
+      ouverts, et l'onglet <b>Tajwid</b> de chacun liste les règles que son texte
+      contient, avec un exemple pris dans ce roub'. Les notes rédigées (points
+      durs, remarques de tajwid propres au roub', vocabulaire, cartes) existent
+      pour le roub' 1, et ailleurs ces onglets
       affichent « contenu à venir » : c'est ce que signale le badge
       <i>notes à venir</i> de l'accueil, qui disparaîtra roub' par roub' à
       mesure de leur rédaction. L'onglet <b>Révision</b> fait revenir les cartes à
       intervalle croissant, et exporte tout pour Anki.</p>
-      <p><b>Qui écrit.</b> <b>Anis</b> (co-fondateur, docteur en mathématiques) :
-      à l'origine de la méthode. <b>Yusuf</b> (co-fondateur, interne en
-      médecine) : conception et réalisation. <b>Israa</b> (ostéopathe) :
-      conseillère pédagogique. Contact et avis :
+      <p><b>Qui sommes-nous.</b> Roub' est né de l'idée originale d'<b>Anis</b>
+      (co-fondateur, docteur en mathématiques), conceptualisé et réalisé par
+      <b>Yusuf</b> (co-fondateur, interne en médecine), avec les ajustements
+      pédagogiques d'<b>Israa</b> (ostéopathe). Contact et avis :
       <a href="mailto:dev.yusuf@pm.me">dev.yusuf@pm.me</a>.</p>
       <p><b>Sources.</b> Texte du mushaf de Médine (Complexe du Roi Fahd),
       traduction Hamidullah, récitation Al-Husary, tafsir verset par verset
@@ -2468,9 +2470,10 @@ function pageParams() {
   ${section("Synchronisation", sync)}
 
   <p class="param-pied">Version : <b id="appver">${esc(APPVER || "…")}</b><br><br>
-    <b>Anis</b> (co-fondateur, docteur en mathématiques) : à l'origine de la
-    méthode. <b>Yusuf</b> (co-fondateur, interne en médecine) : conception et
-    réalisation. <b>Israa</b> (ostéopathe) : conseillère pédagogique.
+    Roub' est né de l'idée originale d'<b>Anis</b> (co-fondateur, docteur en
+    mathématiques), conceptualisé et réalisé par <b>Yusuf</b> (co-fondateur,
+    interne en médecine), avec les ajustements pédagogiques d'<b>Israa</b>
+    (ostéopathe).
     Avis et contact :
     <a href="mailto:dev.yusuf@pm.me">dev.yusuf@pm.me</a> · Discord
     <b>@ophtalmologie</b>.<br><br>
@@ -3057,7 +3060,7 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "1.18.0";   // réécrit par tools/release.py
+const BUILD_VERSION = "1.18.1";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {

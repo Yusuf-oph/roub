@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.18.1 · 2026-07-28
+- La présentation de l'équipe est réécrite : Roub' est né de l'idée originale d'Anis, conceptualisé et réalisé par Yusuf, avec les ajustements pédagogiques d'Israa
+- Le bloc d'accueil et le LISEZMOI annonçaient encore que l'onglet Tajwid n'existait que pour le roub' 1 : c'est corrigé, il est disponible pour les 24 roub' depuis la version précédente
+- L'onglet Tajwid est maintenant décrit dans le README et le LISEZMOI, avec le rappel que le détail sourate par sourate se lit dans l'onglet Mémoriser
+
 ## 1.18.0 · 2026-07-27
 - L'onglet Tajwid d'un roub' est refait : les règles ne sont plus une liste de pastilles, chacune a sa place, son explication et un exemple pris dans le roub' que vous lisez
 - Un sommaire à gauche liste toutes les règles du roub', suit votre lecture et vous emmène de l'une à l'autre

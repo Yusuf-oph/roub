@@ -22,6 +22,15 @@ mémorisation, particularités tajwid, vocabulaire, cartes mutashabihat et de
 sens) existe pour le **roub' 1** ; les autres portent la mention « notes à
 venir », qui disparaîtra roub' par roub' à mesure de leur rédaction.
 
+**Le tajwid, règle par règle.** Chaque roub' a son onglet Tajwid : les règles
+qu'il contient, dérivées du texte lui-même, chacune avec son explication et un
+exemple pris dans ce roub'. L'exemple montre le passage exact où la règle se
+produit, sa seule couleur allumée et tout le reste en encre neutre, avec la
+translittération et la traduction. Une case « déjà vue » par règle, et trois
+filtres pour ne voir que ce qui reste à travailler ; l'état suit d'un appareil à
+l'autre. En mode Mémoriser, chaque sourate courte annonce en plus ses propres
+règles et celles qui y apparaissent pour la première fois.
+
 Également : **révision espacée** intégrée avec export des cartes pour Anki
 (planificateur FSRS) et **synchronisation multi-appareils par code
 anonyme**. PWA installable ; le texte, le tafsir et l'interface fonctionnent
@@ -37,11 +46,10 @@ La calligraphie du texte coranique, elle, ne change jamais.
 
 ## Qui sommes-nous
 
-- **Anis** (co-fondateur, docteur en mathématiques) : à l'origine de la
-  méthode.
-- **Yusuf** (co-fondateur, interne en médecine) : conception et
-  réalisation. Discord : **@ophtalmologie**.
-- **Israa** (ostéopathe) : conseillère pédagogique.
+Roub' est né de l'idée originale d'**Anis** (co-fondateur, docteur en
+mathématiques), conceptualisé et réalisé par **Yusuf** (co-fondateur, interne
+en médecine, Discord **@ophtalmologie**), avec les ajustements pédagogiques
+d'**Israa** (ostéopathe).
 
 Tout le contenu religieux (tafsir, hadiths, règles de tajwid, texte) est
 sourcé et vérifié contre ses sources ; une erreur reste toujours possible :
@@ -105,7 +113,9 @@ onglet **Sources**.
 - Cartes et tutoriels : sources citées au fil du texte (Ibn Kathîr, As-Sa'dî,
   Ibn al-Jazarî, et pour le tutoriel « Obligatoire ou perfectionnement ? »
   Mullâ 'Alî al-Qârî, al-Marṣafî, Makkî Naṣr et al-Ghazâlî) ; fiches de règles
-  d'après les matns Tuhfat al-Atfal et al-Muqaddima al-Jazariyya.
+  d'après les matns Tuhfat al-Atfal et al-Muqaddima al-Jazariyya, ainsi que les
+  conventions de ḍabṭ du mushaf de Médine pour les lettres écrites et non
+  prononcées.
 
 Application gratuite et non commerciale, sans compte ni collecte de
 données personnelles ; la synchronisation optionnelle repose sur un code

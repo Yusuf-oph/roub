@@ -1,12 +1,9 @@
 {
-  "version": "1.18.0",
-  "date": "2026-07-27",
+  "version": "1.18.1",
+  "date": "2026-07-28",
   "notes": [
-    "L'onglet Tajwid d'un roub' est refait : les règles ne sont plus une liste de pastilles, chacune a sa place, son explication et un exemple pris dans le roub' que vous lisez",
-    "Un sommaire à gauche liste toutes les règles du roub', suit votre lecture et vous emmène de l'une à l'autre",
-    "Chaque exemple montre le passage exact où la règle se produit, avec sa seule couleur allumée et tout le reste en encre neutre, plus la translittération et la traduction du verset",
-    "Une case « déjà vue » par règle, et trois filtres pour ne voir que les nouvelles ou que celles que vous avez déjà travaillées. L'état suit d'un appareil à l'autre comme le reste de votre progression",
-    "Deux nouvelles fiches de règles : l'idghâm mutajânisayn, et les lettres écrites mais non prononcées, dont la page Sources donne désormais l'origine exacte dans les conventions du mushaf de Médine",
-    "Les exemples des fiches sont maintenant tirés du texte du mushaf par leur référence, ce qui garantit qu'ils sont exacts au signe près"
+    "La présentation de l'équipe est réécrite : Roub' est né de l'idée originale d'Anis, conceptualisé et réalisé par Yusuf, avec les ajustements pédagogiques d'Israa",
+    "Le bloc d'accueil et le LISEZMOI annonçaient encore que l'onglet Tajwid n'existait que pour le roub' 1 : c'est corrigé, il est disponible pour les 24 roub' depuis la version précédente",
+    "L'onglet Tajwid est maintenant décrit dans le README et le LISEZMOI, avec le rappel que le détail sourate par sourate se lit dans l'onglet Mémoriser"
   ]
 }
