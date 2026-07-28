@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.23.0 · 2026-07-29
+- Les noms de sourates s'affichent en calligraphie. Dans Versets et Texte continu, c'est le nom précédé de سورة ; sur la page imprimée, c'est le bandeau orné du mushaf, comme sur le papier. Les deux dessins viennent du Complexe du Roi Fahd, comme la calligraphie du texte. Le nom français reste affiché dans tous les cas
+- Les cinq entrées de la navigation portent maintenant une icône : une maison, un livre, une toque, des rouages et un livre ouvert annoté. Les libellés restent, une icône seule se devine mais ne se lit pas
+- Les deux polices de noms sont découpées aux seules sourates que l'application couvre, ce qui les ramène de 2,8 Mo à 319 Ko
+
 ## 1.22.0 · 2026-07-29
 - Le haut de page rend 66 px de plus au texte. Le retour vers la liste des roub' quitte l'en-tête pour la barre grise du haut, là où on le cherche, et les six onglets tiennent maintenant sur une seule ligne qui défile au doigt au lieu de deux rangées
 - Un dégradé au bord des onglets signale qu'il y en a d'autres, et seulement du côté où il en reste vraiment. L'onglet ouvert est toujours ramené dans le champ, y compris le dernier

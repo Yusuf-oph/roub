@@ -261,10 +261,15 @@ button { font: inherit; cursor: pointer; }
 .logo .mark svg { width: 44px; height: 44px; display: block; }
 .logo b { font-size: var(--fs-400); letter-spacing: .3px; }
 .nav { display: flex; gap: 4px; margin-left: 10px; flex-wrap: wrap; }
+/* En large, l'icône précède le libellé sur la même ligne ; en barre basse elle
+   passe au-dessus (cf. le bloc mobile). Elle suit `currentColor`, donc elle
+   s'allume avec le libellé sur l'onglet actif, sans une seule règle de plus. */
 .nav button {
   background: none; border: none; color: var(--muted);
   padding: 7px 12px; border-radius: var(--r-sm); font-weight: 600;
+  display: inline-flex; align-items: center; gap: 7px;
 }
+.nav button svg { width: 17px; height: 17px; display: block; flex: 0 0 auto; }
 .nav button.on { background: var(--bg3); color: var(--text); }
 .nav button:hover { color: var(--text); }
 .topbar .spacer { flex: 1; }
@@ -477,6 +482,36 @@ button { font: inherit; cursor: pointer; }
 }
 .surah-head .nom { font-weight: 700; font-size: var(--fs-400); }
 .surah-head .basmala { font-family: "UthmanicHafs", serif; font-size: 26px; margin-top: 6px; }
+
+/* ---------- noms de sourates calligraphiés ----------
+   Deux polices du Complexe du Roi Fahd, deux emplois (cf. nomSourateHtml et
+   tools/build_polices_noms.py), découpées aux 39 sourates couvertes.
+   `sn-hd` porte SES couleurs dans le fichier (CPAL + SVG) : elle ne suit donc
+   pas le thème, d'où le corps généreux et rien d'autre.
+   `sn-band` n'a aucune table de couleur malgré son nom : elle suit
+   `currentColor` et prend les trois palettes toute seule. */
+@font-face {
+  font-family: "SurahNameHD";
+  src: url("fonts/QCF_FullSurahHD.woff2") format("woff2");
+  font-display: swap;
+}
+@font-face {
+  font-family: "SurahHeader";
+  src: url("fonts/QCF_SurahHeader.woff2") format("woff2");
+  font-display: swap;
+}
+.calli { display: block; line-height: 1.35; }
+.calli.sn-hd { font-family: "SurahNameHD", serif; font-size: 40px; }
+.calli.sn-band {
+  font-family: "SurahHeader", serif; font-size: 64px;
+  color: var(--text);
+  /* la bande est large : sur 390 px elle déborderait sans cette réduction */
+  max-width: 100%; overflow: hidden;
+}
+.tfr-surah .calli.sn-hd { font-size: 30px; margin-bottom: 2px; }
+/* dans le tafsir, l'intitulé reste la ligne en capitales : la calligraphie s'y
+   ajoute au-dessus sans reprendre sa graisse ni son interlettrage */
+.tfr-surah .nom { text-transform: none; letter-spacing: normal; }
 .verse {
   padding: 14px 14px 12px; border-radius: var(--r); margin-bottom: 10px;
   background: var(--panel); border: 1px solid var(--border);
@@ -1194,11 +1229,19 @@ h2.sec { font-size: var(--fs-500); margin: 22px 0 8px; }
     backdrop-filter: blur(10px);
     border-top: 1px solid var(--border);
   }
+  /* icône au-dessus du libellé : les 56 px de la barre en logent 20 + 12 sans
+     serrer, et la cible tactile reste pleine hauteur */
   .nav button {
     flex: 1 1 0; min-width: 0; min-height: var(--tap-min);
     padding: 0 3px; border-radius: 0;
-    font-size: var(--fs-100); font-weight: 600; white-space: nowrap;
-    overflow: hidden; text-overflow: ellipsis;
+    font-size: var(--fs-100); font-weight: 600;
+    flex-direction: column; justify-content: center; gap: 2px;
+  }
+  .nav button svg { width: 20px; height: 20px; }
+  /* l'ellipse porte sur le LIBELLÉ et non sur le bouton : sur un bouton en
+     colonne elle rognerait l'icône avec */
+  .nav button span {
+    max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
   /* l'onglet actif se marque par un filet, pas par une pastille : sur des
      boutons pleine hauteur, un fond arrondi flotte dans la barre */

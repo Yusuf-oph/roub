@@ -43,6 +43,19 @@ propre et n'est pas présenté comme une position savante.
 - **Polices QCF (Qur'anic Complex Fonts) du KFGQPC**, un glyphe par mot :
   version 1 en noir et blanc, version 4 en couleurs tajwid (COLRv1).
 - **Police UthmanicHafs** (KFGQPC) pour le texte courant.
+- **Noms de sourates**, deux polices du KFGQPC également, pour deux emplois
+  distincts : **`QCF_FullSurah_HD_COLOR-v1`** (version 1.000, novembre 2023)
+  donne le nom calligraphié précédé de سُورَة et sert de titre dans Versets,
+  Texte continu et l'onglet Tafsir ; **`QCF_SurahHeader_COLOR`** (version 1.000,
+  septembre 2025) reproduit le bandeau orné du haut de page et n'est employée
+  que sur la page imprimée, dont elle achève la reproduction. Toutes deux
+  portent « King Fahad Complex, all rights reserved », comme les polices QCF
+  ci-dessus. Elles sont **découpées aux seules sourates couvertes** par
+  l'application (`tools/build_polices_noms.py`), et le nom **français reste
+  affiché** dans tous les cas : la calligraphie s'ajoute, elle ne remplace pas.
+  La correspondance sourate → glyphe vient des fichiers de ligatures publiés par
+  la Quranic Universal Library ; elle ne suit pas l'ordre des sourates et n'est
+  jamais déduite.
 - Mise en page ligne à ligne reprise de l'API quran.com (`code_v1`/`code_v2`,
   numéros de page et de ligne) : les pages de l'application correspondent
   exactement aux pages du mushaf imprimé.

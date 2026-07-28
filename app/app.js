@@ -1414,7 +1414,7 @@ function secMemoriser(R) {
       if (v.s !== lastS) {
         lastS = v.s;
         if (open) { h += `</div>`; open = false; }
-        h += `<div class="surah-head"><div class="nom">Sourate ${esc(SURAH_NAMES[v.s] || v.s)}</div>`;
+        h += `<div class="surah-head">${nomSourateHtml(v.s, "sn-hd")}`;
         if (basmalaFor(v)) h += `<div class="basmala">${arEsc(BASMALA)}</div>`;
         h += `</div>` + tajCurHtml(v.s) + `<div class="mushaf${rendUtilise() === "khatt" ? " khatt" : ""}">`;
         open = true;
@@ -1427,7 +1427,7 @@ function secMemoriser(R) {
     R.verses.forEach((v, i) => {
       if (v.s !== lastS) {
         lastS = v.s;
-        h += `<div class="surah-head"><div class="nom">Sourate ${esc(SURAH_NAMES[v.s] || v.s)}</div>`;
+        h += `<div class="surah-head">${nomSourateHtml(v.s, "sn-hd")}`;
         if (basmalaFor(v)) h += `<div class="basmala">${arEsc(BASMALA)}</div>`;
         h += `</div>` + tajCurHtml(v.s);
       }
@@ -1473,6 +1473,20 @@ function secMemoriser(R) {
   return h;
 }
 
+/* Le nom d'une sourate, calligraphie comprise. Deux polices du Complexe du Roi
+   Fahd pour deux emplois : `sn-hd` titre (nom précédé de سُورَة, en couleur),
+   `sn-band` reproduit le bandeau orné du haut de page, réservé à la page
+   imprimée dont il achève la reproduction.
+   ⚠ Le nom FRANÇAIS reste dans les deux cas : la calligraphie s'ajoute, elle ne
+   remplace pas, sinon un lecteur qui n'a pas encore l'arabe perd l'information.
+   Le glyphe part en aria-hidden : une police à glyphes n'est pas du texte, un
+   lecteur d'écran n'y lirait rien, et c'est la ligne française qui est lue. */
+function nomSourateHtml(s, police) {
+  const g = (window.NOMS_SOURATES || {})[s];
+  return (g ? `<span class="calli ${police}" aria-hidden="true">${g}</span>` : "")
+    + `<div class="nom">Sourate ${esc(SURAH_NAMES[s] || s)}</div>`;
+}
+
 function pagesHtml(R) {
   const DATA = rendUtilise() === "glyphesV4" && Object.keys(PAGES2).length ? PAGES2 : PAGES;
   const fpfx = DATA === PAGES2 ? "t" : "p";
@@ -1500,7 +1514,7 @@ function pagesHtml(R) {
       }
     }
     for (const s of starts.sort((a, b) => a - b)) {
-      h += `<div class="surah-head"><div class="nom">Sourate ${esc(SURAH_NAMES[s] || s)}</div>`;
+      h += `<div class="surah-head">${nomSourateHtml(s, "sn-band")}`;
       if (s !== 1 && s !== 9) h += `<div class="basmala">${arEsc(BASMALA)}</div>`;
       h += `</div>`;
     }
@@ -1731,7 +1745,7 @@ function secTafsir(R) {
       if (!t) continue;
       if (v.s !== lastS) {
         lastS = v.s;
-        h += `<div class="tfr-surah">Sourate ${esc(SURAH_NAMES[v.s] || v.s)}</div>`;
+        h += `<div class="tfr-surah">${nomSourateHtml(v.s, "sn-hd")}</div>`;
       }
       h += `<details class="tfr"><summary><b>${v.k}</b> <span class="tfr-apercu">${esc(t.slice(0, 110))}…</span></summary>
         <div class="tfr-body">${esc(t)}</div>
@@ -3374,7 +3388,7 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "1.22.0";   // réécrit par tools/release.py
+const BUILD_VERSION = "1.23.0";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {
