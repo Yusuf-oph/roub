@@ -449,10 +449,19 @@ button { font: inherit; cursor: pointer; }
   background: var(--bg3); border-radius: var(--r-sm); padding: 1px 8px;
   font-weight: 700; color: var(--text);
 }
-.verse .vhead button {
+/* ⚠ VISER POSITIVEMENT les boutons de lecture, jamais `.verse .vhead button`.
+   La version d'origine habillait tous les boutons de l'en-tête : ce sélecteur
+   (0-2-1) écrasait .evalbtn.eN (0-2-0) sur `color` ET sur `border`, donc la
+   pastille d'auto-évaluation restait grise et SANS CERCLE dans les quatre
+   états, alors que la même pastille colorait bien dans la barre audio, habillée
+   par .audiobar button (0-1-1), qui perd. Défaut présent depuis la v1.2.0,
+   signalé par Anis le 28/07, et il a récidivé aussitôt sur les boutons
+   d'auto-évaluation en maquette. Toute commande ajoutée dans cet en-tête doit
+   porter son propre habillage sans avoir à s'exclure d'ici. */
+.verse .vhead .vh-play {
   background: none; border: none; color: var(--muted); font-size: var(--fs-300); padding: 2px 6px;
 }
-.verse .vhead button:hover { color: var(--accent); }
+.verse .vhead .vh-play:hover { color: var(--accent); }
 .ar {
   direction: rtl; text-align: right;
   font-family: "UthmanicHafs", serif;
@@ -585,6 +594,41 @@ button { font: inherit; cursor: pointer; }
   font-size: var(--fs-300); padding: 0 4px; flex: none;
 }
 .evalnote:hover { color: var(--accent); }
+/* Le crayon étant toujours là, c'est sa COULEUR qui dit si une note existe :
+   sans ça, retrouver ses notes demanderait d'ouvrir les 32 versets un à un.
+   --accent2 et NON --accent : en thème sombre, --accent et --ok sont le même
+   vert à quatre points près, donc un verset « solide » annoté portait deux
+   marques vertes indiscernables (mesuré et vu sur planche le 28/07). */
+.evalnote.has { color: var(--accent2); }
+
+/* auto-évaluation d'un verset : trois choix étiquetés (le cycle sur une
+   pastille muette n'était compris de personne, retour d'Anis du 28/07) */
+.evalseg { display: flex; gap: 4px; }
+.segbtn {
+  background: none; border: 1px solid var(--border); border-radius: 999px;
+  padding: 3px 8px; font-size: var(--fs-200); color: var(--muted); line-height: 1.2;
+  /* `nowrap` est un GARDE-FOU, pas une coquetterie : sans lui, un en-tête trop
+     étroit ne déborde pas, il fait passer l'étiquette à la ligne DANS la
+     pastille, qui double de hauteur sans rien signaler. Le défaut se voit alors
+     à l'œil mais aucune mesure de débordement ne le rapporte. */
+  white-space: nowrap; flex: none;
+}
+/* En 390 px, les trois étiquettes NE TIENNENT PAS à leur taille normale, et le
+   débordement dépend de la police du thème : mesuré à 6 px en Gentium Book,
+   11 en Charis, 15 en Noto Sans. Les réduire d'un cran fait tenir les trois
+   thèmes avec de la marge, pour 1,5 px de corps en moins. La solution du retour
+   à la ligne a été mesurée aussi : elle garde le corps normal mais porte
+   l'en-tête de 28 à 57 px, soit environ 1 000 px de défilement en plus sur un
+   roub' de 32 versets. */
+@media (max-width: 640px) {
+  .verse .vhead { gap: 6px; }
+  .evalseg { gap: 3px; }
+  .segbtn { font-size: var(--fs-100); padding: 2px 6px; }
+}
+.segbtn:hover { border-color: var(--muted); color: var(--text); }
+.segbtn.on.e1 { color: var(--panel); background: var(--danger); border-color: var(--danger); }
+.segbtn.on.e2 { color: var(--panel); background: var(--mid); border-color: var(--mid); }
+.segbtn.on.e3 { color: var(--panel); background: var(--ok); border-color: var(--ok); }
 .vend.e1 { border-color: var(--danger); color: var(--danger); }
 .vend.e2 { border-color: var(--mid); color: var(--mid); }
 .vend.e3 { border-color: var(--ok); color: var(--ok); }

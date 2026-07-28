@@ -185,35 +185,72 @@ function basculerRegleVue(id) {
 const EVAL_KEY = "quran-eval";
 const EVAL = store.get(EVAL_KEY, {});
 const EVAL_LABELS = ["non évalué", "à revoir", "fragile", "solide"];
-function evalCycle(k) {
-  const cur = (EVAL[k] || {}).n || 0;
-  const next = (cur + 1) % 4;
-  if (next === 0) delete EVAL[k];
-  else EVAL[k] = Object.assign(EVAL[k] || {}, { n: next, ts: Date.now() });
+function evalSet(k, n) {
+  /* Retour à « non évalué » : on garde une entrée {n:0, ts} au lieu d'effacer.
+     mergeRemote() reprend sans condition toute clé ABSENTE en local, donc un
+     delete était défait au premier rapatriement d'un appareil en retard : le
+     verset se réévaluait tout seul. Une entrée à n=0 se compare par ts et
+     gagne, et tout le reste du code la lit déjà comme « non évalué »
+     (`(EVAL[k] || {}).n || 0`). La note éventuelle survit au passage. */
+  EVAL[k] = Object.assign(EVAL[k] || {}, { n, ts: Date.now() });
   store.set(EVAL_KEY, EVAL);
   schedulePush();
-  return next;
+  return n;
 }
+/* Le cycle ne sert plus qu'à la barre audio, où trois étiquettes ne tiendraient
+   pas : dans la carte du verset, les trois choix sont désormais explicites. */
+function evalCycle(k) { return evalSet(k, (((EVAL[k] || {}).n || 0) + 1) % 4); }
+/* Une note ne demande AUCUNE auto-évaluation préalable (Yusuf, 28/07) : si le
+   verset n'a pas d'entrée, elle est créée à « non évalué ». Renvoie la note
+   enregistrée, ou null si l'utilisateur a annulé. */
 function evalNote(k) {
-  const cur = EVAL[k];
-  if (!cur) { alert("Choisis d'abord un niveau (clic sur la pastille)."); return; }
-  const note = prompt(`Note sur ${k} (auto-évaluation « ${EVAL_LABELS[cur.n]} ») :`, cur.note || "");
-  if (note === null) return;
-  cur.note = note.trim();
-  cur.ts = Date.now();
+  const cur = EVAL[k] || {};
+  const note = prompt(`Note sur ${k} (auto-évaluation « ${EVAL_LABELS[cur.n || 0]} ») :`, cur.note || "");
+  if (note === null) return null;
+  EVAL[k] = Object.assign(cur, { n: cur.n || 0, note: note.trim(), ts: Date.now() });
   store.set(EVAL_KEY, EVAL);
   schedulePush();
+  return EVAL[k].note;
 }
 function weakSet() {
   const s = new Set();
   for (const k of Object.keys(EVAL)) if (EVAL[k].n === 1 || EVAL[k].n === 2) s.add(k);
   return s;
 }
-function evalBtn(k, extra) {
+/* Le crayon s'affiche TOUJOURS, évalué ou non : une note est un usage à part
+   entière, pas une suite de l'auto-évaluation (Yusuf, 28/07). */
+function crayonHtml(k) {
+  const note = (EVAL[k] || {}).note;
+  return `<button class="evalnote${note ? " has" : ""}" data-eval-note="${k}"
+    title="${note ? "note : " + esc(note) : "note personnelle"}">✎</button>`;
+}
+/* TROIS CHOIX ÉTIQUETÉS, pas un cycle aveugle sur une pastille muette : celle-ci
+   n'était comprise de personne (« je comprends pas ce qu'il faut faire avec les
+   points », Anis, 28/07), son seul indice était une infobulle donc rien du tout
+   au doigt, et revenir en arrière demandait trois clics. Ici l'état se lit sans
+   avoir rien appris, et recliquer le choix actif annule. */
+function evalGroupHtml(k) {
   const n = (EVAL[k] || {}).n || 0;
-  return `<button class="evalbtn e${n}" data-eval="${k}"
-    title="auto-évaluation : ${EVAL_LABELS[n]} (clic pour changer)">●</button>` +
-    (extra && n ? `<button class="evalnote" data-eval-note="${k}" title="note personnelle">✎</button>` : "");
+  return `<span class="evalseg" role="group" aria-label="auto-évaluation du verset ${k}">` +
+    [1, 2, 3].map(i => `<button class="segbtn e${i}${i === n ? " on" : ""}"
+      data-eval-set="${k}" data-eval-n="${i}" aria-pressed="${i === n}"
+      title="${i === n ? "annuler : revenir à « non évalué »" : `marquer ce verset « ${EVAL_LABELS[i]} »`}"
+      >${EVAL_LABELS[i]}</button>`).join("") + `</span>` + crayonHtml(k);
+}
+/* Reflète l'état d'un verset PARTOUT où il s'affiche, sans re-render : un
+   re-render perdrait la position de lecture en pleine récitation. */
+function majEval(k) {
+  const n = (EVAL[k] || {}).n || 0;
+  document.querySelectorAll(`.verse[data-k="${k}"] .segbtn`).forEach(b => {
+    const actif = +b.dataset.evalN === n;
+    b.classList.toggle("on", actif);
+    b.setAttribute("aria-pressed", actif);
+    b.title = actif ? "annuler : revenir à « non évalué »"
+      : `marquer ce verset « ${EVAL_LABELS[+b.dataset.evalN]} »`;
+  });
+  const vend = document.querySelector(`.mver[data-k="${k}"] .vend`);
+  if (vend) vend.className = "vend e" + n;
+  updateAudioBar();
 }
 
 /* ---------------- SRS (SM-2 allégé) ---------------- */
@@ -1346,10 +1383,10 @@ function secMemoriser(R) {
       }
       h += `<div class="verse" data-k="${v.k}">
         <div class="vhead"><span class="vnum">${v.k}</span>
-          <button title="écouter ce verset" data-play-one="${i}">▶</button>
-          <button title="lire à partir d'ici" data-play-from="${i}">▶▶</button>
+          <button class="vh-play" title="écouter ce verset" data-play-one="${i}">▶</button>
+          <button class="vh-play" title="lire à partir d'ici" data-play-from="${i}">▶▶</button>
           <span class="spacer" style="flex:1"></span>
-          ${evalBtn(v.k, true)}
+          ${evalGroupHtml(v.k)}
         </div>
         <div class="ar${rendUtilise() === "khatt" ? " khatt" : ""} ${memoState.maskAr ? "masked" : ""}" data-reveal>${texteHtml(v)}</div>
         ${PARAMS.showTl ? `<div class="tl ${memoState.maskTl ? "masked" : ""}" data-reveal>${esc(tlOf(v))}</div>` : ""}
@@ -2830,26 +2867,27 @@ function bindMain() {
     saveParams(); render();
   }));
 
-  /* auto-évaluation (mise à jour en place, sans re-render pour garder le scroll) */
-  $$("[data-eval]", main).forEach(el => el.addEventListener("click", ev => {
+  /* auto-évaluation (mise à jour en place, sans re-render pour garder le scroll) ;
+     recliquer le choix déjà actif annule l'évaluation */
+  $$("[data-eval-set]", main).forEach(el => el.addEventListener("click", ev => {
     ev.stopPropagation();
-    const k = el.dataset.eval;
-    const n = evalCycle(k);
-    el.className = "evalbtn e" + n;
-    el.title = `auto-évaluation : ${EVAL_LABELS[n]} (clic pour changer)`;
+    const k = el.dataset.evalSet, i = +el.dataset.evalN;
+    evalSet(k, ((EVAL[k] || {}).n || 0) === i ? 0 : i);
+    majEval(k);
   }));
   $$("[data-eval-note]", main).forEach(el => el.addEventListener("click", ev => {
     ev.stopPropagation();
-    evalNote(el.dataset.evalNote);
+    const note = evalNote(el.dataset.evalNote);
+    if (note === null) return;              // annulé : ne rien toucher
+    el.className = "evalnote" + (note ? " has" : "");
+    el.title = note ? "note : " + note : "note personnelle";
   }));
   const audioEval = $("#audio-eval", main);
   if (audioEval) audioEval.addEventListener("click", () => {
     const k = audioEval.dataset.evalKey;
     if (!k) return;
     evalCycle(k);
-    updateAudioBar();
-    const vend = $(`.mver[data-k="${k}"] .vend`, main);
-    if (vend) vend.className = "vend e" + ((EVAL[k] || {}).n || 0);
+    majEval(k);
   });
   $$(".masked[data-reveal]", main).forEach(el =>
     el.addEventListener("click", () => el.classList.toggle("revealed")));
@@ -3277,7 +3315,7 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "1.19.0";   // réécrit par tools/release.py
+const BUILD_VERSION = "1.20.0";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {
