@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.21.0 · 2026-07-28
+- Sur téléphone, la barre d'options ne garde que les trois présentations : Versets, Texte continu et Page imprimée. L'écriture, l'affichage et le masquage passent derrière une clé, comme les réglages de la barre de récitation. La barre tombe de quatre lignes à une seule et le texte commence 106 px plus haut
+- Le panneau des options recouvre le texte au lieu de le repousser, et il reste ouvert tant qu'on règle : enchaîner plusieurs réglages ne le referme plus à chaque fois
+- Les groupes de réglages portent enfin leur nom, Écriture, Affichage et Masquer, là où un simple trait les séparait sans rien dire
+- Sur grand écran, rien ne change : tout reste déplié et la clé n'apparaît pas
+
 ## 1.20.1 · 2026-07-28
 - Correction d'une fiche de tajwid. Sur l'izhâr shafawi, la mise en garde devant les lettres و et ف disait l'inverse de celle du matn : le risque n'est pas de laisser traîner le mîm, c'est qu'il s'efface, le fâ' étant proche de son point d'articulation et le wâw le partageant
 

@@ -419,7 +419,19 @@ button { font: inherit; cursor: pointer; }
 .memo-opts {
   display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
   margin-bottom: 14px;
+  position: relative;             /* ancre du panneau replié, cf. .mo-second */
 }
+/* Écriture, affichage et masquage. En LARGE ils restent dépliés dans la barre et
+   la clé n'existe pas : `display:contents` rend les groupes enfants directs du
+   flex, donc la barre garde exactement sa disposition d'avant, les intitulés de
+   groupe en plus (ils remplacent les traits séparateurs, qui ne nommaient rien). */
+.mo-second { display: contents; }
+.mo-grp { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.mo-lab {
+  font-size: var(--fs-100); color: var(--muted);
+  text-transform: uppercase; letter-spacing: var(--ls-caps);
+}
+.mo-cle { display: none; }
 .chip {
   border: 1px solid var(--border); background: var(--panel); color: var(--muted);
   padding: 5px 11px; border-radius: var(--r-pill); font-size: var(--fs-200); font-weight: 600;
@@ -1185,6 +1197,27 @@ h2.sec { font-size: var(--fs-500); margin: 22px 0 8px; }
   }
   .audiobar.reglages-ouverts .ab-second { display: flex; }
 
+  /* Barre d'options : même mécanique, appliquée en haut de page. Seules les trois
+     présentations restent visibles ; l'écriture, l'affichage et le masquage
+     passent derrière la clé. Le panneau DESCEND sous la barre et il est hors
+     flux : il recouvre le texte au lieu de le repousser, sinon l'ouverture
+     ferait sauter la ligne en cours de lecture. */
+  .mo-cle {
+    display: grid; place-items: center;
+    min-width: var(--tap-min); min-height: var(--tap-min);
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: var(--r-sm); color: var(--text); padding: 0;
+  }
+  .mo-cle svg { width: 18px; height: 18px; display: block; }
+  .mo-second {
+    display: none;
+    position: absolute; left: 0; right: 0; top: calc(100% + 8px); z-index: 5;
+    flex-direction: column; align-items: flex-start; gap: 10px; padding: 10px 12px;
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--r); box-shadow: var(--shadow);
+  }
+  .memo-opts.opts-ouverts .mo-second { display: flex; }
+
   /* Les rangées de réglages sont en flex avec la commande à droite : sur 390 px
      la colonne d'explication tombe à trois mots par ligne, et la refonte l'a
      aggravé en portant le corps de 15 à 17 px. On empile : l'explication en
@@ -1246,9 +1279,8 @@ h2.sec { font-size: var(--fs-500); margin: 22px 0 8px; }
    affichage), et une puce grisée pour une option que le rendu courant ne peut
    pas porter. Grisée et non masquée : une option qui disparaît fait croire à
    un bug, une option grisée s'explique au survol. */
-.memo-opts .sep {
-  width: 1px; align-self: stretch; margin: 2px 4px;
-  background: var(--border);
-}
+/* Les traits séparateurs de la barre d'options ont disparu avec le repli : les
+   groupes portent désormais leur nom (.mo-lab). Le `.sep` de index.html, lui,
+   vit ailleurs et garde sa règle propre. */
 .chip.off { opacity: .45; cursor: not-allowed; }
 .chip.off:hover { background: none; border-color: var(--border); }

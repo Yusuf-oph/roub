@@ -1079,7 +1079,12 @@ const TABS = [
    pixel : les rendus supplémentaires se brancheront dans `rendUtilise()`, et
    nulle part ailleurs. Rien n'est persisté, c'est l'état d'écran d'aujourd'hui. */
 const memoState = { maskAr: false, maskTl: false, maskTr: false,
-  presentation: "versets", rendu: null };
+  presentation: "versets", rendu: null,
+  /* Le panneau de la barre d'options. Il DOIT vivre ici et pas dans une simple
+     classe posée sur le noeud : toucher une puce appelle render(), qui refait
+     la barre, et le panneau se refermerait au premier réglage. Non persisté,
+     comme la présentation et comme le panneau de la barre audio. */
+  optsOuverts: false };
 /* filtre de l'onglet Tajwid : état de vue, non persisté, comme la présentation */
 const tajState = { filtre: "toutes" };
 
@@ -1332,29 +1337,45 @@ function secMemoriser(R) {
      donc les deux ne se croisaient pas, mais deux attributs de même nom pour
      deux notions étrangères est un piège qui finit par se refermer. */
   const pres = memoState.presentation;
-  let h = `<div class="memo-opts">
+  /* SEULES les trois présentations restent dans la barre ; l'écriture, l'affichage
+     et le masquage passent derrière une clé (Yusuf, 28/07, sur planche). Mesuré
+     en 390 px : la barre tombe de 150 px sur quatre lignes à une seule ligne, et
+     le premier verset remonte d'autant. Le motif est repris TEL QUEL de la barre
+     audio (arbitrage du 27/07) : en large le panneau reste déplié et la clé
+     n'existe pas, elle n'apparaît que là où la place manque.
+     Le panneau sort HORS FLUX : il recouvre le texte au lieu de le pousser,
+     sinon la barre grandirait à l'ouverture et on aurait déplacé le problème. */
+  let h = `<div class="memo-opts${memoState.optsOuverts ? " opts-ouverts" : ""}">
     <button class="chip ${pres === "versets" ? "on" : ""}" data-pres="versets">Versets</button>
     <button class="chip ${pres === "continu" ? "on" : ""}" data-pres="continu">Texte continu</button>
     <button class="chip ${pres === "pages" ? "on" : ""}" data-pres="pages">Page imprimée</button>
-    <span class="sep"></span>
-    ${chipsRendu(pres)}
-    <span class="sep"></span>
-    ${chipCouleurs()}
-    <button class="chip ${PARAMS.silentMarks ? "on" : ""}" data-opt="silentMarks" title="les ronds ۟ au-dessus des lettres écrites mais non prononcées">Ronds muets</button>`;
+    <button class="mo-cle" data-mo="cle" aria-expanded="${memoState.optsOuverts}"
+      title="écriture, affichage et masquage" aria-label="écriture, affichage et masquage"
+      ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+      stroke-linecap="round" aria-hidden="true"><path
+      d="M3 8.5h5M12.5 8.5H21M3 15.5h11.5M19 15.5H21"/><circle cx="10.25" cy="8.5"
+      r="2.25"/><circle cx="16.75" cy="15.5" r="2.25"/></svg></button>
+    <div class="mo-second">
+      <div class="mo-grp"><span class="mo-lab">Écriture</span>${chipsRendu(pres)}</div>
+      <div class="mo-grp"><span class="mo-lab">Affichage</span>${chipCouleurs()}
+        <button class="chip ${PARAMS.silentMarks ? "on" : ""}" data-opt="silentMarks" title="les ronds ۟ au-dessus des lettres écrites mais non prononcées">Ronds muets</button>`;
   if (pres === "versets") {
     h += `
-    <button class="chip ${PARAMS.showTl ? "on" : ""}" data-opt="showTl">Translittération</button>
-    <button class="chip ${PARAMS.showTr ? "on" : ""}" data-opt="showTr">Traduction</button>
-    <button class="chip ${memoState.maskAr ? "on" : ""}" data-mask="maskAr">Masquer l'arabe</button>
-    <button class="chip ${memoState.maskTl ? "on" : ""}" data-mask="maskTl">Masquer la translit.</button>`;
+        <button class="chip ${PARAMS.showTl ? "on" : ""}" data-opt="showTl">Translittération</button>
+        <button class="chip ${PARAMS.showTr ? "on" : ""}" data-opt="showTr">Traduction</button></div>
+      <div class="mo-grp"><span class="mo-lab">Masquer</span>
+        <button class="chip ${memoState.maskAr ? "on" : ""}" data-mask="maskAr">L'arabe</button>
+        <button class="chip ${memoState.maskTl ? "on" : ""}" data-mask="maskTl">La translit.</button></div>`;
   } else if (pres === "continu") {
-    h += `<span class="fb-note">clic sur un verset : l'écouter ; double-clic sur un mot : lecture à partir de ce mot</span>`;
+    h += `</div>
+      <span class="fb-note">Clic sur un verset : l'écouter ; double-clic sur un mot : lecture à partir de ce mot</span>`;
   } else {
-    h += `<span class="fb-note">mise en page exacte du mushaf de Médine ·
+    h += `</div>
+      <span class="fb-note">Mise en page exacte du mushaf de Médine ·
       clic sur un mot : écouter le verset ; double-clic : lecture à partir de ce mot ;
       les versets hors de ce roub' sont estompés</span>`;
   }
-  h += `</div>`;
+  h += `</div></div>`;
   let lastS = null;
   if (pres === "pages") {
     h += pagesHtml(R);
@@ -2867,6 +2888,15 @@ function bindMain() {
     saveParams(); render();
   }));
 
+  /* la clé de la barre d'options : même mécanique que celle de la barre audio,
+     à ceci près que l'état vit dans memoState, sinon la première puce touchée
+     refermerait le panneau en re-rendant la barre */
+  $$('[data-mo="cle"]', main).forEach(el => el.addEventListener("click", () => {
+    memoState.optsOuverts = !memoState.optsOuverts;
+    el.closest(".memo-opts").classList.toggle("opts-ouverts", memoState.optsOuverts);
+    el.setAttribute("aria-expanded", memoState.optsOuverts ? "true" : "false");
+  }));
+
   /* auto-évaluation (mise à jour en place, sans re-render pour garder le scroll) ;
      recliquer le choix déjà actif annule l'évaluation */
   $$("[data-eval-set]", main).forEach(el => el.addEventListener("click", ev => {
@@ -3315,7 +3345,7 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "1.20.1";   // réécrit par tools/release.py
+const BUILD_VERSION = "1.21.0";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {
