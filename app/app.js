@@ -192,10 +192,29 @@ function evalSet(k, n) {
      verset se réévaluait tout seul. Une entrée à n=0 se compare par ts et
      gagne, et tout le reste du code la lit déjà comme « non évalué »
      (`(EVAL[k] || {}).n || 0`). La note éventuelle survit au passage. */
+  logEval(k, (EVAL[k] || {}).n || 0, n);
   EVAL[k] = Object.assign(EVAL[k] || {}, { n, ts: Date.now() });
   store.set(EVAL_KEY, EVAL);
   schedulePush();
   return n;
+}
+
+/* HISTORIQUE des auto-évaluations (voulu par Yusuf le 29/07). `EVAL` ne garde
+   que le niveau ACTUEL d'un verset : la photo de l'instant, jamais le chemin.
+   Ce journal-ci enregistre chaque changement, ce qui permet de dire « douze
+   versets passés de fragile à solide ce mois-ci » — la courbe du hifz plutôt
+   que son état.
+   ⚠ Seul le CHANGEMENT est retenu : réaffirmer le même niveau n'écrit rien,
+   sinon un doigt qui hésite gonflerait la statistique.
+   Borné à 4000 entrées (~160 Ko) et coupé par le début : très au-delà d'un
+   usage réel, mais rien ne doit pouvoir filer sans limite dans le stockage. */
+const EVALLOG_KEY = "quran-eval-log";
+const EVAL_LOG = store.get(EVALLOG_KEY, []);
+function logEval(k, de, a) {
+  if (de === a) return;
+  EVAL_LOG.push({ t: Date.now(), k, de, a });
+  if (EVAL_LOG.length > 4000) EVAL_LOG.splice(0, EVAL_LOG.length - 4000);
+  store.set(EVALLOG_KEY, EVAL_LOG);
 }
 /* Le cycle ne sert plus qu'à la barre audio, où trois étiquettes ne tiendraient
    pas : dans la carte du verset, les trois choix sont désormais explicites. */
@@ -259,15 +278,35 @@ const SRS = store.get(SRS_KEY, {});
 
 /* journal agrégé par jour (streak + progression, Lot E) */
 const JOURNAL_KEY = "quran-journal";
-function logAnswer(grade) {
+const jourCourant = () => new Date().toISOString().slice(0, 10);
+/* On ajoute au jour courant sans jamais écraser ce qui s'y trouve : le journal
+   s'est enrichi en cours de route (temps, écoute), et les jours anciens n'ont
+   pas les champs récents. Tout lecteur doit donc traiter l'absence comme 0. */
+function journalAjoute(champs) {
   const j = store.get(JOURNAL_KEY, {});
-  const day = new Date().toISOString().slice(0, 10);
-  const d = j[day] || { n: 0, again: 0 };
-  d.n++;
-  if (grade === "again") d.again++;
+  const day = jourCourant();
+  const d = j[day] || {};
+  for (const [k, v] of Object.entries(champs)) d[k] = (d[k] || 0) + v;
   j[day] = d;
   store.set(JOURNAL_KEY, j);
 }
+
+/* TEMPS DE RÉVISION. Rien n'est chronométré au sens strict : on mesure l'écart
+   entre deux réponses, **plafonné à deux minutes**. Une carte laissée ouverte
+   pendant une pause déjeuner compterait sinon pour trois heures. Le plafond
+   sous-estime les cartes vraiment longues, ce qui est le bon sens de l'erreur :
+   mieux vaut un chiffre prudent qu'un chiffre flatteur. */
+const PLAFOND_CARTE = 120e3;
+let dernierGeste = 0;
+function logAnswer(grade) {
+  const now = Date.now();
+  const dt = dernierGeste ? Math.min(now - dernierGeste, PLAFOND_CARTE) : 0;
+  dernierGeste = now;
+  journalAjoute({ n: 1, again: grade === "again" ? 1 : 0, ms: dt });
+}
+/* la session reprend à zéro quand on ouvre le réviseur : le premier geste ne
+   doit pas se voir imputer le temps écoulé depuis la session d'hier */
+function demarreChrono() { dernierGeste = Date.now(); }
 function streak() {
   const j = store.get(JOURNAL_KEY, {});
   let n = 0;
@@ -380,6 +419,22 @@ function motDe(cible) {
   return el ? +el.dataset.w : 0;
 }
 
+/* ÉCOUTE DE LA RÉCITATION (voulu par Yusuf le 29/07). Pour une application de
+   hifz, écouter est la moitié du travail et rien n'en était suivi.
+   On mesure le temps RÉEL passé à écouter, au mur : les événements `play` et
+   `pause`/`ended` de l'élément audio bornent chaque tranche. C'est bien le
+   temps vécu et non la durée du fichier, donc la vitesse de lecture choisie est
+   prise en compte d'elle-même.
+   ⚠ On vide la tranche en cours quand la page se cache ou se ferme, sinon toute
+   une écoute perdue au moment où l'on quitte l'application. */
+let ecouteDebut = 0;
+function ecouteVide() {
+  if (!ecouteDebut) return;
+  const dt = Date.now() - ecouteDebut;
+  ecouteDebut = 0;
+  if (dt > 500) journalAjoute({ ecoute: dt });   // sous une demi-seconde : un faux départ
+}
+
 const player = {
   el: new Audio(),
   queue: [], qi: 0, rep: 1, repLeft: 1, loopRange: false, playing: false,
@@ -420,6 +475,7 @@ const player = {
     /* départ au milieu du verset : tant que les métadonnées ne sont pas là,
        currentTime fixe la position de départ par défaut ; loadedmetadata la
        réapplique si le navigateur ne l'a pas retenue */
+    journalAjoute({ versetsEcoutes: 1 });   // les répétitions comptent : c'est de l'écoute
     this.mot = mot | 0;
     this.depart = motDebutMs(item.k, this.mot) / 1000;
     if (this.depart) this.el.currentTime = this.depart;
@@ -1017,8 +1073,13 @@ const jour0 = d => d.toISOString().slice(0, 10);
 function statsJournal(nJours) {
   const j = store.get(JOURNAL_KEY, {});
   const jours = Object.keys(j).sort();
-  let total = 0, again = 0;
-  for (const k of jours) { total += j[k].n || 0; again += j[k].again || 0; }
+  let total = 0, again = 0, ms = 0, ecoute = 0, versetsEcoutes = 0;
+  /* ⚠ les jours antérieurs à ces mesures n'ont pas les champs : l'absence vaut
+     zéro, jamais NaN. C'est pourquoi tout se lit avec `|| 0`. */
+  for (const k of jours) {
+    total += j[k].n || 0; again += j[k].again || 0; ms += j[k].ms || 0;
+    ecoute += j[k].ecoute || 0; versetsEcoutes += j[k].versetsEcoutes || 0;
+  }
   /* meilleure série : on parcourt les jours présents et on casse dès qu'un
      jour manque entre deux dates consécutives */
   let best = 0, cur = 0, prev = null;
@@ -1035,7 +1096,8 @@ function statsJournal(nJours) {
     const k = jour0(x);
     derniers.push({ k, n: (j[k] || {}).n || 0 });
   }
-  return { total, again, joursActifs: jours.length, meilleureSerie: best, derniers,
+  return { total, again, ms, ecoute, versetsEcoutes,
+           joursActifs: jours.length, meilleureSerie: best, derniers,
            premierJour: jours[0] || null };
 }
 
@@ -1086,6 +1148,23 @@ function pageStats() {
   const neuf = !pg.seen && !Object.keys(EVAL).length;
 
   const pct = (a, b) => b ? Math.round(100 * a / b) : 0;
+  /* durées : on ne montre jamais « 0,03 h ». Sous l'heure on parle en minutes,
+     sous la minute on dit « moins d'une minute » plutôt qu'un zéro sec. */
+  const duree = ms => {
+    if (!ms) return "—";
+    const min = Math.round(ms / 60000);
+    if (min < 1) return "moins d'une minute";
+    if (min < 60) return min + " min";
+    return Math.floor(min / 60) + " h " + String(min % 60).padStart(2, "0");
+  };
+  /* mouvements d'auto-évaluation sur les 30 derniers jours : c'est la courbe du
+     hifz, pas son état. Une remontée = un verset qui s'est consolidé. */
+  const depuis = Date.now() - 30 * 86400e3;
+  const recents = (typeof EVAL_LOG !== "undefined" ? EVAL_LOG : []).filter(e => e.t >= depuis);
+  const montees = recents.filter(e => e.a > e.de && e.de > 0).length;
+  const versSolide = recents.filter(e => e.a === 3 && e.de !== 3).length;
+  const descentes = recents.filter(e => e.a < e.de && e.a > 0).length;
+  const premieres = recents.filter(e => e.de === 0 && e.a > 0).length;
   const bloc = (titre, aide, corps) =>
     `<div class="juz-title"><h2>${titre}</h2>${aide ? `<span>${aide}</span>` : ""}</div>${corps}`;
   const cle = (valeur, libelle) =>
@@ -1126,7 +1205,31 @@ function pageStats() {
       ${ligne("Révisions au total", jr.total)}
       ${ligne("Moyenne par jour actif", jr.joursActifs ? Math.round(jr.total / jr.joursActifs) : 0)}
       ${ligne("Réponses « à revoir »", jr.total ? pct(jr.again, jr.total) + " %" : "—")}
+      ${ligne("Temps de révision", duree(jr.ms))}
+      ${jr.ms && jr.total ? ligne("Temps moyen par carte",
+        Math.round(jr.ms / jr.total / 1000) + " s") : ""}
       ${jr.premierJour ? ligne("Première révision", jr.premierJour) : ""}
+    </div>`);
+
+  // ---- ce qui a bougé : la courbe du hifz, et non sa photo
+  h += bloc("Ce qui a bougé", "sur les trente derniers jours",
+    `<div class="note-card">
+      ${ligne("Versets consolidés", montees)}
+      ${ligne("Versets devenus solides", versSolide)}
+      ${ligne("Versets évalués pour la première fois", premieres)}
+      ${ligne("Versets redescendus d'un cran", descentes)}
+      ${EVAL_LOG.length ? "" : `<div class="fb-note" style="margin:6px 0 0">Cet
+        historique commence aujourd'hui : seuls les changements postérieurs à
+        cette version y figurent.</div>`}
+    </div>`);
+
+  // ---- écoute
+  h += bloc("Écoute", "la récitation, dans l'application",
+    `<div class="note-card">
+      ${ligne("Temps d'écoute", duree(jr.ecoute))}
+      ${ligne("Versets écoutés", jr.versetsEcoutes || 0)}
+      <div class="fb-note" style="margin:6px 0 0">Les répétitions comptent :
+      réécouter un verset, c'est l'écouter.</div>
     </div>`);
 
   // ---- mémorisation
@@ -2107,6 +2210,7 @@ function startSession(pool) {
   }
   if (!list.length) return;
   rev.session = { list, i: 0, shown: false, done: 0, again: [] };
+  demarreChrono();     // sinon la 1re carte hérite du temps depuis la veille
   render();
 }
 
@@ -3508,7 +3612,12 @@ const syncHeaders = () => ({
   "Content-Type": "application/json",
 });
 function localPayload() {
-  return { v: 1, srs: SRS, journal: store.get(JOURNAL_KEY, {}), eval: EVAL, vues: VUES };
+  /* `v` reste à 1 : un appareil resté en arrière ignore simplement les clés
+     qu'il ne connaît pas, et n'en perd aucune puisqu'il ne réécrit que les
+     siennes. Monter la version obligerait à un code de migration pour un ajout
+     purement additif. */
+  return { v: 1, srs: SRS, journal: store.get(JOURNAL_KEY, {}), eval: EVAL,
+           vues: VUES, evalLog: EVAL_LOG };
 }
 function mergeRemote(remote) {
   if (!remote) return;
@@ -3521,9 +3630,24 @@ function mergeRemote(remote) {
   store.set(SRS_KEY, SRS);
   const j = store.get(JOURNAL_KEY, {});
   for (const [day, d] of Object.entries(remote.journal || {})) {
-    if (!j[day] || d.n > j[day].n) j[day] = d;
+    if (!j[day] || (d.n || 0) > (j[day].n || 0)) j[day] = d;
   }
   store.set(JOURNAL_KEY, j);
+  /* HISTORIQUE des auto-évaluations : deux appareils écrivent des ÉVÉNEMENTS
+     distincts, pas des états concurrents. On fusionne donc par union, en
+     dédupliquant sur (horodatage, verset) — deux entrées identiques ne peuvent
+     être que la même, rejouée par la synchro — puis on retrie et on reborne. */
+  if (Array.isArray(remote.evalLog) && remote.evalLog.length) {
+    const vu = new Set(EVAL_LOG.map(e => e.t + "|" + e.k));
+    for (const e of remote.evalLog) {
+      if (!e || vu.has(e.t + "|" + e.k)) continue;
+      vu.add(e.t + "|" + e.k);
+      EVAL_LOG.push(e);
+    }
+    EVAL_LOG.sort((a, b) => a.t - b.t);
+    if (EVAL_LOG.length > 4000) EVAL_LOG.splice(0, EVAL_LOG.length - 4000);
+    store.set(EVALLOG_KEY, EVAL_LOG);
+  }
   for (const [k, e] of Object.entries(remote.eval || {})) {
     if (!EVAL[k] || (e.ts || 0) > (EVAL[k].ts || 0)) EVAL[k] = e;
   }
@@ -3632,7 +3756,7 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "1.28.0";   // réécrit par tools/release.py
+const BUILD_VERSION = "1.29.0";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {
@@ -3753,6 +3877,13 @@ const PRELOAD_MO = { pages: 10, husary64: 121, husary128: 240, muallim: 265, muj
   }
 }
 applyTheme();
+/* les bornes de l'écoute : une seule fois, sur l'élément audio du lecteur */
+player.el.addEventListener("play", () => { ecouteDebut = Date.now(); });
+player.el.addEventListener("pause", ecouteVide);
+player.el.addEventListener("ended", ecouteVide);
+document.addEventListener("visibilitychange", () => { if (document.hidden) ecouteVide(); });
+window.addEventListener("pagehide", ecouteVide);
+
 /* le retour est HORS de #main : bindMain() ne le voit pas, il se câble une fois */
 $("#tb-back").addEventListener("click", () => nav("home"));
 $("#theme-toggle").addEventListener("click", () => {

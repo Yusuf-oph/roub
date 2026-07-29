@@ -1,8 +1,11 @@
 {
-  "version": "1.28.0",
+  "version": "1.29.0",
   "date": "2026-07-29",
   "notes": [
-    "L'onglet Statistiques s'étoffe : quatre chiffres clés en tête, puis la régularité (trente derniers jours en barres, meilleure série, jours de révision, moyenne, part de réponses « à revoir »), la mémorisation (versets solides, fragiles, à revoir, part auto-évaluée, enchaînements acquis, versets annotés), l'état du paquet (neuves, en apprentissage, acquises, rechutes, intervalle moyen et le plus long, et le détail par type de carte), ce qui revient aujourd'hui, demain, sous 7 et 30 jours, et les règles de tajwid déjà vues",
-    "Tout est calculé à partir de ce que l'application enregistre déjà : aucun compteur supplémentaire, donc aucun chiffre qui puisse diverger de la réalité"
+    "L'application enregistre désormais trois choses qu'elle ignorait : l'historique de tes auto-évaluations, le temps passé à réviser et le temps d'écoute de la récitation",
+    "Nouveau bloc « Ce qui a bougé » : combien de versets se sont consolidés, sont devenus solides, ont été évalués pour la première fois ou sont redescendus d'un cran sur les trente derniers jours. C'est la courbe de ta mémorisation, là où le reste n'en donnait que l'état",
+    "Nouveau bloc « Écoute » : temps d'écoute et versets écoutés, les répétitions comprises",
+    "Le temps de révision se mesure entre deux réponses, plafonné à deux minutes par carte : une carte laissée ouverte pendant une pause ne gonfle pas le total",
+    "Ces trois mesures commencent aujourd'hui : elles ne peuvent rien dire du travail accompli avant cette version"
   ]
 }
