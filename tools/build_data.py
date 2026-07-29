@@ -26,6 +26,90 @@ from translit import translit_verse  # noqa: E402
 CACHE = os.path.join(HERE, "cache")
 OUT = os.path.join(HERE, "..", "app", "data", "quran")
 
+# ---------------------------------------------------------------- recalage
+# L'application AFFICHE l'uthmani et TRANSLITTERE l'imlaei. Les deux viennent du
+# meme Complexe du Roi Fahd mais ne decoupent pas toujours les mots pareil :
+#   2:21   uthmani  يَـٰٓأَيُّهَا  (1 mot)   imlaei  يَا أَيُّهَا  (2 mots)
+#   2:181  uthmani  بَعْدَ مَا     (2 mots)  imlaei  بَعْدَمَا     (1 mot)
+# La translittetation heritait donc du decoupage imlaei, et ne s'alignait plus
+# mot a mot sur l'arabe affiche : 26 versets sur 823, ce qui obligeait l'appli a
+# rendre la translittetation ENTIERE au lieu d'une coupe (cf. trancheTranslit).
+#
+# On recale donc les jetons de translittetation sur le decoupage UTHMANI, qui
+# est celui que l'utilisateur a sous les yeux.
+#
+# ⚠ APPROCHE ABANDONNEE, ET POURQUOI : j'ai d'abord ecrit un aligneur GENERAL
+# comparant des squelettes consonantiques normalises. Il s'est revele fragile —
+# chaque regle ajoutee (alif suscrit, waw+alif suscrit de حَيَوٰة...) en cassait
+# une autre, et le nombre de versets corriges OSCILLAIT au lieu de monter. Sur
+# du texte coranique affiche, un aligneur qui se trompe en silence est pire que
+# pas d'aligneur du tout.
+# On s'en tient donc a la classe REELLE, connue et fermee : l'imlaei detache la
+# particule vocative يَا, que l'uthmani soude au mot suivant. C'est verifiable
+# d'un coup d'oeil et ca ne peut pas deraper ailleurs.
+#
+# RESTE NON TRAITE, ASSUME : 2:181, ou l'imlaei SOUDE بَعْدَمَا quand l'uthmani
+# separe بَعْدَ مَا. Corriger demanderait de COUPER un jeton de translittetation
+# en deux, donc de decider ou — ce qui s'invente. Ce verset garde son rendu
+# entier, exactement comme avant.
+
+# ⚠ Les MARQUES DE PAUSE sont des « mots » dans l'uthmani mais n'ont aucun
+# equivalent en translittetation. L'application les exclut deja de son compte
+# (`estPause`, app.js) : les compter ici faisait croire a 209 versets
+# desalignes au lieu de 26.
+PAUSES = "ۖۗۘۙۚۛۜ۞۩"
+# la particule vocative telle que l'imlaei l'ecrit, voyelles comprises
+VOCATIF = re.compile(r"^يَ?ا$")
+
+# ⚠⚠ DESACTIVE EN ATTENTE D'UNE DECISION D'ANIS (29/07). Le recalage MARCHE et
+# porte l'alignement de 797 a 822 versets sur 823, mais il ecrit « ya-'ayyouha »
+# la ou DIN/Arabica ecrirait « ya 'ayyouha » : le trait d'union marque ailleurs
+# dans ce projet des PROCLITIQUES reellement soudes en arabe (bi-l-gayb), alors
+# qu'ici c'est l'uthmani qui soude pour des raisons calligraphiques. Faire suivre
+# la translittetation au decoupage calligraphique est un CHOIX, pas une norme,
+# et il touche du contenu affiche : Yusuf le renvoie donc a Anis.
+# Trois sorties possibles : garder le trait d'union comme convention interne (et
+# la documenter dans le tutoriel de translittetation), employer un autre signe
+# moins charge, ou renoncer et laisser ces versets au rendu entier.
+# Passer a True regenere tout en une commande : python tools/build_data.py
+RECALER_VOCATIF = False
+
+
+def mots_reels(texte):
+    return [m for m in texte.split() if m and not all(c in PAUSES for c in m)]
+
+
+def recale(tl, uthmani, imlaei):
+    """Soude a son voisin la particule vocative que l'imlaei detache.
+
+    Renvoie (chaine recalee, True) si le compte tombe juste ensuite,
+    (chaine d'origine, False) sinon : on ne publie JAMAIS un alignement dont on
+    n'est pas sur, le rendu entier deja en place vaut mieux.
+    """
+    if not RECALER_VOCATIF:
+        return tl, False
+    jt, ji, ju = tl.split(), mots_reels(imlaei), mots_reels(uthmani)
+    if len(jt) != len(ji):      # translittetation deja desynchronisee : on ne touche pas
+        return tl, False
+    if len(ji) == len(ju):
+        return tl, True         # rien a faire
+    manque = len(ji) - len(ju)
+    vocatifs = [n for n, m in enumerate(ji) if VOCATIF.match(m) and n + 1 < len(ji)]
+    if manque <= 0 or manque != len(vocatifs):
+        return tl, False        # l'ecart ne s'explique pas par les vocatifs seuls
+    sort, saute = [], set()
+    for n, mot in enumerate(jt):
+        if n in saute:
+            continue
+        if n in vocatifs:
+            # trait d'union : la convention deja employee par translit.py
+            # pour « plusieurs mots arabes, un seul jeton » (bi-l-gayb)
+            sort.append(mot + "-" + jt[n + 1])
+            saute.add(n + 1)
+        else:
+            sort.append(mot)
+    return (" ".join(sort), True) if len(sort) == len(ju) else (tl, False)
+
 SURAHS = {1: "Al-Fâtiḥa", 2: "Al-Baqara",
           78: "An-Naba'", 79: "An-Nâzi'ât", 80: "'Abasa", 81: "At-Takwîr",
           82: "Al-Infitâr", 83: "Al-Mutaffifîn", 84: "Al-Inshiqâq",
@@ -158,10 +242,18 @@ def main():
     rubs = {}
     all_classes = {}
     perdues = []
+    recales, non_recales = [], []
     for v in verses:
         s, a = v["key"].split(":")
         s, a = int(s), int(a)
         sci, fr = translit_verse(v["imlaei"])
+        sci2, okS = recale(sci, v["uthmani"], v["imlaei"])
+        fr2, okF = recale(fr, v["uthmani"], v["imlaei"])
+        if okS and okF and (sci2 != sci or fr2 != fr):
+            recales.append((v["key"], fr, fr2))
+            sci, fr = sci2, fr2
+        elif len(fr.split()) != len(mots_reels(v["uthmani"])):
+            non_recales.append((v["key"], len(mots_reels(v["uthmani"])), len(fr.split())))
         brut = qul.get(v["key"], v["tajweed"])
         spans = project_spans(brut, v["uthmani"])
         for _, _, c in spans:
@@ -215,6 +307,17 @@ def main():
               f"dont {perdues[:6]}")
     else:
         print(f"projection : aucune classe perdue sur les {len(verses)} versets")
+    # RECALAGE : on dit ce qui a bougé, verset par verset, parce que ça change
+    # du texte AFFICHÉ et que ça doit pouvoir se relire.
+    print(f"recalage translittération : {len(recales)} versets réalignés sur "
+          f"le découpage uthmani")
+    for k, avant, apres in recales:
+        a, b = avant.split(), apres.split()
+        diff = [x for x in b if "-" in x and x not in a]
+        print(f"   {k:8} {len(a):3} -> {len(b):3} jetons   {' '.join(diff[:2])}")
+    if non_recales:
+        print(f"⚠ {len(non_recales)} versets restent désalignés (rendu entier "
+              f"conservé, aucun risque) : {non_recales}")
 
 
 if __name__ == "__main__":
