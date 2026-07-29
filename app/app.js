@@ -1028,11 +1028,18 @@ function pageHome() {
     const rubs = RUBS.filter(r => r.juz === juz);
     const cartes = rubs.reduce((n, r) => n + (DECKS[r.id] || []).length, 0);
     const dues = rubs.reduce((n, r) => n + deckStats((DECKS[r.id] || []).map(c => c.id)).due, 0);
+    /* Deux rangées VOULUES plutôt qu'un flex qui décide : le nom, l'arabe et
+       trois chiffres sur une seule ligne partaient en quatre lignes en désordre
+       sur un écran de 390. En haut ce qui nomme, en bas ce qui compte. */
+    const nj = nomJuz(juz);
     h += `<details class="juz-bloc" name="juz" data-juz="${juz}"${juz === ouvert ? " open" : ""}>
-      <summary class="juz-title"><h2>Juz ${juz}${juz === 30 ? " · 'Amma" : ""}</h2>
-        <span>${rubs[0].debut} → ${rubs[rubs.length - 1].fin}</span>
-        <span class="juz-compte">${rubs.length} roub'${
-          dues ? ` · <b>${dues} à revoir</b>` : ` · ${cartes} cartes`}</span></summary>`;
+      <summary class="juz-title">
+        <span class="jt-txt">
+          <span class="jt-haut"><h2>Juz ${juz}${nj ? ` · ${esc(nj.tl)}` : ""}</h2>
+            ${nj ? `<span class="juz-ar">${arEsc(nj.ar)}</span>` : ""}</span>
+          <span class="jt-bas">${rubs[0].debut} → ${rubs[rubs.length - 1].fin} · ${rubs.length} roub'${
+            dues ? ` · <b>${dues} à revoir</b>` : ` · ${cartes} cartes`}</span>
+        </span></summary>`;
     h += `<div class="rub-grid">`;
     for (const r of rubs) {
       const cards = (DECKS[r.id] || []).map(c => c.id);
@@ -1131,6 +1138,38 @@ const tajState = { filtre: "toutes" };
 /* juz déplié sur l'accueil, non persisté : c'est un état d'écran, comme la
    présentation. `null` = celui du premier juz couvert. */
 const accueilState = { juzOuvert: null };
+
+/* NOMS DE JUZ. Un juz se nomme par ses PREMIERS MOTS. On ne les écrit donc pas,
+   on les EXTRAIT de notre propre texte et de nos propres translittérations, qui
+   existent déjà dans les deux systèmes : rien n'est inventé ici, et le réglage
+   Paramètres est respecté sans table parallèle à tenir.
+   ⚠ Le juz 1 est l'exception : il ouvre à 1:1 mais la tradition le nomme
+   d'après 2:1 (الٓمٓ). Ce n'est pas une supposition — la police de noms de juz
+   publiée par QUL donne bien الٓمٓ pour son `j001`, ce qui corrobore l'usage.
+   Table à compléter à mesure que des juz sont couverts : verset d'ouverture et
+   nombre de mots retenus. */
+const NOM_JUZ = { 1: ["2:1", 1], 2: ["2:142", 1], 30: ["78:1", 2] };
+
+function nomJuz(juz) {
+  const e = NOM_JUZ[juz];
+  if (!e) return null;
+  const [k, nMots] = e;
+  let v = null;
+  for (const rid of Object.keys(QURAN)) {
+    v = (QURAN[rid].verses || []).find(x => x.k === k);
+    if (v) break;
+  }
+  if (!v) return null;                       // juz déclaré mais texte non embarqué
+  /* le marqueur de roub' ۞ ouvre certains versets (2:142) : il n'est pas un mot */
+  const coupe = s => (s || "").trim().replace(/^۞\s*/, "").split(/\s+/);
+  const ar = coupe(v.ar), fr = coupe(v.fr), sci = coupe(v.sci);
+  /* ⚠ garde-fou : la translittération n'est PAS alignée mot à mot sur tous les
+     versets (26 sur 823). On ne coupe que si les premiers mots existent des
+     trois côtés, sinon on n'affiche pas de nom plutôt qu'un nom faux. */
+  if (ar.length < nMots || fr.length < nMots || sci.length < nMots) return null;
+  return { ar: ar.slice(0, nMots).join(" "),
+           tl: (PARAMS.translit === "sci" ? sci : fr).slice(0, nMots).join(" ") };
+}
 
 /* LE point de décision du rendu. Il reproduit aujourd'hui le comportement
    historique à l'identique : notre police de texte partout, sauf sur les pages
@@ -3411,7 +3450,7 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "1.25.0";   // réécrit par tools/release.py
+const BUILD_VERSION = "1.26.0";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {

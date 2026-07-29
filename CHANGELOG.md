@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.26.0 · 2026-07-29
+- Chaque juz porte maintenant son nom, en arabe et en lettres latines : Juz 1 · alif-lâm-mîm, Juz 30 · ʿamma yatasâ'aloûn. Un juz se nomme par ses premiers mots, et ces mots sont pris dans le texte de l'application avec leur translittération, laquelle suit le système choisi dans Paramètres
+- La ligne d'un juz se lit sur deux rangées : le nom au-dessus, l'étendue et les comptes en dessous
+
 ## 1.25.0 · 2026-07-29
 - L'accueil se parcourt maintenant par juz : chaque juz se déplie pour montrer ses huit roub', et en ouvrir un referme le précédent. La liste tenait jusqu'ici tout entière à l'écran, ce qui deviendra impraticable à mesure que le Qur'an sera couvert
 - Chaque juz annonce son étendue, son nombre de roub' et ses cartes à revoir sans qu'il soit besoin de le déplier

@@ -400,9 +400,26 @@ button { font: inherit; cursor: pointer; }
    qu'à remplacer le triangle natif, qui ne suit ni la couleur ni la taille du
    texte, par un chevron qui pivote. La transition passe par --dur-micro, donc
    le réglage « animations réduites » l'éteint sans règle de plus. */
-summary.juz-title { cursor: pointer; list-style: none; }
+/* ⚠ `.juz-title` sert AUSSI de simple <div> à « Ma progression » : ne toucher
+   que la variante <summary>, sinon ce bloc-là se disloque. */
+summary.juz-title {
+  cursor: pointer; list-style: none;
+  align-items: center;              /* et non baseline : deux rangées à centrer */
+}
 summary.juz-title::-webkit-details-marker { display: none; }
 summary.juz-title:hover h2 { color: var(--accent); }
+.jt-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.jt-haut { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.jt-bas { color: var(--muted); font-size: var(--fs-200); }
+.jt-bas b { color: var(--accent); }
+/* ⚠ `.juz-title span` ci-dessus est PLUS SPÉCIFIQUE qu'une classe seule : viser
+   `summary.juz-title span.juz-ar`, sinon la calligraphie hérite de --fs-300 et
+   sort minuscule quoi qu'on écrive (piège payé sur planche le 29/07). */
+summary.juz-title span.juz-ar {
+  font-family: "UthmanicHafs", serif; font-size: 21px; line-height: 1.5;
+  color: var(--text); white-space: nowrap;
+  direction: rtl; unicode-bidi: isolate;
+}
 .juz-compte { margin-left: auto; font-size: var(--fs-200) !important; }
 .juz-compte b { color: var(--accent); }
 summary.juz-title::after {
