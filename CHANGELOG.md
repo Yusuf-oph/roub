@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.31.0 · 2026-07-29
+- Paramètres gagne une section « Réinitialiser » : on peut effacer séparément la planification des cartes, les auto-évaluations de versets, les règles de tajwid cochées, ou l'historique et les statistiques. Tes réglages, tes avis et le contenu de l'application ne sont jamais touchés
+- L'effacement tient : il vaut pour tous les appareils liés et ne peut plus être défait par un appareil resté en arrière, qui restaurait jusqu'ici ce qu'on venait de supprimer
+- Chaque bouton nomme précisément ce qu'il efface avant de demander confirmation
+
 ## 1.30.0 · 2026-07-29
 - L'application conserve désormais le détail de chaque révision, et non plus seulement un total par jour. Cet historique ne sert encore à rien de visible : il prépare le passage à un planificateur plus fin, qui s'ajuste sur les révisions passées. Il est branché dès maintenant parce qu'un historique ne se fabrique pas après coup
 

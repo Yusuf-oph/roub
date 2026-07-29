@@ -333,6 +333,62 @@ function logRevision(id, grade) {
   REV_LOG.log.push([Math.round(Date.now() / 1000), revIndexDe(id), NOTE_NUM[grade] || 0]);
   store.set(REVLOG_KEY, REV_LOG);
 }
+
+/* ---------- remise à zéro de la progression (demandé par Yusuf le 27/07) ----
+   ⚠ LE PROBLÈME N'EST PAS D'EFFACER, C'EST QUE ÇA TIENNE. Toutes les règles de
+   fusion reprennent sans condition une clé ABSENTE en local : effacer ici puis
+   se synchroniser ferait tout revenir depuis l'autre appareil, au premier
+   rapprochement. C'est exactement le défaut déjà rencontré sur l'auto-évaluation.
+   D'où une ÉPOQUE par domaine, horodatage de la dernière remise à zéro, qui
+   voyage dans la charge. À la fusion, trois cas et trois seulement :
+     - époque distante PLUS RÉCENTE : l'autre a réinitialisé après nous, on
+       efface à notre tour puis on fusionne ;
+     - la nôtre plus récente : ses données datent d'avant notre remise à zéro,
+       on les ignore, il adoptera notre époque à son prochain rapprochement ;
+     - égales : fusion normale.
+   La règle converge sans arbitre, et aucune donnée effacée ne ressuscite.
+   ⚠ Les objets d'état sont VIDÉS EN PLACE, jamais réassignés : tout le code les
+   tient par référence depuis le chargement. */
+const EPOCH_KEY = "quran-epochs";
+const EPOCHS = store.get(EPOCH_KEY, {});
+const videObjet = o => { for (const k of Object.keys(o)) delete o[k]; };
+const DOMAINES_RAZ = {
+  cartes: {
+    nom: "la planification des cartes",
+    detail: "intervalles, échéances et facilité de chaque carte",
+    vide() { videObjet(SRS); store.set(SRS_KEY, SRS); },
+  },
+  eval: {
+    nom: "les auto-évaluations de versets",
+    detail: "les niveaux « à revoir / fragile / solide », leurs notes, et leur historique",
+    vide() {
+      videObjet(EVAL); store.set(EVAL_KEY, EVAL);
+      EVAL_LOG.length = 0; store.set(EVALLOG_KEY, EVAL_LOG);
+    },
+  },
+  tajwid: {
+    nom: "les règles de tajwid cochées",
+    detail: "les cases « déjà vue » de l'onglet Tajwid",
+    vide() { videObjet(VUES); store.set(VUES_KEY, VUES); },
+  },
+  histo: {
+    nom: "l'historique et les statistiques",
+    detail: "le journal quotidien, la série de jours, le temps de révision, l'écoute et le détail des révisions",
+    vide() {
+      store.set(JOURNAL_KEY, {});
+      REV_LOG.ids.length = 0; REV_LOG.log.length = 0; revIdx.clear();
+      store.set(REVLOG_KEY, REV_LOG);
+    },
+  },
+};
+function razDomaine(d) {
+  const dom = DOMAINES_RAZ[d];
+  if (!dom) return;
+  dom.vide();
+  EPOCHS[d] = Date.now();
+  store.set(EPOCH_KEY, EPOCHS);
+  schedulePush();
+}
 /* la session reprend à zéro quand on ouvre le réviseur : le premier geste ne
    doit pas se voir imputer le temps écoulé depuis la session d'hier */
 function demarreChrono() { dernierGeste = Date.now(); }
@@ -3152,6 +3208,17 @@ function pageParams() {
 
   ${section("Synchronisation", sync)}
 
+  ${section("Réinitialiser",
+    `<div class="param-bloc param-bloc-large"><div class="lab"><b>Effacer une partie de ta progression</b>
+      <span>Chaque bouton n'efface que ce qu'il annonce ; tes réglages, tes avis
+      et le contenu de l'application ne sont jamais touchés. <b>L'effacement vaut
+      pour tous les appareils liés</b> et ne peut pas être annulé.</span></div></div>`
+    + Object.entries(DOMAINES_RAZ).map(([id, d]) =>
+        rangee(d.nom.charAt(0).toUpperCase() + d.nom.slice(1), d.detail,
+          `<button class="iconbtn" data-raz="${id}">Effacer</button>`)).join("")
+    + rangee("Tout effacer", "Les quatre à la fois : on repart d'une progression vierge.",
+        `<button class="iconbtn" data-raz="tout">Tout effacer</button>`))}
+
   <p class="param-pied">Version : <b id="appver">${esc(APPVER || "…")}</b><br><br>
     Roub' est né de l'idée originale d'<b>Anis</b> (co-fondateur, docteur en
     mathématiques), conceptualisé et réalisé par <b>Yusuf</b> (co-fondateur,
@@ -3297,6 +3364,22 @@ function bindMain() {
     PARAMS.rendu = el.dataset.rendu;
     memoState.rendu = null;      // un choix explicite prime sur le lien profond
     saveParams(); render();
+  }));
+
+  /* remise à zéro : la confirmation NOMME ce qui part et rappelle que ça vaut
+     pour tous les appareils. Une opération irréversible ne se déclenche pas sur
+     un « êtes-vous sûr ? » qui ne dit rien. */
+  $$("[data-raz]", main).forEach(el => el.addEventListener("click", () => {
+    const id = el.dataset.raz;
+    const tout = id === "tout";
+    const quoi = tout
+      ? Object.values(DOMAINES_RAZ).map(d => "· " + d.nom).join("\n")
+      : "· " + DOMAINES_RAZ[id].nom;
+    if (!confirm(`Effacer définitivement :\n\n${quoi}\n\n`
+      + "Cet effacement vaut pour tous les appareils liés à ton code de "
+      + "synchronisation, et ne peut pas être annulé.")) return;
+    for (const d of tout ? Object.keys(DOMAINES_RAZ) : [id]) razDomaine(d);
+    render();
   }));
 
   /* le juz déplié sur l'accueil, mémorisé pour que le re-rendu de la synchro ne
@@ -3646,27 +3729,45 @@ function localPayload() {
      siennes. Monter la version obligerait à un code de migration pour un ajout
      purement additif. */
   return { v: 1, srs: SRS, journal: store.get(JOURNAL_KEY, {}), eval: EVAL,
-           vues: VUES, evalLog: EVAL_LOG, revLog: REV_LOG };
+           vues: VUES, evalLog: EVAL_LOG, revLog: REV_LOG, epochs: EPOCHS };
 }
 function mergeRemote(remote) {
   if (!remote) return;
-  for (const [id, r] of Object.entries(remote.srs || {})) {
-    const l = SRS[id];
-    if (!l || r.reps > l.reps || (r.reps === l.reps && (r.due || 0) > (l.due || 0))) {
-      SRS[id] = r;
+  /* Époques de remise à zéro : à traiter AVANT toute fusion, puisqu'elles
+     décident si les données distantes valent encore quelque chose. */
+  const ignorer = {};
+  const epDist = remote.epochs || {};
+  for (const d of Object.keys(DOMAINES_RAZ)) {
+    const local = EPOCHS[d] || 0, dist = epDist[d] || 0;
+    if (dist > local) {            // il a réinitialisé après nous : on suit
+      DOMAINES_RAZ[d].vide();
+      EPOCHS[d] = dist;
+      store.set(EPOCH_KEY, EPOCHS);
+    } else if (local > dist) {     // ses données précèdent notre remise à zéro
+      ignorer[d] = true;
     }
   }
-  store.set(SRS_KEY, SRS);
-  const j = store.get(JOURNAL_KEY, {});
-  for (const [day, d] of Object.entries(remote.journal || {})) {
-    if (!j[day] || (d.n || 0) > (j[day].n || 0)) j[day] = d;
+  if (!ignorer.cartes) {
+    for (const [id, r] of Object.entries(remote.srs || {})) {
+      const l = SRS[id];
+      if (!l || r.reps > l.reps || (r.reps === l.reps && (r.due || 0) > (l.due || 0))) {
+        SRS[id] = r;
+      }
+    }
+    store.set(SRS_KEY, SRS);
   }
-  store.set(JOURNAL_KEY, j);
+  if (!ignorer.histo) {
+    const j = store.get(JOURNAL_KEY, {});
+    for (const [day, d] of Object.entries(remote.journal || {})) {
+      if (!j[day] || (d.n || 0) > (j[day].n || 0)) j[day] = d;
+    }
+    store.set(JOURNAL_KEY, j);
+  }
   /* HISTORIQUE des auto-évaluations : deux appareils écrivent des ÉVÉNEMENTS
      distincts, pas des états concurrents. On fusionne donc par union, en
      dédupliquant sur (horodatage, verset) — deux entrées identiques ne peuvent
      être que la même, rejouée par la synchro — puis on retrie et on reborne. */
-  if (Array.isArray(remote.evalLog) && remote.evalLog.length) {
+  if (!ignorer.eval && Array.isArray(remote.evalLog) && remote.evalLog.length) {
     const vu = new Set(EVAL_LOG.map(e => e.t + "|" + e.k));
     for (const e of remote.evalLog) {
       if (!e || vu.has(e.t + "|" + e.k)) continue;
@@ -3684,7 +3785,7 @@ function mergeRemote(remote) {
      (horodatage, carte) : deux entrées identiques ne peuvent être que la même,
      rejouée par la synchro. Aucun élagage, l'ancienneté fait la valeur. */
   const rl = remote.revLog;
-  if (rl && Array.isArray(rl.log) && Array.isArray(rl.ids) && rl.log.length) {
+  if (!ignorer.histo && rl && Array.isArray(rl.log) && Array.isArray(rl.ids) && rl.log.length) {
     const vu = new Set(REV_LOG.log.map(e => e[0] + "|" + REV_LOG.ids[e[1]]));
     let ajouts = 0;
     for (const [t, i, g] of rl.log) {
@@ -3699,17 +3800,21 @@ function mergeRemote(remote) {
       store.set(REVLOG_KEY, REV_LOG);
     }
   }
-  for (const [k, e] of Object.entries(remote.eval || {})) {
-    if (!EVAL[k] || (e.ts || 0) > (EVAL[k].ts || 0)) EVAL[k] = e;
+  if (!ignorer.eval) {
+    for (const [k, e] of Object.entries(remote.eval || {})) {
+      if (!EVAL[k] || (e.ts || 0) > (EVAL[k].ts || 0)) EVAL[k] = e;
+    }
+    store.set(EVAL_KEY, EVAL);
   }
-  store.set(EVAL_KEY, EVAL);
   /* règles vues : une règle cochée quelque part est plus avancée qu'une règle
-     non cochée, donc union. On garde l'horodatage le PLUS RÉCENT, pour que la
-     future époque de remise à zéro ne balaie pas une coche postérieure. */
-  for (const [id, ts] of Object.entries(remote.vues || {})) {
-    if (!VUES[id] || ts > VUES[id]) VUES[id] = ts;
+     non cochée, donc union. On garde l'horodatage le PLUS RÉCENT — l'époque de
+     remise à zéro, désormais en place, ne balaie donc pas une coche postérieure. */
+  if (!ignorer.tajwid) {
+    for (const [id, ts] of Object.entries(remote.vues || {})) {
+      if (!VUES[id] || ts > VUES[id]) VUES[id] = ts;
+    }
+    store.set(VUES_KEY, VUES);
   }
-  store.set(VUES_KEY, VUES);
 }
 /* état de la synchro : il doit dire la VÉRITÉ du moment. Un « synchronisé
    14:32 » figé alors que les envois échouent depuis est trompeur : on
@@ -3807,7 +3912,7 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "1.30.0";   // réécrit par tools/release.py
+const BUILD_VERSION = "1.31.0";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {
