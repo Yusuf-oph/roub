@@ -26,6 +26,8 @@ Vérifie :
      mots sur celui de arHtml (dont dépendent l'audio et le double-clic),
      police et licence présentes, câblage index.html/release
 """
+import base64
+import hashlib
 import json
 import os
 import re
@@ -651,6 +653,26 @@ def main():
                 "chemin réel et corriger release.py::shell_files et ce contrôle")
     if "fsrs_browser.js" not in app_src:
         err("fsrs : app.js ne charge pas le planificateur")
+    # ⚠ EMPREINTES : une bibliothèque vendorisée doit rester identique OCTET POUR
+    # OCTET à ce que sa source publie. Le défaut est arrivé le 30/07 : le
+    # `* text=auto eol=lf` de .gitattributes a normalisé les fins de ligne du
+    # fragment rayon, et le fichier commité ne correspondait plus à l'original.
+    # Réparé par `app/vendor/** -text` ; ce contrôle est là pour que ça se voie.
+    # Valeurs relevées sur data.jsdelivr.com pour fsrs-browser 6.6.0.
+    EMPREINTES = {
+        "vendor/fsrs_browser.js": "DNyu2FIAnpTyOXI1Tyimn5uLnxa+6PI3YKWmxTlX7zo=",
+        "vendor/fsrs_browser_bg.wasm": "oyoZjjfiiLhks+8XrckebFgJ84TohnDM0vDBvCz3vIk=",
+        RAYON: "aYKnoAammEnWZqr0rH6gekKTH4UMMQBngrGTf9VwT5Y=",
+    }
+    for rel, attendu in EMPREINTES.items():
+        chemin = os.path.join(APP, *rel.split("/"))
+        if not os.path.exists(chemin):
+            continue                       # l'absence est déjà signalée plus haut
+        vu = base64.b64encode(hashlib.sha256(open(chemin, "rb").read()).digest()).decode()
+        if vu != attendu:
+            err(f"fsrs : {rel} ne correspond plus à ce que publie jsDelivr "
+                f"(vu {vu}, attendu {attendu}) : fichier modifié, ou fins de "
+                f"ligne normalisées par git")
     # SOURCES.md doit nommer ce qu'on redistribue et ce qu'on cite
     src_md = open(os.path.join(ROOT, "SOURCES.md"), encoding="utf-8").read()
     for aig, quoi in (("fsrs-browser", "fsrs-browser"), ("wasm-bindgen-rayon", "le fragment rayon"),

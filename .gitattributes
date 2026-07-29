@@ -5,3 +5,8 @@
 *.otf binary
 *.apkg binary
 *.bat text eol=crlf
+
+# Bibliothèques vendorisées : stockées TELLES QUELLES. Leur empreinte doit
+# rester comparable à celle publiée par la source (jsDelivr), donc pas de
+# normalisation de fins de ligne, sinon les octets diffèrent de l'original.
+app/vendor/** -text
