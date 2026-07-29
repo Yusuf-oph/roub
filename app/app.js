@@ -872,6 +872,7 @@ function render() {
   else if (page === "tutoriels") main.innerHTML = pageTutoriels(a || "translit");
   else if (page === "params") main.innerHTML = pageParams();
   else if (page === "sources") main.innerHTML = pageSources();
+  else if (page === "stats") main.innerHTML = pageStats();
   else main.innerHTML = pageHome();
   /* les pages de lecture suivie resserrent leur cadre autour de la colonne ;
      les autres, qu'on balaie, gardent toute la largeur (cf. styles.css) */
@@ -1001,6 +1002,17 @@ function accueilHtml() {
     </div></details>`;
 }
 
+/* L'onglet Statistiques. Il ne crée rien : il recueille ce que l'accueil portait
+   en bas de page, là où il fallait dérouler tout le catalogue pour le voir. */
+function pageStats() {
+  return `<div class="hero"><div class="hero-txt"><h1>Statistiques</h1>
+    <p>Ce que l'application retient de ton travail. Tout est calculé sur cet
+    appareil et suit ta progression d'un appareil à l'autre si la synchronisation
+    est active.</p></div></div>`
+    + progressionHtml()
+    + `<div class="footer-pad"></div>`;
+}
+
 function pageHome() {
   /* L'entrelacs en tête de l'accueil, à 84 px, À CÔTÉ du titre en large et
      au-dessus en mobile : c'est la disposition de la direction artistique.
@@ -1067,7 +1079,9 @@ function pageHome() {
     }
     h += `</div></details>`;
   }
-  h += progressionHtml();
+  /* « Ma progression » a quitté l'accueil pour son propre onglet (Yusuf,
+     29/07). Elle n'en disparaît pas pour autant : l'entrée Statistiques de la
+     navigation la signale mieux qu'un bloc en bas d'une page qu'on déroule. */
   return h + `<div class="footer-pad"></div>`;
 }
 
@@ -3459,7 +3473,7 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "1.26.1";   // réécrit par tools/release.py
+const BUILD_VERSION = "1.27.0";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {

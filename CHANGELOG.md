@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.27.0 · 2026-07-29
+- Nouvel onglet Statistiques, avec son icône. Il recueille « Ma progression », qui vivait jusqu'ici en bas de l'accueil, là où il fallait dérouler tout le catalogue pour la trouver
+- Sur grand écran, Sources et Statistiques se regroupent à droite de la barre, contre la bascule clair/sombre : les écrans de consultation se séparent ainsi des écrans de travail. Sur téléphone, les six entrées se partagent la barre du bas à égalité
+
 ## 1.26.1 · 2026-07-29
 - « Ma progression » s'affiche dès la première visite au lieu d'attendre la première carte révisée. Elle était invisible pour ceux à qui elle est le plus utile : un nouvel utilisateur ignorait que l'application suit son avancement. Tant qu'il n'y a rien à montrer, elle dit ce qu'elle attend
 

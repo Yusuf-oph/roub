@@ -268,7 +268,11 @@ button { font: inherit; cursor: pointer; }
 .logo .mark { display: block; color: var(--accent); }
 .logo .mark svg { width: 44px; height: 44px; display: block; }
 .logo b { font-size: var(--fs-400); letter-spacing: .3px; }
-.nav { display: flex; gap: 4px; margin-left: 10px; flex-wrap: wrap; }
+.nav { display: flex; gap: 4px; margin-left: 10px; flex-wrap: wrap; flex: 1; }
+/* sépare les écrans de travail des écrans de consultation : en large il pousse
+   Sources et Statistiques contre la bascule clair/sombre ; en barre basse il
+   n'existe pas, les six boutons s'y partageant la largeur à égalité */
+.nav-sep { flex: 1; }
 /* En large, l'icône précède le libellé sur la même ligne ; en barre basse elle
    passe au-dessus (cf. le bloc mobile). Elle suit `currentColor`, donc elle
    s'allume avec le libellé sur l'onglet actif, sans une seule règle de plus. */
@@ -280,7 +284,12 @@ button { font: inherit; cursor: pointer; }
 .nav button svg { width: 17px; height: 17px; display: block; flex: 0 0 auto; }
 .nav button.on { background: var(--bg3); color: var(--text); }
 .nav button:hover { color: var(--text); }
-.topbar .spacer { flex: 1; }
+/* En large c'est `.nav` qui occupe l'espace, et son séparateur interne qui pousse
+   Sources et Statistiques contre la bascule : ce cale-vide ne doit donc PLUS
+   grandir, sinon un blanc s'ouvre entre le second groupe et la bascule.
+   En barre basse au contraire la nav sort du flux, et lui seul tient la bascule
+   à droite : il y retrouve son flex-grow (bloc mobile). */
+.topbar .spacer { flex: 0; }
 /* Le retour du roub', monté de l'en-tête vers la barre. Le gap de .topbar
    l'espace du logo ; la marge négative le ramène au bord, où le pouce le
    trouve sans viser. */
@@ -1304,11 +1313,17 @@ h2.sec { font-size: var(--fs-500); margin: 22px 0 8px; }
     backdrop-filter: blur(10px);
     border-top: 1px solid var(--border);
   }
+  .topbar .spacer { flex: 1; }   /* cf. le commentaire du bloc large */
+  .nav-sep { display: none; }    /* les six boutons se partagent la largeur */
+
   /* icône au-dessus du libellé : les 56 px de la barre en logent 20 + 12 sans
      serrer, et la cible tactile reste pleine hauteur */
   .nav button {
     flex: 1 1 0; min-width: 0; min-height: var(--tap-min);
-    padding: 0 3px; border-radius: 0;
+    /* 1 px et non 3 : à six entrées, un bouton fait 65 px et « Statistiques »
+       en demande 61 pour 59 disponibles. Il ne manquait que 2 px, donc on les
+       prend sur le calage plutôt que d'abréger le libellé. */
+    padding: 0 1px; border-radius: 0;
     font-size: var(--fs-100); font-weight: 600;
     flex-direction: column; justify-content: center; gap: 2px;
   }
