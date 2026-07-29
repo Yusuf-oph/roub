@@ -38,6 +38,17 @@ const PARAMS = Object.assign({
   translit: "fr", showTl: true, showTr: true,
   taj: true, speed: 1, newLimit: 15, silentMarks: true, rendu: "uthmani",
   recitation: "husary64", karaoke: true,
+  /* Révision (FSRS-6). `notation` vaut "2" ou "4" : deux boutons par défaut,
+     parce qu'on ne peut pas se tromper sur un choix binaire et que la
+     documentation de FSRS donne cette notation pour au moins aussi juste. Celui
+     qui prend quatre boutons le fait donc en connaissance de cause.
+     `retention` est en POUR CENT, pour qu'un curseur entier suffise.
+     `fsrsW` reste nul tant que l'optimiseur n'a pas tourné : nul veut dire
+     « les poids d'usine de la bibliothèque », jamais une valeur recopiée ici. */
+  /* `fsrsPrefTs` horodate le dernier changement de `notation` ou `retention` :
+     ces trois-là voyagent dans la charge de synchro, contrairement au reste des
+     réglages, parce qu'ils pilotent la planification. */
+  notation: "2", retention: 90, fsrsW: null, fsrsWInfo: null, fsrsPrefTs: 0,
 }, store.get("quran-params", {}));
 
 (function migrerParams() {
@@ -378,6 +389,14 @@ const DOMAINES_RAZ = {
       store.set(JOURNAL_KEY, {});
       REV_LOG.ids.length = 0; REV_LOG.log.length = 0; revIdx.clear();
       store.set(REVLOG_KEY, REV_LOG);
+      /* Les poids optimisés se calculaient sur cet historique : sans lui, ils
+         n'ont plus de justification. On revient donc aux valeurs d'usine plutôt
+         que de garder un ajustement dont la matière a disparu. */
+      if (PARAMS.fsrsW) {
+        PARAMS.fsrsW = null; PARAMS.fsrsWInfo = null;
+        fsrsModele = null;
+        saveParams();
+      }
     },
   },
 };
@@ -389,6 +408,24 @@ function razDomaine(d) {
   store.set(EPOCH_KEY, EPOCHS);
   schedulePush();
 }
+
+/* BASCULE VERS FSRS, une fois par appareil. La planification SM-2 ne se convertit
+   pas, elle s'efface : décision de Yusuf du 30/07, prise sur le constat que
+   personne n'avait encore utilisé les cartes, donc qu'il n'y avait rien à
+   convertir. On passe par l'ÉPOQUE de remise à zéro, sinon le premier appareil
+   resté en arrière nous renverrait son ancien état à la première synchro, les
+   règles de fusion reprenant sans condition une clé absente en local.
+   On reconnaît l'ancien format à son champ `ease`, qu'un état FSRS n'a jamais :
+   aucun marqueur de version à tenir, et l'opération est idempotente.
+   ⚠ Limite assumée : un appareil qui porterait encore de l'état SM-2 et se
+   mettrait à jour PLUS TARD poserait une époque plus récente, effaçant au passage
+   ce qui aurait été révisé ici entre-temps. Acceptable ici et seulement ici,
+   puisque personne n'a d'état de cartes au moment de la bascule. */
+(function basculeFsrs() {
+  if (!Object.keys(SRS).some(k => SRS[k] && SRS[k].ease !== undefined)) return;
+  videObjet(SRS); store.set(SRS_KEY, SRS);
+  EPOCHS.cartes = Date.now(); store.set(EPOCH_KEY, EPOCHS);
+})();
 /* la session reprend à zéro quand on ouvre le réviseur : le premier geste ne
    doit pas se voir imputer le temps écoulé depuis la session d'hier */
 function demarreChrono() { dernierGeste = Date.now(); }
@@ -405,12 +442,22 @@ function streak() {
   return n;
 }
 const MATURE_DAYS = 21;
+/* « Acquise » porte sur la STABILITÉ, pas sur l'intervalle affiché (tranché par
+   Yusuf le 30/07). La stabilité est le nombre de jours au bout duquel FSRS estime
+   qu'il resterait 9 chances sur 10 de retrouver la carte : elle ne bouge que
+   quand la mémoire bouge. L'intervalle, lui, dépend AUSSI du souvenir visé, si
+   bien qu'en le prenant pour seuil le compte des cartes acquises s'effondrerait
+   au seul déplacement d'un curseur de Paramètres, sans que rien n'ait été appris
+   ni oublié.
+   ⚠ Une carte venue d'un appareil resté en arrière n'a pas de `s` : elle n'est
+   donc pas acquise, et sa prochaine réponse la repose proprement en FSRS. */
+const estAcquise = s => !!s && (s.s || 0) >= MATURE_DAYS;
 function progressOf(cards) {
   let seen = 0, mature = 0, matureChains = 0, chains = 0;
   for (const c of cards) {
     const s = SRS[c.id];
     const isSeen = s && s.reps > 0;
-    const isMature = s && s.iv >= MATURE_DAYS;
+    const isMature = estAcquise(s);
     if (isSeen) seen++;
     if (isMature) mature++;
     if (c.type === "chain") {
@@ -420,32 +467,116 @@ function progressOf(cards) {
   }
   return { total: cards.length, seen, mature, chains, matureChains };
 }
-function srsState(id) {
-  return SRS[id] || { iv: 0, ease: 2.5, due: null, reps: 0, lapses: 0 };
+/* ---------------- planification : FSRS-6 ----------------
+   Le moteur maison (un SM-2 simplifié : facilité 2,5, intervalle multiplié)
+   a été REMPLACÉ le 30/07 par FSRS-6 au moyen de `fsrs-browser`, qui est
+   `fsrs-rs` compilé en WebAssembly, c'est-à-dire l'implémentation de référence,
+   celle qu'Anki emploie. On ne calcule donc plus rien ici : on l'interroge.
+   ⚠ POURQUOI CE N'EST PLUS SYNCHRONE. Le WebAssembly s'initialise de façon
+   asynchrone (~0,6 s la première fois). Le module est chargé à l'ouverture du
+   réviseur et `srsAnswer()` attend cette promesse. Le coût de contagion est nul :
+   il n'y a qu'un appelant, le gestionnaire des boutons de note.
+   ⚠ MESURES À NE PAS REFAIRE. Tout fonctionne SANS isolation d'origine :
+   `SharedArrayBuffer` est indisponible sur GitHub Pages, mais la mémoire WASM
+   partagée passe quand même, et l'entraînement n'a pas besoin de fils
+   d'exécution (61 600 révisions en 74 ms). Vérifié sous Chromium et sous
+   LibreWolf.
+   ⚠ SOUS `file://`, RIEN NE PEUT SE CHARGER : un module ES y est refusé et
+   `fetch` aussi. Mesuré dans un vrai Edge, jamais dans un panneau de
+   prévisualisation, qui sert `file:` par un proxy et donne un faux positif. La
+   copie locale ouverte par double-clic garde donc tout sauf la planification, ce
+   qui est cohérent : la synchro y est déjà impossible pour la même raison. */
+let fsrsMod = null, fsrsCharge = null, fsrsModele = null;
+const fsrsPossible = () => location.protocol !== "file:";
+const retentionVisee = () => Math.min(0.96, Math.max(0.8, (PARAMS.retention || 90) / 100));
+
+function chargeFsrs() {
+  if (!fsrsCharge) fsrsCharge = (async () => {
+    const mod = await import("./vendor/fsrs_browser.js");
+    await mod.default({ module_or_path: "./vendor/fsrs_browser_bg.wasm" });
+    fsrsMod = mod;
+  })();
+  return fsrsCharge;
 }
-function srsAnswer(id, grade) {
-  const s = srsState(id);
-  const now = Date.now(), day = 86400e3;
-  if (grade === "again") {
-    s.ease = Math.max(1.3, s.ease - 0.2);
-    if (s.reps > 0) s.lapses++;
-    s.iv = 0; s.due = now + 60e3;
-  } else if (grade === "hard") {
-    s.ease = Math.max(1.3, s.ease - 0.15);
-    s.iv = s.iv ? Math.max(1, s.iv * 1.2) : 1;
-    s.due = now + s.iv * day;
-  } else if (grade === "good") {
-    s.iv = s.iv ? s.iv * s.ease : 1;
-    s.due = now + s.iv * day;
-  } else {
-    s.ease += 0.15;
-    s.iv = s.iv ? s.iv * s.ease * 1.3 : 2.5;
-    s.due = now + s.iv * day;
+/* le modèle porte les poids : on le jette dès qu'ils changent, plutôt que de
+   maintenir deux sources de vérité sur ce qui planifie */
+function fsrsModeleCourant() {
+  if (!fsrsModele) {
+    const w = PARAMS.fsrsW;
+    fsrsModele = new fsrsMod.Fsrs(w && w.length ? new Float32Array(w) : undefined);
   }
-  s.reps++;
-  SRS[id] = s; store.set(SRS_KEY, SRS);
+  return fsrsModele;
+}
+
+/* Les clés de `nextStates` sont exactement nos quatre notes. Le réglage à deux
+   boutons n'en expose que deux, ce qui n'enlève rien au calcul : la note absente
+   n'est simplement jamais émise. */
+async function srsAnswer(id, grade) {
+  if (!fsrsPossible()) return;
+  await chargeFsrs();
+  const a = SRS[id], now = Date.now(), jour = 86400e3;
+  /* jours écoulés depuis la dernière réponse : c'est ce que FSRS confronte à la
+     stabilité pour savoir si le souvenir avait eu le temps de s'affaiblir */
+  const ecoules = a && a.last ? Math.max(0, Math.round((now - a.last) / jour)) : 0;
+  const etats = fsrsModeleCourant()
+    .nextStates(a ? a.s : undefined, a ? a.d : undefined, retentionVisee(), ecoules);
+  const e = etats[grade] || etats.good;
+  const iv = Math.max(0, e.interval);
+  SRS[id] = {
+    s: e.memory.stability, d: e.memory.difficulty, iv,
+    /* « À revoir » réarme la carte à une minute et la remet dans la file de la
+       séance : un verset raté se retravaille séance tenante. On n'emploie donc
+       pas le palier court de FSRS (environ 5 heures), qui la ferait sortir. */
+    due: grade === "again" ? now + 60e3 : now + Math.round(iv * jour),
+    reps: (a ? a.reps : 0) + 1,
+    lapses: (a ? a.lapses : 0) + (grade === "again" && a && a.reps ? 1 : 0),
+    last: now,
+  };
+  store.set(SRS_KEY, SRS);
   logAnswer(id, grade);
   schedulePush();
+}
+
+/* Les deux notations proposées. Rien d'autre ne change entre elles : ni le
+   journal (il stocke 1 à 4 depuis la 1.30.0), ni l'état des cartes. */
+const NOTATION = {
+  2: [["again", "À revoir"], ["good", "Bien"]],
+  4: [["again", "À revoir"], ["hard", "Difficile"], ["good", "Bien"], ["easy", "Facile"]],
+};
+const notationCourante = () => NOTATION[PARAMS.notation === "4" ? 4 : 2];
+
+/* ---- l'historique mis en forme pour l'optimiseur ----
+   ⚠ `computeParameters` n'attend PAS un historique par carte, mais la suite de
+   ses PRÉFIXES : une carte revue cinq fois donne quatre items, de longueurs 2 à 5,
+   tous concaténés. Lui passer un seul item par carte le fait paniquer sur
+   « NotEnoughData », faute d'items de longueur 2 pour estimer la stabilité
+   initiale. Piège payé le 30/07, et coûteux à diagnostiquer : la panique remonte
+   en JS sous la forme illisible « unreachable », le vrai motif n'apparaissant que
+   dans la console. */
+function jeuEntrainement() {
+  const parCarte = new Map();
+  for (const [t, i, note] of REV_LOG.log) {
+    if (!note) continue;                  // 0 = note inconnue, écartée
+    const id = REV_LOG.ids[i];
+    if (!id) continue;
+    let suite = parCarte.get(id);
+    if (!suite) parCarte.set(id, suite = []);
+    suite.push([t, note]);
+  }
+  const notes = [], deltas = [], longueurs = [];
+  for (const suite of parCarte.values()) {
+    if (suite.length < 2) continue;       // une seule réponse n'apprend rien
+    suite.sort((a, b) => a[0] - b[0]);
+    // delta_t = jours depuis la réponse précédente ; 0 pour la première
+    const dts = suite.map(([t], k) =>
+      k === 0 ? 0 : Math.max(0, Math.round((t - suite[k - 1][0]) / 86400)));
+    for (let n = 2; n <= suite.length; n++) {
+      for (let k = 0; k < n; k++) { notes.push(suite[k][1]); deltas.push(dts[k]); }
+      longueurs.push(n);
+    }
+  }
+  return { notes: new Uint32Array(notes), deltas: new Uint32Array(deltas),
+           longueurs: new Uint32Array(longueurs), revisions: REV_LOG.log.length };
 }
 function deckStats(cardIds) {
   const now = Date.now();
@@ -1194,7 +1325,7 @@ function statsPaquet() {
   let lapses = 0, ivTotal = 0, ivMax = 0, avecIv = 0;
   for (const c of cartes) {
     const s = SRS[c.id];
-    const etat = !s || !s.reps ? "neuves" : (s.iv >= MATURE_DAYS ? "acquises" : "apprentissage");
+    const etat = !s || !s.reps ? "neuves" : (estAcquise(s) ? "acquises" : "apprentissage");
     par[etat]++;
     const t = parType[c.type] || (parType[c.type] = { total: 0, acquises: 0 });
     t.total++; if (etat === "acquises") t.acquises++;
@@ -1331,7 +1462,7 @@ function pageStats() {
 
   // ---- le paquet
   const libT = { chain: "Enchaînements", vocab: "Vocabulaire", mutash: "Mutashabihat", sens: "Sens des passages" };
-  h += bloc("Le paquet", `une carte est « acquise » après un intervalle de ${MATURE_DAYS} jours ou plus`,
+  h += bloc("Le paquet", `une carte est « acquise » quand FSRS estime que tu la retiendrais ${MATURE_DAYS} jours`,
     `<div class="note-card">
       ${ligne("Neuves", pq.neuves)}
       ${ligne("En apprentissage", pq.apprentissage)}
@@ -1445,7 +1576,7 @@ function progressionHtml() {
   const neuf = !pg.seen && !Object.keys(EVAL).length;
   const sk = streak();
   let h = `<div class="juz-title"><h2>Ma progression</h2>
-    <span>une carte est « acquise » après un intervalle de ${MATURE_DAYS} jours ou plus</span></div>
+    <span>une carte est « acquise » quand FSRS estime que tu la retiendrais ${MATURE_DAYS} jours</span></div>
   <div class="note-card">`;
   if (neuf) {
     h += `<div class="fb-note" style="margin:0 0 8px">Rien à afficher pour l'instant :
@@ -2210,7 +2341,7 @@ function secCartes(rid) {
     <div style="margin-top:12px">
       <button class="fb-send" data-start-deck="${rid}">Réviser ce roub'</button>
       <span class="fb-note">ou l'onglet Révision pour mélanger plusieurs roub'
-      et télécharger les cartes pour Anki (recommandé : planificateur FSRS).</span>
+      et télécharger les cartes pour Anki.</span>
     </div></div></div>`;
   return h;
 }
@@ -2227,16 +2358,27 @@ function pageRevision() {
   let pool = collectCards();
   const st = deckStats(pool.map(c => c.id));
   let h = `<div class="hero"><h1>Révision espacée</h1>
-    <p>Les cartes reviennent à intervalle croissant selon tes réponses. Pour un
-    vrai suivi au long cours, <b>nous recommandons Anki</b> : son planificateur
-    <b>FSRS</b> (disponible depuis Anki 23.10, à activer dans les options du
-    paquet) place les révisions bien plus finement que le moteur simple intégré
-    ici.</p>
+    <p>Les cartes reviennent au moment où tu es sur le point de les oublier,
+    plutôt qu'à intervalle fixe. La planification est confiée à <b>FSRS-6</b>,
+    l'algorithme qu'emploie Anki : il s'ajuste sur ton propre historique de
+    révisions au lieu de suivre une formule figée. Ses réglages, dont le nombre de
+    boutons de notation, sont dans Paramètres.</p>
     <p><button class="fb-send" data-apkg>Télécharger les cartes pour Anki (.apkg)</button>
     <span class="fb-note">804 cartes, 24 sous-paquets (un par roub'), 1,4 Mo :
     enchaînements, vocabulaire, mutashabihat et sens. Sans audio : la récitation
     s'écoute ici. Un paquet avec audio (roub' 1) est disponible dans
     <code>apkg/</code> sur le dépôt.</span></p></div>`;
+  /* Sous file:// le planificateur ne peut pas se charger (module ES et wasm tous
+     deux refusés). On le dit, et on n'affiche pas une sélection qui ne mènerait à
+     rien. Le téléchargement Anki reste offert : lui fonctionne là, depuis le
+     correctif de la 1.12.2. */
+  if (!fsrsPossible()) return h + `<div class="revision-ko"><b>La révision espacée
+    n'est pas disponible quand l'appli est ouverte comme un simple fichier.</b> Son
+    planificateur est un module que le navigateur refuse de charger dans ce cas, la
+    restriction qui empêche déjà la synchronisation ici. Deux façons de la
+    retrouver : l'appli en ligne, ou <code>start.bat</code> dans ce dossier, qui la
+    sert par un petit serveur local. Le reste, lecture, récitation, tajwid et pages
+    du mushaf, fonctionne normalement.</div><div class="footer-pad"></div>`;
   h += `<div class="deck-opts">`;
   for (const r of avail) {
     h += `<button class="chip ${rev.sel.has(r.id) ? "on" : ""}" data-rev-rub="${r.id}">J${r.juz} R${r.rub}</button>`;
@@ -2295,6 +2437,10 @@ function startSession(pool) {
   }
   if (!list.length) return;
   rev.session = { list, i: 0, shown: false, done: 0, again: [] };
+  /* on lance le chargement du planificateur maintenant, sans l'attendre : il sera
+     prêt bien avant la première réponse, qui demande de lire la carte puis de
+     dévoiler la réponse. L'appel est mémorisé, le répéter ne coûte rien. */
+  if (fsrsPossible()) chargeFsrs();
   demarreChrono();     // sinon la 1re carte hérite du temps depuis la veille
   render();
 }
@@ -2332,12 +2478,9 @@ function revSessionHtml() {
   if (!s.shown) {
     h += `<div class="fc-actions"><button class="reveal" data-rev-show>Afficher la réponse</button></div>`;
   } else {
-    h += `<div class="fc-actions">
-      <button class="again" data-grade="again">À revoir</button>
-      <button class="hard" data-grade="hard">Difficile</button>
-      <button class="good" data-grade="good">Bien</button>
-      <button class="easy" data-grade="easy">Facile</button>
-    </div>`;
+    h += `<div class="fc-actions">` + notationCourante()
+      .map(([g, lib]) => `<button class="${g}" data-grade="${g}">${lib}</button>`)
+      .join("") + `</div>`;
   }
   h += `<div class="fc-meta">${remaining} restante${remaining > 1 ? "s" : ""} ·
     <a data-rev-back style="cursor:pointer">quitter</a></div></div>`;
@@ -3095,6 +3238,88 @@ function section(titre, contenu) {
   return `<h2 class="param-sec">${titre}</h2><div class="param-groupe">${contenu}</div>`;
 }
 
+/* ---- les trois réglages de FSRS ----
+   ⚠ Le texte des deux aides a été relu et VALIDÉ par Yusuf le 30/07 : ne pas le
+   réécrire sans lui. Il ATTRIBUE à la documentation d'Anki ce qui vient d'elle,
+   sans la citer entre guillemets traduits, ce qui lui ferait dire en français des
+   mots qu'elle n'a pas écrits.
+   ⚠ `class="aide-styles"` est OBLIGATOIRE sur le contenu : sans elle,
+   `.param-bloc .lab b { display:block }` casse les phrases en deux. */
+function aideNotation() {
+  return `<details class="aide-repli"><summary>Lequel choisir ?</summary>
+    <div class="aide-styles">
+    <p><b>Deux boutons</b> : tu dis seulement si le verset est venu ou non. On ne
+    peut pas se tromper, et la documentation de FSRS indique qu'une notation
+    binaire peut même donner une planification plus juste : un calcul statistique
+    souffre moins du manque de nuance que de l'hésitation.</p>
+    <p><b>Quatre boutons</b> : tu distingues en plus « laborieux » et « évident »,
+    ce qui donne deux signaux supplémentaires. Dans nos essais, la planification
+    obtenue ne diffère que de quelques pour cent.</p>
+    <p>Si tu prends les quatre, retiens que <b>Difficile</b> veut dire « je l'ai
+    su, avec peine », jamais « je l'ai presque su ». C'est la confusion la plus
+    répandue, et elle fausse le calcul, puisqu'elle fait passer un échec pour une
+    réussite.</p>
+    <p>Tu peux changer d'avis quand tu veux : ton historique reste valable, il sera
+    simplement moins homogène.</p></div></details>`;
+}
+function aideRetention() {
+  return `<details class="aide-repli"><summary>Faut-il y toucher ?</summary>
+    <div class="aide-styles">
+    <p>Le manuel d'Anki recommande 90 %, qu'il présente comme le bon équilibre
+    entre ce qu'on retient et ce qu'on révise. Il assortit ce réglage de deux
+    avertissements : au-delà de 90 % la charge de travail augmente très vite, et
+    au-delà de 97 % elle peut devenir écrasante. Sa consigne est de rester prudent
+    et de ne pas dépasser 97 % : ce curseur s'arrête donc à 96 %.</p>
+    <p>Mesuré ici, sur une carte que tu tiens 30 jours : elle revient dans 30 jours
+    à 90 %, dans 22 jours à 92 %, dans 12 jours à 95 %, dans 9 jours à 96 %. Au
+    bout du curseur, tu révises donc trois fois plus souvent qu'à 90 %, sans que ta
+    mémoire ait changé.</p>
+    <p>Dans l'autre sens, descendre allège les séances : à 85 %, la même carte ne
+    revient qu'au bout de 57 jours. Le prix est des oublis plus fréquents, donc des
+    versets à reprendre.</p></div></details>`;
+}
+function aidePoids() {
+  const info = PARAMS.fsrsWInfo, w = PARAMS.fsrsW;
+  /* Avant la première optimisation on n'affiche AUCUN nombre : les valeurs
+     d'usine vivent dans le WebAssembly, et charger 370 Ko sur un écran de
+     réglages pour afficher une liste que personne ne lit ne se justifie pas. */
+  return `<details class="aide-repli"><summary>Poids du modèle</summary>
+    <div class="aide-styles">
+    <p>Vingt et une valeurs, ajustées sur ton historique. Il n'y a rien à saisir :
+    elles se calculent, elles ne se choisissent pas.</p>
+    ${w && w.length ? `<p class="poids">${w.map(x => (+x).toFixed(3).replace(".", ",")).join(" · ")}</p>` : ""}
+    <p>${info ? `Ajustées le ${esc(info.date)} sur ${info.n} révision${info.n > 1 ? "s" : ""}.`
+      : "Ce sont pour l'instant les valeurs d'usine de FSRS-6, jamais optimisées."}</p>
+    <p>À quelle fréquence recommencer ? La documentation de FSRS répond qu'une fois
+    par mois suffit largement, et donne une règle plus fine pour qui la préfère :
+    optimiser chaque fois que le nombre de révisions double, à 100 révisions, puis
+    200, puis 400.</p></div></details>`;
+}
+function blocFsrs() {
+  const pc = Math.round(retentionVisee() * 100);
+  return rangee("Boutons de notation",
+      `Deux boutons (« À revoir » et « Bien ») ou quatre (avec « Difficile » et
+       « Facile »).${aideNotation()}`,
+      segment("notation", [["2", "2"], ["4", "4"]], PARAMS.notation === "4" ? "4" : "2"))
+    + rangee("Souvenir visé",
+      `Ce que tu acceptes d'oublier avant qu'une carte revienne. À 90 %, elle
+       revient quand il te reste environ 9 chances sur 10 de la retrouver. Laisse
+       90 % si tu hésites : c'est la valeur recommandée.${aideRetention()}`,
+      `<div class="retention"><input type="range" min="80" max="96" step="1"
+         value="${pc}" data-param="retention" aria-label="souvenir visé, en pour cent">
+       <b data-ret-val>${pc} %</b></div>`)
+    + rangee("Optimiser sur mon historique",
+      (PARAMS.fsrsWInfo
+        ? `Les intervalles suivent des poids ajustés sur ta mémoire. À refaire
+           chaque fois que ton nombre de révisions double.`
+        : `Les intervalles se calculent pour l'instant avec les valeurs d'usine.
+           L'appli peut les recalculer sur ta mémoire dès que tu auras révisé, et
+           c'est à refaire chaque fois que ton nombre de révisions double.`)
+      + aidePoids(),
+      `<div><button class="fb-send" data-fsrs-opt${fsrsPossible() ? "" : " disabled"}
+         >Optimiser</button><div class="fb-note" data-fsrs-etat></div></div>`);
+}
+
 function pageParams() {
   const listePolice = `<select data-param="police">
       <option value="auto" ${!POLICES.some(p => p.id === PARAMS.police) ? "selected" : ""}
@@ -3186,7 +3411,8 @@ function pageParams() {
       </select>`))}
 
   ${section("Révision et avis",
-    rangee("Nouvelles cartes par session", "Révision espacée.",
+    blocFsrs()
+    + rangee("Nouvelles cartes par session", "Révision espacée.",
       `<select data-param="newLimit">
         ${[5, 10, 15, 20, 30].map(x => `<option value="${x}" ${PARAMS.newLimit === x ? "selected" : ""}>${x}</option>`).join("")}
       </select>`)
@@ -3515,10 +3741,16 @@ function bindMain() {
   $$("[data-rev-show]", main).forEach(el => el.addEventListener("click", () => {
     rev.session.shown = true; render();
   }));
-  $$("[data-grade]", main).forEach(el => el.addEventListener("click", () => {
+  $$("[data-grade]", main).forEach(el => el.addEventListener("click", async () => {
     const s = rev.session;
     const c = currentCard();
-    srsAnswer(c.id, el.dataset.grade);
+    /* le WebAssembly peut n'être pas encore prêt au tout premier clic : on
+       l'attend, en verrouillant la rangée pour qu'un second clic impatient ne
+       note pas la carte deux fois. Pas de déverrouillage à écrire : render()
+       reconstruit la rangée. */
+    if (el.parentElement.dataset.busy) return;
+    el.parentElement.dataset.busy = "1";
+    await srsAnswer(c.id, el.dataset.grade);
     if (el.dataset.grade === "again") s.again.push(c);
     else s.done++;
     s.i++; s.shown = false;
@@ -3540,6 +3772,8 @@ function bindMain() {
   const sansBouger = f => { const y = window.scrollY; f(); window.scrollTo(0, y); };
   $$("[data-seg]", main).forEach(el => el.addEventListener("click", () => {
     PARAMS[el.dataset.seg] = el.dataset.val;
+    // le nombre de boutons pilote la planification : il s'horodate et il voyage
+    if (el.dataset.seg === "notation") { PARAMS.fsrsPrefTs = Date.now(); schedulePush(); }
     saveParams();   // saveParams appelle déjà applyTheme()
     sansBouger(render);   // l'état « appliqué maintenant / en veille » change aussi
   }));
@@ -3549,6 +3783,8 @@ function bindMain() {
       if (el.type === "checkbox") PARAMS[k] = el.checked;
       else if (k === "speed") PARAMS[k] = +el.value;
       else if (k === "newLimit") PARAMS[k] = +el.value;
+      // même raison que pour `notation` : ce réglage change les échéances
+      else if (k === "retention") { PARAMS[k] = +el.value; PARAMS.fsrsPrefTs = Date.now(); schedulePush(); }
       else PARAMS[k] = el.value;
       saveParams();   // saveParams appelle déjà applyTheme()
       /* changer de mode ou de thème change aussi le libellé « appliqué
@@ -3556,6 +3792,65 @@ function bindMain() {
       if (["mode", "themeClair", "themeSombre", "police", "anim", "taille", "largeur"].includes(k)) sansBouger(render);
     });
   });
+
+  /* le curseur du souvenir visé : sa valeur se lit à côté et suit le doigt, mais
+     rien n'est enregistré avant le relâchement, que `change` signale */
+  $$("[data-param='retention']", main).forEach(el => el.addEventListener("input", () => {
+    const b = el.parentElement.querySelector("[data-ret-val]");
+    if (b) b.textContent = el.value + " %";
+  }));
+
+  /* Optimiser : ajuster les 21 poids sur l'historique par révision. Instantané en
+     pratique (61 600 révisions en 74 ms, mesuré), donc aucune barre de progression
+     ni worker : on bloque le bouton le temps du calcul, c'est tout. */
+  $$("[data-fsrs-opt]", main).forEach(el => el.addEventListener("click", async () => {
+    const zone = $$("[data-fsrs-etat]", main)[0];
+    const dire = m => { if (zone) zone.textContent = m; };
+    const TROP_MINCE = "Ton historique est encore trop mince pour en tirer des "
+      + "poids fiables. Les valeurs d'usine restent en place, et tu pourras "
+      + "réessayer quand tu auras révisé davantage.";
+    const jeu = jeuEntrainement();
+    if (!jeu.longueurs.length) {
+      return dire("Il faut d'abord réviser : aucune carte n'a encore deux réponses dans ton historique.");
+    }
+    el.disabled = true; dire("Calcul…");
+    try {
+      await chargeFsrs();
+      /* instance jetable : si l'entraînement panique, l'objet reste inutilisable
+         (« recursive use of an object »), et on ne veut pas perdre celui qui
+         planifie */
+      const w = [...new fsrsMod.Fsrs()
+        .computeParameters(jeu.notes, jeu.deltas, jeu.longueurs, undefined, true)];
+      /* CONTRÔLE DE VRAISEMBLANCE. Sur un historique pauvre ou incohérent,
+         l'optimiseur rend des poids dégénérés : mesuré le 30/07, un intervalle de
+         0,03 jour après un « Bien ». Mieux vaut garder les valeurs d'usine que
+         planifier n'importe comment. */
+      const essai = new fsrsMod.Fsrs(new Float32Array(w));
+      const j = essai.nextStates(undefined, undefined, 0.9, 0).good.interval;
+      if (!w.every(x => isFinite(x)) || !(j >= 0.5 && j <= 365)) {
+        el.disabled = false;
+        return dire(TROP_MINCE);
+      }
+      PARAMS.fsrsW = w;
+      /* `ts` en millisecondes sert la FUSION (le plus récemment optimisé gagne) ;
+         `date` n'est que l'affichage, et une chaîne ne se compare pas. */
+      PARAMS.fsrsWInfo = { date: new Date().toLocaleDateString("fr-FR"),
+                           n: jeu.revisions, ts: Date.now() };
+      saveParams();
+      fsrsModele = null;         // les poids ont changé : le modèle se refait au besoin
+      schedulePush();            // pour que les autres appareils en profitent
+      sansBouger(render);
+    } catch (e) {
+      /* Une panique du WebAssembly remonte en JS sous la forme nue
+         « unreachable », son motif n'apparaissant qu'en console. Le seul motif
+         rencontré est « NotEnoughData », et aucun autre ne serait de toute façon
+         actionnable par l'utilisateur : on lui dit la même chose et on garde le
+         détail pour la console. */
+      console.warn("fsrs : computeParameters a échoué", e);
+      el.disabled = false;
+      dire(TROP_MINCE);
+    }
+  }));
 
   /* feedback + préchargement */
   $$("[data-fb-export]", main).forEach(el =>
@@ -3729,7 +4024,26 @@ function localPayload() {
      siennes. Monter la version obligerait à un code de migration pour un ajout
      purement additif. */
   return { v: 1, srs: SRS, journal: store.get(JOURNAL_KEY, {}), eval: EVAL,
-           vues: VUES, evalLog: EVAL_LOG, revLog: REV_LOG, epochs: EPOCHS };
+           vues: VUES, evalLog: EVAL_LOG, revLog: REV_LOG, epochs: EPOCHS,
+           fsrs: chargeFsrsSync() };
+}
+
+/* Les réglages qui PILOTENT LA PLANIFICATION voyagent, contrairement au reste de
+   `PARAMS` qui reste local (thème, police, taille). Sans ça, un appareil qui a
+   optimisé ses poids et un autre qui ne l'a pas fait donnent à la même carte des
+   échéances différentes de l'ordre de 25 %, mesuré : ce n'est pas une incohérence
+   de données, la carte n'a qu'une échéance, mais une incohérence de traitement.
+   ⚠ DEUX HORODATAGES ET NON UN SEUL. Les préférences (nombre de boutons,
+   souvenir visé) et les poids optimisés changent indépendamment. Avec un seul
+   horodatage de groupe, déplacer le curseur sur son téléphone écraserait les
+   poids calculés sur l'ordinateur, qui n'ont rien à voir avec ce geste. */
+function chargeFsrsSync() {
+  return {
+    pref: { notation: PARAMS.notation, retention: PARAMS.retention,
+            ts: PARAMS.fsrsPrefTs || 0 },
+    poids: { w: PARAMS.fsrsW || null, info: PARAMS.fsrsWInfo || null,
+             ts: (PARAMS.fsrsWInfo && PARAMS.fsrsWInfo.ts) || 0 },
+  };
 }
 function mergeRemote(remote) {
   if (!remote) return;
@@ -3814,6 +4128,31 @@ function mergeRemote(remote) {
       if (!VUES[id] || ts > VUES[id]) VUES[id] = ts;
     }
     store.set(VUES_KEY, VUES);
+  }
+  /* RÉGLAGES DE PLANIFICATION : le plus récemment changé gagne, séparément pour
+     les préférences et pour les poids. Aucune époque ne s'y applique : effacer
+     ses cartes n'invalide pas un réglage.
+     ⚠ On ne fait pas confiance à la charge : des poids distants ne sont adoptés
+     que s'il y en a bien 21 et qu'ils sont tous finis. Une ligne Supabase est un
+     casier partagé par code, pas une source sûre. */
+  const f = remote.fsrs;
+  if (f) {
+    let bouge = false;
+    if (f.pref && (f.pref.ts || 0) > (PARAMS.fsrsPrefTs || 0)) {
+      if (f.pref.notation === "2" || f.pref.notation === "4") PARAMS.notation = f.pref.notation;
+      if (typeof f.pref.retention === "number") PARAMS.retention = f.pref.retention;
+      PARAMS.fsrsPrefTs = f.pref.ts;
+      bouge = true;
+    }
+    const tsLocal = (PARAMS.fsrsWInfo && PARAMS.fsrsWInfo.ts) || 0;
+    if (f.poids && (f.poids.ts || 0) > tsLocal && Array.isArray(f.poids.w)
+        && f.poids.w.length === 21 && f.poids.w.every(x => typeof x === "number" && isFinite(x))) {
+      PARAMS.fsrsW = f.poids.w;
+      PARAMS.fsrsWInfo = f.poids.info;
+      fsrsModele = null;            // les poids ont changé : le modèle se refait
+      bouge = true;
+    }
+    if (bouge) saveParams();
   }
 }
 /* état de la synchro : il doit dire la VÉRITÉ du moment. Un « synchronisé
@@ -3912,7 +4251,7 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "1.31.1";   // réécrit par tools/release.py
+const BUILD_VERSION = "2.0.0";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {

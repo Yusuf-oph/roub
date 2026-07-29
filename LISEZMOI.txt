@@ -24,9 +24,13 @@ coranique ne change jamais.
 COPIE LOCALE (ce dossier)
 -------------------------
 Si tu as téléchargé ce dossier depuis GitHub (Code -> Download ZIP) :
-1. Double-cliquer sur  start.bat  (si Python est installé), ou
-2. Ouvrir directement  app\index.html  dans ton navigateur :
-   tout fonctionne pareil, audio compris, sans rien installer.
+1. Double-cliquer sur  start.bat  (si Python est installé) : tout
+   fonctionne pareil, audio et révision espacée compris.
+2. Sans Python, tu peux ouvrir directement  app\index.html  : la lecture,
+   la récitation, le tajwid et les pages du mushaf marchent, mais la
+   révision espacée n'est pas disponible. Son planificateur est un module
+   que le navigateur refuse de charger depuis un simple fichier, la
+   restriction qui empêche déjà la synchronisation dans ce cas.
 Une copie locale ne se met pas à jour toute seule : l'application
 affiche un bandeau quand une version plus récente est en ligne.
 

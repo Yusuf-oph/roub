@@ -1,5 +1,16 @@
 # Changelog
 
+## 2.0.0 · 2026-07-30
+- La révision espacée passe à **FSRS-6**, l'algorithme de planification qu'emploie Anki. Les cartes ne reviennent plus à intervalle simplement croissant : elles reviennent au moment où tu es sur le point de les oublier, calculé sur ton propre historique de révisions. Le calcul se fait sur l'appareil, rien n'est envoyé nulle part
+- **Deux boutons de notation au lieu de quatre** : tu dis seulement si le verset est venu ou non, ce sur quoi on ne peut pas se tromper. Les quatre restent disponibles dans Paramètres, avec une aide qui explique ce que chacun engage et pourquoi « Difficile » signifie « je l'ai su, avec peine » et jamais « je l'ai presque su »
+- Trois réglages neufs dans Paramètres : le nombre de boutons, le **souvenir visé** (la part d'oubli acceptée avant qu'une carte revienne, de 80 à 96 %) et un bouton **Optimiser** qui ajuste la planification sur l'historique. Chacun est expliqué sur place, avec les avertissements de la documentation de FSRS
+- Ces trois réglages **suivent d'un appareil à l'autre**, contrairement au thème ou à la police qui restent propres à chacun : sans cela, un appareil où l'on a optimisé et un autre où l'on ne l'a pas fait donneraient à la même carte des échéances différentes, d'environ 25 % d'écart. Les préférences et les poids portent chacun leur propre horodatage, de sorte que déplacer le curseur sur un appareil n'efface pas les poids calculés sur l'autre
+- Effacer « l'historique et les statistiques » remet aussi les poids aux valeurs d'usine : ils se calculaient sur cet historique, et sans lui ils n'ont plus de justification
+- **Numéro majeur parce que la planification change de format et repart de zéro** : celle de l'ancien moteur ne se convertit pas dans le nouveau. Les auto-évaluations de versets, la série de jours, le journal et les statistiques ne sont pas touchés
+- Une carte est dite « acquise » quand l'application estime qu'on la retiendrait trois semaines, et non plus quand son intervalle atteint trois semaines. Le compte ne bouge donc plus quand on déplace le réglage du souvenir visé, mais seulement quand la mémoire bouge
+- Copie locale : ouvrir `app/index.html` comme un simple fichier ne permet plus de réviser, le navigateur refusant d'y charger le planificateur. `start.bat` (ou la version en ligne) rend la révision ; tout le reste fonctionne dans les deux cas
+- Sources et licences : `fsrs-browser` (BSD-3-Clause) et le fragment `wasm-bindgen-rayon` (Apache-2.0) sont redistribués avec leur texte de licence, et `SOURCES.md` gagne une section sur la planification ainsi que les notices du manuel d'Anki et de sa FAQ FSRS, désormais cités dans l'application
+
 ## 1.31.1 · 2026-07-29
 - Correction : Paramètres affichait la dernière version DISPONIBLE en ligne et non celle réellement installée. On pouvait donc se croire à jour sans l'être. La ligne annonce maintenant la version installée, et signale à côté qu'une mise à jour existe quand c'est le cas
 

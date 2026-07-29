@@ -72,10 +72,13 @@ l'export d'avis intégré à l'application, dans Paramètres).
   l'audio et la calligraphie du mushaf se préchargent **à la carte** dans
   Paramètres, chaque style de récitation séparément. Mises à jour
   automatiques (bannière en haut de page).
-- **En local, sans serveur** : Code → Download ZIP sur cette page GitHub,
-  dézipper, ouvrir `app/index.html` (ou `start.bat` sous Windows avec
-  Python). Tout fonctionne, audio compris ; l'application signale
-  lorsqu'une version plus récente est en ligne.
+- **En local** : Code → Download ZIP sur cette page GitHub, dézipper, puis
+  lancer `start.bat` (Windows) ou `python serve.py`. Tout fonctionne, audio
+  compris ; l'application signale lorsqu'une version plus récente est en
+  ligne. Ouvrir `app/index.html` directement, sans serveur, reste possible
+  pour lire et écouter, mais **la révision espacée n'y fonctionne pas** : son
+  planificateur est un module que le navigateur refuse de charger depuis un
+  simple fichier, la même restriction qui y empêche déjà la synchronisation.
 
 ### L'accueil : les 24 roub' et leur difficulté
 

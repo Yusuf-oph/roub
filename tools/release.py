@@ -46,6 +46,22 @@ def shell_files():
         for f in sorted(os.listdir(d)):
             if f.endswith(".js"):
                 files.append(f"data/{sub + '/' if sub else ''}{f}")
+    # Planificateur FSRS-6 : la glu ESM, le WebAssembly, et le fragment
+    # wasm-bindgen-rayon que la glu importe STATIQUEMENT. Sans lui, le module ne
+    # se charge pas du tout.
+    # ⚠ PARCOURS RÉCURSIF OBLIGATOIRE ICI, contrairement à tout le reste de cette
+    # fonction : ce fragment vit sous snippets/…/src/, et un os.listdir non
+    # récursif l'oublierait. L'application marcherait alors en ligne et casserait
+    # HORS CONNEXION, c'est-à-dire le défaut le plus difficile à voir venir.
+    # Les deux fichiers de licence sont volontairement exclus : ils doivent
+    # accompagner la redistribution du dépôt, pas peser dans la coquille.
+    vdir = os.path.join(APP, "vendor")
+    for racine, _, noms in os.walk(vdir):
+        for f in sorted(noms):
+            if f.endswith(".txt"):
+                continue
+            rel = os.path.relpath(os.path.join(racine, f), APP).replace(os.sep, "/")
+            files.append(rel)
     return files
 
 

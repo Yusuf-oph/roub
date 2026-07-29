@@ -173,13 +173,39 @@ mu'allim* enregistré au monde (1969).
   versets sont identiques ») sont vérifiées par script contre le texte
   coranique complet, jamais de mémoire.
 
+## 9 bis. Planification des révisions (FSRS-6)
+
+Les cartes ne sont plus planifiées par un moteur écrit ici. Depuis la refonte de
+juillet 2026, elles le sont par **FSRS-6**, exécuté dans le navigateur, sur
+l'appareil, sans que rien ne soit envoyé nulle part.
+
+- **Bibliothèque : `fsrs-browser`** (Open Spaced Repetition), version 6.6.0, sous
+  **BSD-3-Clause**, © 2023 Alex Nguyen. C'est `fsrs-rs`, l'implémentation de
+  référence de l'algorithme, celle qu'Anki emploie, compilée en WebAssembly. Les
+  fichiers redistribués sont dans `app/vendor/`, accompagnés du texte de la
+  licence (`BSD-fsrs-browser.txt`). La clause qui distingue cette licence de MIT
+  interdit de se servir du nom de l'auteur pour recommander ou promouvoir Roub' :
+  ce qui précède est un crédit, rien de plus.
+- Elle embarque un fragment de **wasm-bindgen-rayon** (© Google Inc.), sous
+  **Apache-2.0**, dont le texte est joint (`APACHE-wasm-bindgen-rayon.txt`).
+- **Les réglages et leurs avertissements reprennent la documentation d'Anki** :
+  la valeur recommandée du souvenir visé et le fait que la charge de révision
+  s'envole au-delà, la fréquence à laquelle il vaut la peine de réoptimiser, et
+  le sens exact du bouton « Difficile », qui note une réussite laborieuse et non
+  un échec. Ces textes sont en anglais : l'application **attribue** le propos,
+  elle ne le cite pas en traduction.
+- Les 21 poids du modèle ne sont jamais choisis à la main. Ce sont les valeurs
+  d'usine de la bibliothèque, ou celles que son optimiseur calcule sur
+  l'historique de révisions de l'utilisateur, lequel ne quitte pas son appareil.
+
 ## 10. Ce que l'application NE reprend à personne
 
 Le découpage roub' par roub', la notation de difficulté sur cinq étoiles, le
-choix des points durs à signaler, l'ordre du parcours de tajwid progressif, la
-formulation des cartes et le moteur de révision espacée sont le travail propre
-de Roub'. Ce sont des choix pédagogiques, pas des positions savantes, et ils
-n'engagent que nous.
+choix des points durs à signaler, l'ordre du parcours de tajwid progressif et la
+formulation des cartes sont le travail propre de Roub'. Ce sont des choix
+pédagogiques, pas des positions savantes, et ils n'engagent que nous. La
+planification des révisions, en revanche, n'est plus de notre fait : elle est
+confiée à FSRS (section 9 bis).
 
 ---
 
@@ -209,6 +235,18 @@ selon l'usage des bibliographies d'études arabes ; date de décès en hégire e
 parenthèses pour les auteurs classiques quand elle est établie ; translittération
 scientifique pour les titres arabes ; nom du *muḥaqqiq* quand l'édition en a un.
 
+ANKI. *Anki Manual : Studying*, section « Answer Buttons » [en ligne]. [Consulté
+le 30 juillet 2026]. Disponible à l'adresse :
+https://docs.ankiweb.net/studying.html#answer-buttons
+
+ANKI. *Anki Manual : Deck Options*, section « FSRS », sous-section « Desired
+Retention » [en ligne]. [Consulté le 30 juillet 2026]. Disponible à l'adresse :
+https://docs.ankiweb.net/deck-options.html
+
+ANKI. *Frequently Asked Questions about FSRS* [en ligne]. [Consulté le 30 juillet
+2026]. Disponible à l'adresse :
+https://faqs.ankiweb.net/frequently-asked-questions-about-fsrs.html
+
 COMPLEXE DU ROI FAHD POUR L'IMPRESSION DU NOBLE CORAN (KFGQPC).
 *Al-Muṣḥaf al-sharīf*, riwāyat Ḥafṣ ʿan ʿĀṣim [en ligne]. Médine. Texte obtenu
 par l'API quran.com v4, champs `text_uthmani`, `text_uthmani_tajweed`,
@@ -222,6 +260,11 @@ AL-GHAZĀLĪ, Abū Ḥāmid Muḥammad ibn Muḥammad aṭ-Ṭūsī (m. 505 H). 
 ad-dīn*. Beyrouth : Dār al-Maʿrifa, 4 vol. T. II, p. 336, kitāb al-amr
 bi-l-maʿrūf wa-n-nahy ʿan al-munkar [en ligne]. [Consulté le 25 juillet 2026].
 Disponible à l'adresse : https://shamela.ws/book/9472/696
+
+GOOGLE INC. *wasm-bindgen-rayon* [bibliothèque logicielle]. Apache-2.0. Fragment
+`workerHelpers.js`, redistribué avec `fsrs-browser` [en ligne]. [Consulté le
+30 juillet 2026]. Disponible à l'adresse :
+https://github.com/RReverser/wasm-bindgen-rayon
 
 HAMIDULLAH, Muhammad. *Le Noble Coran et la traduction en langue française de
 ses sens* [en ligne]. Servie par l'API quran.com, identifiant 31. Diffusion non

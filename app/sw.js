@@ -3,7 +3,7 @@
    - coquille (html/css/js/données/police de texte) : precache versionné ;
    - audio Husary + polices de pages QCF : cache à la demande, immuable ;
    - version.json : réseau d'abord (détection de mise à jour). */
-const VERSION = "1.31.1+2026-07-29";
+const VERSION = "2.0.0+2026-07-30";
 const SHELL_CACHE = "roub-shell-" + VERSION;
 const MEDIA_CACHE = "roub-media-v1";
 
@@ -142,7 +142,10 @@ const SHELL = [
   "data/segments/husary128.js",
   "data/segments/husary64.js",
   "data/segments/muallim.js",
-  "data/segments/mujawwad.js"
+  "data/segments/mujawwad.js",
+  "vendor/fsrs_browser.js",
+  "vendor/fsrs_browser_bg.wasm",
+  "vendor/snippets/wasm-bindgen-rayon-38edf6e439f6d70d/src/workerHelpers.js"
 ];
 // __SHELL_END__
 

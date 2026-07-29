@@ -1048,7 +1048,9 @@ details[open] > summary.juz-title::after { transform: rotate(90deg); }
 /* message d'indisponibilité dans la barre audio */
 .audio-ko { color: var(--danger); font-weight: 600; }
 .audio-repli { color: var(--accent2); }
-.pages-ko {
+/* encart d'indisponibilité : mêmes règles pour les polices de page manquantes et
+   pour la planification que file:// interdit de charger */
+.pages-ko, .revision-ko {
   margin: 10px 0; padding: 9px 12px; border-radius: var(--r);
   border: 1px solid var(--danger); color: var(--danger); font-size: var(--fs-300);
 }
@@ -1227,6 +1229,15 @@ h2.sec { font-size: var(--fs-500); margin: 22px 0 8px; }
 }
 .param-groupe > .param-bloc:first-child { border-top: 0; }
 .param-bloc .lab b { display: block; }
+/* le souvenir visé : un curseur et sa valeur lue juste à côté */
+.retention { display: flex; align-items: center; gap: 8px; }
+.retention input[type="range"] { width: 150px; }
+.retention b { min-width: 46px; text-align: right; }
+/* les 21 poids du modèle : des nombres qu'on aligne, pas de la prose */
+.aide-styles .poids {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: .82em; line-height: 1.6; color: var(--muted);
+}
 .param-bloc .lab span { color: var(--muted); font-size: var(--fs-300); }
 .param-bloc .lab { min-width: 0; }
 /* les blocs qui portent leur commande dessous plutôt qu'à droite */

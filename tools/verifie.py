@@ -616,6 +616,53 @@ def main():
         print(f"K. khatt : {len(KHATT)} versets, {sum(len(x) for x in KHATT.values())} mots, "
               f"{cales} calés sur arHtml et sur les {len(SEGK)} jeux de segments")
 
+    # ---------------- L. planificateur FSRS ----------------
+    # Trois échecs MUETS sont possibles ici, d'où ce contrôle :
+    #  - le fragment wasm-bindgen-rayon manquant : la glu l'importe STATIQUEMENT,
+    #    donc le module ne se charge pas du tout, et le message du navigateur
+    #    (« Failed to fetch dynamically imported module ») ne dit pas lequel ;
+    #  - un fichier hors de la coquille du SW : l'appli marche en ligne et casse
+    #    hors connexion, le pire des deux mondes ;
+    #  - une licence absente : BSD-3-Clause et Apache-2.0 obligent tous deux à
+    #    joindre leur texte à ce qu'on redistribue.
+    sys.path.insert(0, HERE)
+    from release import shell_files as _shell
+    coq = set(_shell())
+    app_src = open(os.path.join(APP, "app.js"), encoding="utf-8").read()
+    RAYON = "vendor/snippets/wasm-bindgen-rayon-38edf6e439f6d70d/src/workerHelpers.js"
+    for f in ("vendor/fsrs_browser.js", "vendor/fsrs_browser_bg.wasm", RAYON):
+        if not os.path.exists(os.path.join(APP, *f.split("/"))):
+            err(f"fsrs : {f} absent")
+        elif f not in coq:
+            err(f"fsrs : {f} hors de la coquille du SW, donc réviser serait "
+                f"impossible hors connexion (relancer tools/release.py)")
+    for f, quoi in (("vendor/BSD-fsrs-browser.txt", "BSD-3-Clause de fsrs-browser"),
+                    ("vendor/APACHE-wasm-bindgen-rayon.txt", "Apache-2.0 du fragment rayon")):
+        if not os.path.exists(os.path.join(APP, *f.split("/"))):
+            err(f"fsrs : licence {quoi} absente ({f})")
+    # la glu importe le fragment par un chemin littéral : si l'un des deux bouge,
+    # le contrôle ci-dessus vérifierait un chemin qui n'est plus le bon
+    glu = os.path.join(APP, "vendor", "fsrs_browser.js")
+    if os.path.exists(glu):
+        src = open(glu, encoding="utf-8").read()
+        attendu = "./snippets/wasm-bindgen-rayon-38edf6e439f6d70d/src/workerHelpers.js"
+        if attendu not in src:
+            err("fsrs : la glu n'importe plus le fragment attendu ; relever son "
+                "chemin réel et corriger release.py::shell_files et ce contrôle")
+    if "fsrs_browser.js" not in app_src:
+        err("fsrs : app.js ne charge pas le planificateur")
+    # SOURCES.md doit nommer ce qu'on redistribue et ce qu'on cite
+    src_md = open(os.path.join(ROOT, "SOURCES.md"), encoding="utf-8").read()
+    for aig, quoi in (("fsrs-browser", "fsrs-browser"), ("wasm-bindgen-rayon", "le fragment rayon"),
+                      ("FSRS", "FSRS")):
+        if aig not in src_md:
+            err(f"fsrs : {quoi} absent de SOURCES.md")
+    # ⚠ le contrôle porte sur ce que release.py VA écrire, pas sur le sw.js
+    # courant : la liste du SW reste figée à la version précédente jusqu'au
+    # prochain stampage. C'est voulu, c'est là que le défaut serait introduit.
+    print("L. fsrs : 3 fichiers présents et retenus par shell_files, "
+          "2 licences, SOURCES.md à jour")
+
     print()
     if ERR:
         print(f"{len(ERR)} ERREUR(S)")
