@@ -3912,16 +3912,28 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "1.31.0";   // réécrit par tools/release.py
+const BUILD_VERSION = "1.31.1";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {
   if (location.protocol.startsWith("http")) {
+    /* ⚠ On affiche la version INSTALLÉE — `BUILD_VERSION`, gravée dans CE
+       fichier — et jamais celle du serveur. C'est ce fichier-ci qui s'exécute,
+       or le service worker peut en servir une copie plus ancienne que la
+       dernière publiée : lire `version.json` faisait donc afficher la dernière
+       version DISPONIBLE, et l'utilisateur se croyait à jour alors qu'il ne
+       l'était pas (signalé par Yusuf le 29/07).
+       La version du serveur ne sert plus qu'à SIGNALER qu'une mise à jour
+       existe, la bannière et son bouton faisant le reste. */
+    APPVER = BUILD_VERSION;
     try {
       const v = await (await fetch("version.json", { cache: "no-store" })).json();
-      APPVER = `${v.version} · ${v.date}`;
+      if (v.version && v.version !== BUILD_VERSION) {
+        APPVER = `${BUILD_VERSION} · mise à jour disponible : ${v.version}`;
+      } else if (v.date) {
+        APPVER = `${BUILD_VERSION} · ${v.date} · à jour`;
+      }
     } catch (e) {
-      // la version installée est connue : ne pas afficher « hors-ligne » à sa place
       APPVER = BUILD_VERSION + " (vérification des mises à jour impossible)";
     }
   } else {

@@ -1,9 +1,7 @@
 {
-  "version": "1.31.0",
+  "version": "1.31.1",
   "date": "2026-07-29",
   "notes": [
-    "Paramètres gagne une section « Réinitialiser » : on peut effacer séparément la planification des cartes, les auto-évaluations de versets, les règles de tajwid cochées, ou l'historique et les statistiques. Tes réglages, tes avis et le contenu de l'application ne sont jamais touchés",
-    "L'effacement tient : il vaut pour tous les appareils liés et ne peut plus être défait par un appareil resté en arrière, qui restaurait jusqu'ici ce qu'on venait de supprimer",
-    "Chaque bouton nomme précisément ce qu'il efface avant de demander confirmation"
+    "Correction : Paramètres affichait la dernière version DISPONIBLE en ligne et non celle réellement installée. On pouvait donc se croire à jour sans l'être. La ligne annonce maintenant la version installée, et signale à côté qu'une mise à jour existe quand c'est le cas"
   ]
 }
