@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.30.0 · 2026-07-29
+- L'application conserve désormais le détail de chaque révision, et non plus seulement un total par jour. Cet historique ne sert encore à rien de visible : il prépare le passage à un planificateur plus fin, qui s'ajuste sur les révisions passées. Il est branché dès maintenant parce qu'un historique ne se fabrique pas après coup
+
 ## 1.29.0 · 2026-07-29
 - L'application enregistre désormais trois choses qu'elle ignorait : l'historique de tes auto-évaluations, le temps passé à réviser et le temps d'écoute de la récitation
 - Nouveau bloc « Ce qui a bougé » : combien de versets se sont consolidés, sont devenus solides, ont été évalués pour la première fois ou sont redescendus d'un cran sur les trente derniers jours. C'est la courbe de ta mémorisation, là où le reste n'en donnait que l'état

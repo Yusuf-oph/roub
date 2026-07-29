@@ -1,11 +1,7 @@
 {
-  "version": "1.29.0",
+  "version": "1.30.0",
   "date": "2026-07-29",
   "notes": [
-    "L'application enregistre désormais trois choses qu'elle ignorait : l'historique de tes auto-évaluations, le temps passé à réviser et le temps d'écoute de la récitation",
-    "Nouveau bloc « Ce qui a bougé » : combien de versets se sont consolidés, sont devenus solides, ont été évalués pour la première fois ou sont redescendus d'un cran sur les trente derniers jours. C'est la courbe de ta mémorisation, là où le reste n'en donnait que l'état",
-    "Nouveau bloc « Écoute » : temps d'écoute et versets écoutés, les répétitions comprises",
-    "Le temps de révision se mesure entre deux réponses, plafonné à deux minutes par carte : une carte laissée ouverte pendant une pause ne gonfle pas le total",
-    "Ces trois mesures commencent aujourd'hui : elles ne peuvent rien dire du travail accompli avant cette version"
+    "L'application conserve désormais le détail de chaque révision, et non plus seulement un total par jour. Cet historique ne sert encore à rien de visible : il prépare le passage à un planificateur plus fin, qui s'ajuste sur les révisions passées. Il est branché dès maintenant parce qu'un historique ne se fabrique pas après coup"
   ]
 }

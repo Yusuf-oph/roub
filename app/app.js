@@ -298,11 +298,40 @@ function journalAjoute(champs) {
    mieux vaut un chiffre prudent qu'un chiffre flatteur. */
 const PLAFOND_CARTE = 120e3;
 let dernierGeste = 0;
-function logAnswer(grade) {
+function logAnswer(id, grade) {
   const now = Date.now();
   const dt = dernierGeste ? Math.min(now - dernierGeste, PLAFOND_CARTE) : 0;
   dernierGeste = now;
   journalAjoute({ n: 1, again: grade === "again" ? 1 : 0, ms: dt });
+  logRevision(id, grade);
+}
+
+/* HISTORIQUE PAR RÉVISION. Branché maintenant alors que FSRS est loin, et pour
+   une seule raison : un historique NE SE FABRIQUE PAS APRÈS COUP. Chaque jour
+   sans lui est perdu pour toujours, et l'Optimizer de FSRS s'ajuste précisément
+   là-dessus. Le crochet coûte trois lignes ; attendre coûterait des mois.
+   ⚠ FORME COMPACTE, parce que le volume est le seul vrai enjeu : 50 révisions
+   par jour pendant deux ans font 36 500 entrées. Un objet JSON verbeux les
+   porterait à ~1,5 Mo, contre ~730 Ko en `[horodatage, index, note]` avec
+   l'horodatage en SECONDES et un INDEX de carte au lieu de son identifiant.
+   ⚠ Le dictionnaire `ids` est APPEND-ONLY : un index ne doit jamais changer de
+   sens, sinon tout l'historique se met à mentir. On n'y retire donc rien, même
+   si une carte disparaît du paquet.
+   ⚠ On N'ÉLAGUE PAS les vieilles entrées, contrairement à EVAL_LOG : ici c'est
+   l'ancienneté qui fait la valeur. */
+const REVLOG_KEY = "quran-rev-log";
+const REV_LOG = store.get(REVLOG_KEY, { ids: [], log: [] });
+const NOTE_NUM = { again: 1, hard: 2, good: 3, easy: 4 };
+const revIdx = new Map(REV_LOG.ids.map((id, i) => [id, i]));
+function revIndexDe(id) {
+  let i = revIdx.get(id);
+  if (i === undefined) { i = REV_LOG.ids.push(id) - 1; revIdx.set(id, i); }
+  return i;
+}
+function logRevision(id, grade) {
+  if (!id) return;
+  REV_LOG.log.push([Math.round(Date.now() / 1000), revIndexDe(id), NOTE_NUM[grade] || 0]);
+  store.set(REVLOG_KEY, REV_LOG);
 }
 /* la session reprend à zéro quand on ouvre le réviseur : le premier geste ne
    doit pas se voir imputer le temps écoulé depuis la session d'hier */
@@ -359,7 +388,7 @@ function srsAnswer(id, grade) {
   }
   s.reps++;
   SRS[id] = s; store.set(SRS_KEY, SRS);
-  logAnswer(grade);
+  logAnswer(id, grade);
   schedulePush();
 }
 function deckStats(cardIds) {
@@ -3617,7 +3646,7 @@ function localPayload() {
      siennes. Monter la version obligerait à un code de migration pour un ajout
      purement additif. */
   return { v: 1, srs: SRS, journal: store.get(JOURNAL_KEY, {}), eval: EVAL,
-           vues: VUES, evalLog: EVAL_LOG };
+           vues: VUES, evalLog: EVAL_LOG, revLog: REV_LOG };
 }
 function mergeRemote(remote) {
   if (!remote) return;
@@ -3647,6 +3676,28 @@ function mergeRemote(remote) {
     EVAL_LOG.sort((a, b) => a.t - b.t);
     if (EVAL_LOG.length > 4000) EVAL_LOG.splice(0, EVAL_LOG.length - 4000);
     store.set(EVALLOG_KEY, EVAL_LOG);
+  }
+  /* HISTORIQUE PAR RÉVISION : union, mais ⚠ les index sont LOCAUX À CHAQUE
+     APPAREIL. Les reprendre tels quels attribuerait les révisions distantes à
+     de mauvaises cartes. On les fait donc repasser par le dictionnaire distant
+     pour retrouver l'identifiant, puis par le nôtre. Dédoublonnage sur
+     (horodatage, carte) : deux entrées identiques ne peuvent être que la même,
+     rejouée par la synchro. Aucun élagage, l'ancienneté fait la valeur. */
+  const rl = remote.revLog;
+  if (rl && Array.isArray(rl.log) && Array.isArray(rl.ids) && rl.log.length) {
+    const vu = new Set(REV_LOG.log.map(e => e[0] + "|" + REV_LOG.ids[e[1]]));
+    let ajouts = 0;
+    for (const [t, i, g] of rl.log) {
+      const id = rl.ids[i];
+      if (!id || vu.has(t + "|" + id)) continue;
+      vu.add(t + "|" + id);
+      REV_LOG.log.push([t, revIndexDe(id), g]);
+      ajouts++;
+    }
+    if (ajouts) {
+      REV_LOG.log.sort((a, b) => a[0] - b[0]);
+      store.set(REVLOG_KEY, REV_LOG);
+    }
   }
   for (const [k, e] of Object.entries(remote.eval || {})) {
     if (!EVAL[k] || (e.ts || 0) > (EVAL[k].ts || 0)) EVAL[k] = e;
@@ -3756,7 +3807,7 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "1.29.0";   // réécrit par tools/release.py
+const BUILD_VERSION = "1.30.0";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {
