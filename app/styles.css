@@ -396,6 +396,21 @@ button { font: inherit; cursor: pointer; }
 }
 .juz-title h2 { margin: 0; font-size: var(--fs-500); }
 .juz-title span { color: var(--muted); font-size: var(--fs-300); }
+/* Accordéon des juz : `<details name>` fait l'exclusivité tout seul, il ne reste
+   qu'à remplacer le triangle natif, qui ne suit ni la couleur ni la taille du
+   texte, par un chevron qui pivote. La transition passe par --dur-micro, donc
+   le réglage « animations réduites » l'éteint sans règle de plus. */
+summary.juz-title { cursor: pointer; list-style: none; }
+summary.juz-title::-webkit-details-marker { display: none; }
+summary.juz-title:hover h2 { color: var(--accent); }
+.juz-compte { margin-left: auto; font-size: var(--fs-200) !important; }
+.juz-compte b { color: var(--accent); }
+summary.juz-title::after {
+  content: "▸"; margin-left: 10px; color: var(--muted);
+  display: inline-block; transition: transform var(--dur-micro);
+}
+details[open] > summary.juz-title::after { transform: rotate(90deg); }
+.juz-bloc > .rub-grid { margin-bottom: 18px; }
 .rub-grid {
   display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 12px;

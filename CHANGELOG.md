@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.25.0 · 2026-07-29
+- L'accueil se parcourt maintenant par juz : chaque juz se déplie pour montrer ses huit roub', et en ouvrir un referme le précédent. La liste tenait jusqu'ici tout entière à l'écran, ce qui deviendra impraticable à mesure que le Qur'an sera couvert
+- Chaque juz annonce son étendue, son nombre de roub' et ses cartes à revoir sans qu'il soit besoin de le déplier
+
 ## 1.24.0 · 2026-07-29
 - Le mode « Mushaf 1405 H » est retiré : la page imprimée n'affiche plus que l'édition en couleurs. Cette seconde édition, en noir et blanc, ne servait plus. Elle n'est pas perdue pour autant, elle est archivée dans le dépôt avec sa marche à suivre pour la rétablir
 - Télécharger les pages du mushaf pour la lecture hors ligne coûte 4,5 Mo de moins, ces polices n'étant plus nécessaires

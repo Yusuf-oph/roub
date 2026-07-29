@@ -1016,11 +1016,23 @@ function pageHome() {
     'Asim, récitation Al-Husary. Les étoiles notent la difficulté de
     mémorisation sur l'échelle de tous les roub' du Qur'an.</p></div></div>`;
   h += accueilHtml();
+  /* Navigation par JUZ puis par roub' à l'intérieur (Yusuf, 29/07) : à plat, le
+     Qur'an entier ferait 240 cartes à dérouler. Un `<details>` par juz, et
+     l'attribut `name` en fait un accordéon natif — un seul ouvert à la fois,
+     sans une ligne de JavaScript, et opérable au clavier gratuitement.
+     L'état vit dans `accueilState` : l'accueil se re-rend tout seul au retour
+     de la synchro, et le juz ouvert se refermerait sous les doigts. */
   const juzList = [...new Set(RUBS.map(r => r.juz))].sort((a, b) => a - b);
+  const ouvert = accueilState.juzOuvert ?? juzList[0];
   for (const juz of juzList) {
     const rubs = RUBS.filter(r => r.juz === juz);
-    h += `<div class="juz-title"><h2>Juz ${juz}${juz === 30 ? " · 'Amma" : ""}</h2>
-      <span>${rubs[0].debut} → ${rubs[rubs.length - 1].fin}</span></div>`;
+    const cartes = rubs.reduce((n, r) => n + (DECKS[r.id] || []).length, 0);
+    const dues = rubs.reduce((n, r) => n + deckStats((DECKS[r.id] || []).map(c => c.id)).due, 0);
+    h += `<details class="juz-bloc" name="juz" data-juz="${juz}"${juz === ouvert ? " open" : ""}>
+      <summary class="juz-title"><h2>Juz ${juz}${juz === 30 ? " · 'Amma" : ""}</h2>
+        <span>${rubs[0].debut} → ${rubs[rubs.length - 1].fin}</span>
+        <span class="juz-compte">${rubs.length} roub'${
+          dues ? ` · <b>${dues} à revoir</b>` : ` · ${cartes} cartes`}</span></summary>`;
     h += `<div class="rub-grid">`;
     for (const r of rubs) {
       const cards = (DECKS[r.id] || []).map(c => c.id);
@@ -1046,7 +1058,7 @@ function pageHome() {
           ${notesRedigees ? "" : `<span class="badge">notes à venir</span>`}
         </div></div>`;
     }
-    h += `</div>`;
+    h += `</div></details>`;
   }
   h += progressionHtml();
   return h + `<div class="footer-pad"></div>`;
@@ -1116,6 +1128,9 @@ const memoState = { maskAr: false, maskTl: false, maskTr: false,
   optsOuverts: false };
 /* filtre de l'onglet Tajwid : état de vue, non persisté, comme la présentation */
 const tajState = { filtre: "toutes" };
+/* juz déplié sur l'accueil, non persisté : c'est un état d'écran, comme la
+   présentation. `null` = celui du premier juz couvert. */
+const accueilState = { juzOuvert: null };
 
 /* LE point de décision du rendu. Il reproduit aujourd'hui le comportement
    historique à l'identique : notre police de texte partout, sauf sur les pages
@@ -2930,6 +2945,15 @@ function bindMain() {
     saveParams(); render();
   }));
 
+  /* le juz déplié sur l'accueil, mémorisé pour que le re-rendu de la synchro ne
+     le referme pas sous les doigts. -1 signifie « tous repliés », état voulu par
+     l'utilisateur qu'un `??` sur null écraserait. */
+  $$("details.juz-bloc", main).forEach(d => d.addEventListener("toggle", () => {
+    const n = Number(d.dataset.juz);
+    if (d.open) accueilState.juzOuvert = n;
+    else if (accueilState.juzOuvert === n) accueilState.juzOuvert = -1;
+  }));
+
   /* la clé de la barre d'options : même mécanique que celle de la barre audio,
      à ceci près que l'état vit dans memoState, sinon la première puce touchée
      refermerait le panneau en re-rendant la barre */
@@ -3387,7 +3411,7 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "1.24.0";   // réécrit par tools/release.py
+const BUILD_VERSION = "1.25.0";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {
