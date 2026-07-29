@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.26.1 · 2026-07-29
+- « Ma progression » s'affiche dès la première visite au lieu d'attendre la première carte révisée. Elle était invisible pour ceux à qui elle est le plus utile : un nouvel utilisateur ignorait que l'application suit son avancement. Tant qu'il n'y a rien à montrer, elle dit ce qu'elle attend
+
 ## 1.26.0 · 2026-07-29
 - Chaque juz porte maintenant son nom, en arabe et en lettres latines : Juz 1 · alif-lâm-mîm, Juz 30 · ʿamma yatasâ'aloûn. Un juz se nomme par ses premiers mots, et ces mots sont pris dans le texte de l'application avec leur translittération, laquelle suit le système choisi dans Paramètres
 - La ligne d'un juz se lit sur deux rangées : le nom au-dessus, l'étendue et les comptes en dessous

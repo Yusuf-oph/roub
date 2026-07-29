@@ -1077,12 +1077,21 @@ function progressionHtml() {
     for (const c of DECKS[rid]) all.push(c);
   }
   const pg = progressOf(all);
-  if (!pg.seen && !Object.keys(EVAL).length) return "";
+  /* Le bloc s'affichait seulement une fois la première carte vue. C'était le
+     masquer à ceux qui en ont le plus besoin : un nouvel utilisateur ignorait
+     jusqu'à l'existence du suivi (Yusuf, 29/07). Il s'affiche donc toujours, et
+     dit ce qu'il attend quand il n'y a rien encore à montrer. */
+  const neuf = !pg.seen && !Object.keys(EVAL).length;
   const sk = streak();
   let h = `<div class="juz-title"><h2>Ma progression</h2>
     <span>une carte est « acquise » après un intervalle de ${MATURE_DAYS} jours ou plus</span></div>
-  <div class="note-card">
-    <span class="badge">🔥 ${sk} jour${sk > 1 ? "s" : ""} d'affilée</span>
+  <div class="note-card">`;
+  if (neuf) {
+    h += `<div class="fb-note" style="margin:0 0 8px">Rien à afficher pour l'instant :
+      ouvre un roub', révise quelques cartes, et ton avancement se suivra ici. Les
+      versets que tu marques « à revoir » ou « fragile » y apparaîtront aussi.</div>`;
+  }
+  h += `<span class="badge">🔥 ${sk} jour${sk > 1 ? "s" : ""} d'affilée</span>
     <span class="badge" style="margin-left:6px">${pg.matureChains}/${pg.chains} enchaînements de versets acquis</span>
     <span class="badge" style="margin-left:6px">${pg.seen}/${pg.total} cartes vues</span>
     <span class="badge" style="margin-left:6px">${pg.mature} mûres</span>
@@ -3450,7 +3459,7 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "1.26.0";   // réécrit par tools/release.py
+const BUILD_VERSION = "1.26.1";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {
