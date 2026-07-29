@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.28.0 · 2026-07-29
+- L'onglet Statistiques s'étoffe : quatre chiffres clés en tête, puis la régularité (trente derniers jours en barres, meilleure série, jours de révision, moyenne, part de réponses « à revoir »), la mémorisation (versets solides, fragiles, à revoir, part auto-évaluée, enchaînements acquis, versets annotés), l'état du paquet (neuves, en apprentissage, acquises, rechutes, intervalle moyen et le plus long, et le détail par type de carte), ce qui revient aujourd'hui, demain, sous 7 et 30 jours, et les règles de tajwid déjà vues
+- Tout est calculé à partir de ce que l'application enregistre déjà : aucun compteur supplémentaire, donc aucun chiffre qui puisse diverger de la réalité
+
 ## 1.27.0 · 2026-07-29
 - Nouvel onglet Statistiques, avec son icône. Il recueille « Ma progression », qui vivait jusqu'ici en bas de l'accueil, là où il fallait dérouler tout le catalogue pour la trouver
 - Sur grand écran, Sources et Statistiques se regroupent à droite de la barre, contre la bascule clair/sombre : les écrans de consultation se séparent ainsi des écrans de travail. Sur téléphone, les six entrées se partagent la barre du bas à égalité

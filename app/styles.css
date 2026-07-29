@@ -859,6 +859,48 @@ details[open] > summary.juz-title::after { transform: rotate(90deg); }
 .ab-second label { font-size: var(--fs-200); color: var(--muted); }
 .ab-reglages { display: none; }
 
+/* ---------- onglet Statistiques ----------
+   Aucune bibliothèque : les barres sont des `<span>` dont la hauteur est une
+   variable, et le reste des lignes libellé/valeur. Tout suit les jetons du
+   thème, donc les trois habillages et les deux modes marchent sans règle en
+   plus. */
+.stat-cles {
+  display: grid; gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  margin-bottom: 4px;
+}
+.stat-cle {
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 12px 14px; box-shadow: var(--shadow);
+}
+.stat-cle b { display: block; font-size: var(--fs-600); line-height: 1.15; }
+.stat-cle span { color: var(--muted); font-size: var(--fs-200); }
+.stat-ligne {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
+  padding: 5px 0; border-bottom: 1px solid var(--border);
+}
+.stat-ligne:last-child { border-bottom: 0; }
+.stat-ligne span { color: var(--muted); }
+.stat-ligne b { white-space: nowrap; }
+.stat-sous {
+  margin: 12px 0 2px; font-size: var(--fs-100); color: var(--muted);
+  text-transform: uppercase; letter-spacing: var(--ls-caps);
+}
+/* les trente derniers jours : une barre par jour, hauteur relative au plus
+   chargé. `align-items: flex-end` fait pousser les barres depuis le bas. */
+.stat-barres {
+  display: flex; align-items: flex-end; gap: 2px; height: 64px; margin-bottom: 4px;
+}
+.stat-barres .sb {
+  flex: 1; min-width: 0; border-radius: 2px 2px 0 0;
+  height: max(2px, var(--h)); background: var(--accent);
+}
+.stat-barres .sb[style*="--h:0%"] { background: var(--border); }
+.stat-barres-pied {
+  display: flex; justify-content: space-between;
+  font-size: var(--fs-100); color: var(--muted); margin-bottom: 8px;
+}
+
 /* ---------- sections notes ---------- */
 .note-sec { margin-bottom: 18px; }
 .note-sec h3 { margin: 0 0 8px; font-size: var(--fs-400); }

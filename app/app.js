@@ -1002,15 +1002,174 @@ function accueilHtml() {
     </div></details>`;
 }
 
-/* L'onglet Statistiques. Il ne crée rien : il recueille ce que l'accueil portait
-   en bas de page, là où il fallait dérouler tout le catalogue pour le voir. */
+/* ---------- onglet Statistiques ----------
+   Tout ce qui suit est CALCULÉ, jamais stocké en double : les sources sont le
+   journal quotidien (`{jour:{n, again}}`), l'état SRS de chaque carte
+   (intervalle, répétitions, rechutes), l'auto-évaluation des versets et les
+   règles de tajwid cochées. Aucun compteur nouveau n'est écrit, donc rien à
+   migrer et rien qui puisse diverger de la réalité.
+   L'ordre va du plus parlant au plus curieux : ce qu'on a fait, avec quelle
+   régularité, ce qui est mémorisé, comment le paquet se porte, ce qui vient. */
+
+const jour0 = d => d.toISOString().slice(0, 10);
+
+/* Journal : total, jours actifs, meilleure série, et les N derniers jours. */
+function statsJournal(nJours) {
+  const j = store.get(JOURNAL_KEY, {});
+  const jours = Object.keys(j).sort();
+  let total = 0, again = 0;
+  for (const k of jours) { total += j[k].n || 0; again += j[k].again || 0; }
+  /* meilleure série : on parcourt les jours présents et on casse dès qu'un
+     jour manque entre deux dates consécutives */
+  let best = 0, cur = 0, prev = null;
+  for (const k of jours) {
+    const d = new Date(k + "T00:00:00Z");
+    cur = (prev && (d - prev) === 86400e3) ? cur + 1 : 1;
+    best = Math.max(best, cur);
+    prev = d;
+  }
+  const derniers = [];
+  const d = new Date();
+  for (let i = nJours - 1; i >= 0; i--) {
+    const x = new Date(d); x.setDate(d.getDate() - i);
+    const k = jour0(x);
+    derniers.push({ k, n: (j[k] || {}).n || 0 });
+  }
+  return { total, again, joursActifs: jours.length, meilleureSerie: best, derniers,
+           premierJour: jours[0] || null };
+}
+
+/* Le paquet : où en est chaque carte, et par type. */
+function statsPaquet() {
+  const cartes = Object.values(DECKS).flat();
+  const par = { neuves: 0, apprentissage: 0, acquises: 0 };
+  const parType = {};
+  let lapses = 0, ivTotal = 0, ivMax = 0, avecIv = 0;
+  for (const c of cartes) {
+    const s = SRS[c.id];
+    const etat = !s || !s.reps ? "neuves" : (s.iv >= MATURE_DAYS ? "acquises" : "apprentissage");
+    par[etat]++;
+    const t = parType[c.type] || (parType[c.type] = { total: 0, acquises: 0 });
+    t.total++; if (etat === "acquises") t.acquises++;
+    if (s) {
+      lapses += s.lapses || 0;
+      if (s.iv > 0) { ivTotal += s.iv; ivMax = Math.max(ivMax, s.iv); avecIv++; }
+    }
+  }
+  return { total: cartes.length, ...par, parType, lapses,
+           ivMoyen: avecIv ? ivTotal / avecIv : 0, ivMax };
+}
+
+/* Ce qui revient : aujourd'hui, demain, sur 7 et 30 jours. */
+function statsAVenir() {
+  const now = Date.now(), j = 86400e3;
+  const bornes = { "aujourd'hui": now, demain: now + j, "7 jours": now + 7 * j, "30 jours": now + 30 * j };
+  const out = {};
+  const cartes = Object.values(DECKS).flat();
+  for (const [lib, t] of Object.entries(bornes))
+    out[lib] = cartes.filter(c => SRS[c.id] && SRS[c.id].due != null && SRS[c.id].due <= t).length;
+  return out;
+}
+
 function pageStats() {
-  return `<div class="hero"><div class="hero-txt"><h1>Statistiques</h1>
+  const cartes = Object.values(DECKS).flat();
+  const pg = progressOf(cartes);
+  const jr = statsJournal(30);
+  const pq = statsPaquet();
+  const av = statsAVenir();
+  const versets = Object.values(QURAN).reduce((n, R) => n + (R.verses || []).length, 0);
+  const ev = { 1: 0, 2: 0, 3: 0 };
+  for (const k of Object.keys(EVAL)) if (ev[EVAL[k].n] !== undefined) ev[EVAL[k].n]++;
+  const notes = Object.keys(EVAL).filter(k => EVAL[k].note).length;
+  const regles = (typeof REGLES !== "undefined" ? REGLES : []).length;
+  const vues = Object.keys(VUES || {}).filter(k => VUES[k]).length;
+  const neuf = !pg.seen && !Object.keys(EVAL).length;
+
+  const pct = (a, b) => b ? Math.round(100 * a / b) : 0;
+  const bloc = (titre, aide, corps) =>
+    `<div class="juz-title"><h2>${titre}</h2>${aide ? `<span>${aide}</span>` : ""}</div>${corps}`;
+  const cle = (valeur, libelle) =>
+    `<div class="stat-cle"><b>${valeur}</b><span>${libelle}</span></div>`;
+  const ligne = (libelle, valeur) =>
+    `<div class="stat-ligne"><span>${libelle}</span><b>${valeur}</b></div>`;
+
+  let h = `<div class="hero"><div class="hero-txt"><h1>Statistiques</h1>
     <p>Ce que l'application retient de ton travail. Tout est calculé sur cet
-    appareil et suit ta progression d'un appareil à l'autre si la synchronisation
-    est active.</p></div></div>`
-    + progressionHtml()
-    + `<div class="footer-pad"></div>`;
+    appareil, à partir de tes révisions et de tes auto-évaluations, et suit d'un
+    appareil à l'autre si la synchronisation est active.</p></div></div>`;
+
+  if (neuf) {
+    h += `<div class="note-card"><div class="fb-note" style="margin:0">Rien à afficher
+      pour l'instant : ouvre un roub', révise quelques cartes, et tout ce qui suit
+      se remplira. Les versets que tu marques « à revoir » ou « fragile » y
+      apparaîtront aussi.</div></div>`;
+  }
+
+  // ---- l'essentiel : les quatre chiffres qu'on vient chercher en premier
+  h += bloc("L'essentiel", "", `<div class="stat-cles">
+    ${cle(streak(), "jours d'affilée")}
+    ${cle(pg.mature + " / " + pg.total, "cartes acquises")}
+    ${cle(ev[3], "versets jugés solides")}
+    ${cle(av["aujourd'hui"], "cartes à revoir aujourd'hui")}
+  </div>`);
+
+  // ---- régularité
+  const maxJ = Math.max(1, ...jr.derniers.map(d => d.n));
+  h += bloc("Régularité", "les trente derniers jours",
+    `<div class="note-card">
+      <div class="stat-barres">${jr.derniers.map(d =>
+        `<span class="sb" style="--h:${Math.round(100 * d.n / maxJ)}%"
+           title="${d.k} · ${d.n} révision${d.n > 1 ? "s" : ""}"></span>`).join("")}</div>
+      <div class="stat-barres-pied"><span>il y a 30 jours</span><span>aujourd'hui</span></div>
+      ${ligne("Meilleure série", jr.meilleureSerie + " jour" + (jr.meilleureSerie > 1 ? "s" : ""))}
+      ${ligne("Jours de révision", jr.joursActifs)}
+      ${ligne("Révisions au total", jr.total)}
+      ${ligne("Moyenne par jour actif", jr.joursActifs ? Math.round(jr.total / jr.joursActifs) : 0)}
+      ${ligne("Réponses « à revoir »", jr.total ? pct(jr.again, jr.total) + " %" : "—")}
+      ${jr.premierJour ? ligne("Première révision", jr.premierJour) : ""}
+    </div>`);
+
+  // ---- mémorisation
+  h += bloc("Mémorisation", `sur ${versets} versets couverts`,
+    `<div class="note-card">
+      ${ligne("Versets jugés solides", ev[3])}
+      ${ligne("Versets jugés fragiles", ev[2])}
+      ${ligne("Versets à revoir", ev[1])}
+      ${ligne("Versets auto-évalués", (ev[1] + ev[2] + ev[3]) + " / " + versets
+        + " (" + pct(ev[1] + ev[2] + ev[3], versets) + " %)")}
+      ${ligne("Enchaînements de versets acquis", pg.matureChains + " / " + pg.chains)}
+      ${ligne("Versets annotés", notes)}
+    </div>`);
+
+  // ---- le paquet
+  const libT = { chain: "Enchaînements", vocab: "Vocabulaire", mutash: "Mutashabihat", sens: "Sens des passages" };
+  h += bloc("Le paquet", `une carte est « acquise » après un intervalle de ${MATURE_DAYS} jours ou plus`,
+    `<div class="note-card">
+      ${ligne("Neuves", pq.neuves)}
+      ${ligne("En apprentissage", pq.apprentissage)}
+      ${ligne("Acquises", pq.acquises + " (" + pct(pq.acquises, pq.total) + " %)")}
+      ${ligne("Rechutes", pq.lapses)}
+      ${ligne("Intervalle moyen", pq.ivMoyen ? Math.round(pq.ivMoyen) + " jours" : "—")}
+      ${ligne("Plus long intervalle", pq.ivMax ? Math.round(pq.ivMax) + " jours" : "—")}
+      <div class="stat-sous">Par type de carte</div>
+      ${Object.keys(pq.parType).sort().map(t =>
+        ligne(libT[t] || t, pq.parType[t].acquises + " / " + pq.parType[t].total + " acquises")).join("")}
+    </div>`);
+
+  // ---- ce qui vient
+  h += bloc("Ce qui revient", "cartes dont l'échéance tombe dans cette fenêtre",
+    `<div class="note-card">
+      ${Object.entries(av).map(([lib, n]) => ligne(lib.charAt(0).toUpperCase() + lib.slice(1), n)).join("")}
+    </div>`);
+
+  // ---- tajwid
+  if (regles) {
+    h += bloc("Tajwid", "règles cochées « déjà vue » dans l'onglet Tajwid d'un roub'",
+      `<div class="note-card">${ligne("Règles vues", vues + " / " + regles
+        + " (" + pct(vues, regles) + " %)")}</div>`);
+  }
+
+  return h + `<div class="footer-pad"></div>`;
 }
 
 function pageHome() {
@@ -3473,7 +3632,7 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "1.27.0";   // réécrit par tools/release.py
+const BUILD_VERSION = "1.28.0";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {
