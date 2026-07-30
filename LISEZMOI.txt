@@ -14,12 +14,8 @@ l'interface sont gardés hors-ligne dès la première visite ; l'audio et les
 pages du mushaf se préchargent à la carte (Paramètres -> « Précharger »),
 chaque style de récitation séparément.
 
-Apparence : trois habillages (Vélin, Ardoise, Colophon), chacun en clair et
-en sombre, avec sa police, remplaçable sans changer d'habillage.
-À la première visite l'application suit le réglage clair ou sombre de ton
-appareil ; la bascule en haut à droite tranche ensuite. Les animations se
-règlent également. Tout est dans Paramètres. La calligraphie du texte
-coranique ne change jamais.
+Apparence, taille du texte, animations, calligraphie du texte coranique :
+tout se règle dans Paramètres, va voir.
 
 COPIE LOCALE (ce dossier)
 -------------------------
@@ -40,29 +36,31 @@ autre appareil : Paramètres -> Synchronisation -> génère ton code secret
 
 UTILISER
 --------
-- Accueil : les roub' des juz 1, 2 et 'Amma, avec difficulté sur 5 étoiles.
-  Débutant ? Commence par les derniers roub' du juz 'Amma (les sourates
-  courtes de la prière).
-- Dans un roub' : Mémoriser (3 affichages, dont les vraies pages du mushaf
-  de Médine), Tafsir et Tajwid sont disponibles partout ; Difficultés,
-  Vocabulaire et Cartes ne sont rédigés que pour le roub' 1 pour l'instant
+Un roub' est le quart d'un juz, l'unité de découpage du mushaf. Les 24 que
+couvre l'application sont ouverts.
+
+- Accueil : les roub' regroupés par juz, chacun noté sur 5 étoiles selon sa
+  difficulté de mémorisation. Débutant ? Commence par les derniers roub' du
+  juz 'Amma, les sourates courtes de la prière.
+- Mémoriser : le texte et l'audio verset par verset, le mot récité souligné
+  au fil de la récitation. Trois présentations (verset par verset, texte
+  continu, page imprimée du mushaf) et trois calligraphies. Tu peux masquer
+  l'arabe pour te tester d'un clic.
+- Tajwid : les règles que ce roub' contient, tirées de son texte, chacune
+  expliquée avec un exemple pris dedans et une case « déjà vue ».
+- Tafsir : le commentaire verset par verset.
+- Difficultés, Vocabulaire, Cartes : rédigés pour le roub' 1 pour l'instant
   (ailleurs : « contenu à venir »).
-- L'onglet Tajwid d'un roub' liste les règles que SON texte contient, tirées
-  du texte lui-même : chacune avec son explication et un exemple pris dans ce
-  roub', où seule la couleur de la règle est allumée et tout le reste reste en
-  encre neutre. Une case « déjà vue » par règle et trois filtres pour ne voir
-  que ce qui reste à travailler ; l'état suit d'un appareil à l'autre. En mode
-  Mémoriser, chaque sourate courte annonce en plus ses propres règles et
-  celles qui y apparaissent pour la première fois.
-- Révision : flashcards à répétition espacée. Pour un vrai suivi au long
-  cours, nous recommandons Anki et son planificateur FSRS : le bouton
-  « Télécharger les cartes pour Anki » exporte les 804 cartes (24 sous-
-  paquets, sans audio). Un paquet avec audio (roub' 1) est dans  apkg\
-- Tutoriels : lire la translittération, légende des couleurs tajwid, fiches
-  de règles, « Obligatoire ou perfectionnement ? » (ce que les savants
-  tiennent pour obligatoire dans le tajwid et ce dont ils discutent), styles
-  de récitation. À lire en premier si tu ne lis pas l'arabe. Les termes
-  techniques y sont cliquables : leur définition s'affiche.
+- Révision : les cartes reviennent au moment où tu es sur le point de les
+  oublier, par FSRS-6, l'algorithme qu'emploie Anki, exécuté ici même. Deux
+  boutons, quatre si tu préfères. Pour réviser dans Anki plutôt qu'ici,
+  « Télécharger les cartes pour Anki » sort les 804 cartes (24 sous-paquets,
+  sans audio) ; un paquet avec audio (roub' 1) est dans  apkg\
+- Statistiques : série de jours, cartes acquises, régularité sur trente
+  jours, écoute, état du paquet.
+- Tutoriels : à lire en premier si tu ne lis pas l'arabe. Translittération,
+  couleurs du tajwid, fiches de règles, « Obligatoire ou perfectionnement ? »,
+  styles de récitation. Les termes techniques y sont cliquables.
 
 DONNER TON AVIS (important !)
 -----------------------------
@@ -95,6 +93,13 @@ Ibn al-Jazarî, matns Tuhfat al-Atfal et al-Muqaddima al-Jazariyya, et les
 conventions de ḍabṭ du mushaf de Médine pour les lettres écrites et non
 prononcées).
 
+Planification des révisions : FSRS-6 par la bibliothèque fsrs-browser (Open
+Spaced Repetition, BSD-3-Clause, (c) 2023 Alex Nguyen), qui embarque un
+fragment de wasm-bindgen-rayon ((c) Google, Apache-2.0) ; les deux licences
+accompagnent les fichiers dans  app\vendor\ . Les avertissements des réglages
+reprennent la documentation d'Anki, attribuée et non traduite.
+
 Licences : code AGPL-3.0, contenu éditorial CC BY-NC-SA 4.0 (voir LICENSE
-et LICENSE-CONTENU.md). Application gratuite et non commerciale.
+et LICENSE-CONTENU.md), bibliothèques redistribuées sous leurs licences
+propres. Application gratuite et non commerciale.
 © 2026 Anis & Yusuf.

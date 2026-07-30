@@ -1236,21 +1236,25 @@ function accueilHtml() {
   return `<details class="accueil" ${vu ? "" : "open"}>
     <summary>Bienvenue · comment ça marche, qui sommes-nous, quelles sources</summary>
     <div class="accueil-corps">
-      <p><b>Comment ça marche.</b> Choisis un roub' ci-dessous : l'onglet
-      <b>Mémoriser</b> affiche le texte avec l'audio et le soulignage mot à mot :
-      tu choisis la <b>présentation</b> (verset par verset, texte continu, ou la
-      page imprimée telle quelle) et la <b>calligraphie</b> (notre police de
-      lecture, Digital Khatt, ou les dessins de l'édition officielle du mushaf,
-      seuls à porter les couleurs tajwid). L'onglet
-      <b>Tafsir</b> le commentaire verset par verset. Les 24 roub' sont tous
-      ouverts, et l'onglet <b>Tajwid</b> de chacun liste les règles que son texte
-      contient, avec un exemple pris dans ce roub'. Les notes rédigées (points
-      durs, remarques de tajwid propres au roub', vocabulaire, cartes) existent
-      pour le roub' 1, et ailleurs ces onglets
-      affichent « contenu à venir » : c'est ce que signale le badge
-      <i>notes à venir</i> de l'accueil, qui disparaîtra roub' par roub' à
-      mesure de leur rédaction. L'onglet <b>Révision</b> fait revenir les cartes à
-      intervalle croissant, et exporte tout pour Anki.</p>
+      <p><b>Comment ça marche.</b> Un roub' est le quart d'un juz, l'unité de
+      découpage du mushaf. Les 24 sont ouverts : choisis-en un ci-dessous.</p>
+      <ul class="accueil-liste">
+        <li><b>Mémoriser</b> : le texte et l'audio verset par verset, le mot récité
+        souligné au fil de la récitation. Trois présentations (verset par verset,
+        texte continu, page imprimée du mushaf) et trois calligraphies. Tu peux
+        masquer l'arabe pour te tester d'un clic.</li>
+        <li><b>Tajwid</b> : les règles que ce roub' contient, tirées de son texte,
+        chacune expliquée avec un exemple pris dedans et une case « déjà vue ».</li>
+        <li><b>Tafsir</b> : le commentaire verset par verset.</li>
+        <li><b>Difficultés</b>, <b>Vocabulaire</b> et <b>Cartes</b> : rédigés pour
+        le roub' 1 pour l'instant ; ailleurs, le badge <i>notes à venir</i> le
+        dit.</li>
+      </ul>
+      <p>Deux onglets valent pour tout le Qur'an couvert : <b>Révision</b>, où les
+      cartes reviennent au moment où tu es sur le point de les oublier (algorithme
+      FSRS-6, le même qu'Anki, et export vers Anki si tu préfères réviser là-bas),
+      et <b>Statistiques</b>. Enfin les <b>Tutoriels</b>, à lire en premier si tu
+      ne lis pas l'arabe.</p>
       <p><b>Qui sommes-nous.</b> Roub' est né de l'idée originale d'<b>Anis</b>
       (co-fondateur, docteur en mathématiques), conceptualisé et réalisé par
       <b>Yusuf</b> (co-fondateur, interne en médecine), avec les ajustements
@@ -1262,12 +1266,6 @@ function accueilHtml() {
       d'après Tuhfat al-Atfâl et al-Muqaddima al-Jazariyya. Tout le contenu
       religieux est sourcé et vérifié ; une erreur reste possible, signale-la.
       <span class="vref" data-goto-page="sources">Bibliographie complète →</span></p>
-      <p><b>Apparence.</b> Trois habillages au choix (Vélin, Ardoise, Colophon),
-      chacun en clair et en sombre, avec sa police, que tu peux
-      remplacer sans changer d'habillage. À la première visite l'application
-      suit le réglage clair ou sombre de ton appareil ; la bascule en haut à
-      droite tranche ensuite. Les animations se règlent aussi. Tout est dans
-      <b>Paramètres</b>. La calligraphie du texte coranique ne change jamais.</p>
       <p><b>Gratuit et sans compte</b> : progression et réglages restent dans ce
       navigateur. Rien n'est envoyé ailleurs, sauf si tu actives toi-même la
       synchronisation multi-appareils, qui repose sur un code secret anonyme.</p>
@@ -1275,11 +1273,14 @@ function accueilHtml() {
 }
 
 /* ---------- onglet Statistiques ----------
-   Tout ce qui suit est CALCULÉ, jamais stocké en double : les sources sont le
-   journal quotidien (`{jour:{n, again}}`), l'état SRS de chaque carte
-   (intervalle, répétitions, rechutes), l'auto-évaluation des versets et les
-   règles de tajwid cochées. Aucun compteur nouveau n'est écrit, donc rien à
-   migrer et rien qui puisse diverger de la réalité.
+   Le principe est de CALCULER plutôt que de stocker en double : les sources sont
+   le journal quotidien, l'état FSRS de chaque carte (stabilité, difficulté,
+   intervalle, répétitions, rechutes), l'auto-évaluation des versets et les règles
+   de tajwid cochées.
+   ⚠ TROIS EXCEPTIONS ASSUMÉES, ajoutées en 1.29.0 : l'historique des
+   auto-évaluations (`EVAL_LOG`), le temps de révision et le temps d'écoute sont
+   bel et bien ENREGISTRÉS, parce qu'une série temporelle ne se recalcule pas
+   après coup. Le reste se déduit, donc ne peut pas diverger de la réalité.
    L'ordre va du plus parlant au plus curieux : ce qu'on a fait, avec quelle
    régularité, ce qui est mémorisé, comment le paquet se porte, ce qui vient. */
 
@@ -1627,7 +1628,7 @@ const TABS = [
    Ici on installe le vocabulaire et le point de décision UNIQUE, sans changer un
    pixel : les rendus supplémentaires se brancheront dans `rendUtilise()`, et
    nulle part ailleurs. Rien n'est persisté, c'est l'état d'écran d'aujourd'hui. */
-const memoState = { maskAr: false, maskTl: false, maskTr: false,
+const memoState = { maskAr: false, maskTl: false,
   presentation: "versets", rendu: null,
   /* Le panneau de la barre d'options. Il DOIT vivre ici et pas dans une simple
      classe posée sur le noeud : toucher une puce appelle render(), qui refait
@@ -1883,11 +1884,15 @@ function tajCurHtml(s) {
    concernée : elle impose ses glyphes, c'est sa définition. L'ordre va du plus
    sobre au plus fidèle à l'imprimé. */
 const RENDUS = [
-  ["uthmani", "Texte", "notre police de lecture, UthmanicHafs du KFGQPC"],
+  /* ⚠ NE PAS écrire « notre police » : UthmanicHafs est celle du KFGQPC, nous ne
+     l'avons pas dessinée (rappelé par Yusuf le 30/07). Et ce rendu porte bel et
+     bien les couleurs tajwid, posées par notre CSS : dire que les glyphes sont
+     « seuls » à les porter était faux. */
+  ["uthmani", "Texte", "UthmanicHafs, la police de lecture du KFGQPC ; les couleurs tajwid y sont posées par l'application"],
   ["khatt", "Digital Khatt",
    "la calligraphie du mushaf composée en vrai texte (Amine Anane, licence OFL)"],
   ["glyphesV4", "Mushaf",
-   "la calligraphie officielle du KFGQPC, un dessin par mot ; seule à pouvoir porter les couleurs tajwid, qui sont dans la police"],
+   "la calligraphie officielle du KFGQPC, un dessin par mot ; ici les couleurs tajwid sont dans la police elle-même"],
 ];
 function chipsRendu(pres) {
   const offerts = rendusDe(pres), actif = rendUtilise();
@@ -1938,6 +1943,12 @@ function secMemoriser(R) {
     h += `
         <button class="chip ${PARAMS.showTl ? "on" : ""}" data-opt="showTl">Translittération</button>
         <button class="chip ${PARAMS.showTr ? "on" : ""}" data-opt="showTr">Traduction</button></div>
+      /* ⚠ Masquer ≠ ne pas afficher, et la nuance est la raison d'être de ces deux
+         puces : la puce « Translittération » ci-dessus la fait disparaître pour de
+         bon, alors que « Masquer » la floute et la DÉVOILE AU CLIC, ce qui est un
+         geste de mémorisation (je me teste, puis je vérifie). Retiré le 30/07
+         comme un doublon, rétabli le même jour par Yusuf une fois la nuance dite :
+         ne pas le « simplifier » à nouveau. */
       <div class="mo-grp"><span class="mo-lab">Masquer</span>
         <button class="chip ${memoState.maskAr ? "on" : ""}" data-mask="maskAr">L'arabe</button>
         <button class="chip ${memoState.maskTl ? "on" : ""}" data-mask="maskTl">La translit.</button></div>`;
@@ -2646,11 +2657,22 @@ Hâtim : <i>Tirmidhî</i> 2954, <i>hasan gharîb</i> selon at-Tirmidhî). Les
 affirmations sur le texte lui-même sont vérifiées par script, jamais de
 mémoire.</p>
 
+<h3>Planification des révisions</h3>
+<p>Les cartes sont planifiées par <b>FSRS-6</b>, au moyen de la bibliothèque
+<b>fsrs-browser</b> (Open Spaced Repetition, version 6.6.0, sous licence
+BSD-3-Clause, © 2023 Alex Nguyen), qui est l'implémentation de référence de cet
+algorithme compilée pour le navigateur. Elle embarque un fragment de
+<b>wasm-bindgen-rayon</b> (© Google, licence Apache-2.0). Le calcul se fait sur
+l'appareil : rien n'est envoyé nulle part. Les avertissements des réglages
+(valeur recommandée du souvenir visé, fréquence utile de réoptimisation, sens
+exact du bouton « Difficile ») reprennent la documentation d'Anki, dont le propos
+est attribué et non traduit entre guillemets.</p>
+
 <h3>Ce que l'application ne reprend à personne</h3>
 <p>Le découpage roub' par roub', la difficulté sur cinq étoiles, le choix des
-points durs, l'ordre du parcours de tajwid progressif, la formulation des
-cartes et le moteur de révision espacée sont le travail propre de Roub' : des
-choix pédagogiques, pas des positions savantes.</p>
+points durs, l'ordre du parcours de tajwid progressif et la formulation des
+cartes sont le travail propre de Roub' : des choix pédagogiques, pas des
+positions savantes. La planification, elle, n'est plus de notre fait.</p>
 
 <h3>Bibliographie</h3>
 <p>Les mêmes sources, en notices normalisées (ISO 690), classées par auteur.
@@ -2763,7 +2785,10 @@ https://sunnah.com/</p>
 <p>Code sous <b>AGPL-3.0</b> ; contenu éditorial de Roub' sous
 <b>CC BY-NC-SA 4.0</b> (attribution « Roub', Anis &amp; Yusuf »). Chaque
 élément tiers conserve ses propres conditions : c'est pourquoi l'application
-est et doit rester gratuite et non commerciale.</p>
+est et doit rester gratuite et non commerciale. Les bibliothèques redistribuées
+avec l'application gardent les leurs, dont le texte accompagne les fichiers :
+<b>fsrs-browser</b> en BSD-3-Clause, le fragment <b>wasm-bindgen-rayon</b> en
+Apache-2.0, et les polices latines sous SIL Open Font License 1.1.</p>
 
 <p class="src">Une erreur, une source mal citée, un doute :
 <a href="mailto:dev.yusuf@pm.me">dev.yusuf@pm.me</a>. Cette page correspond au
@@ -3445,7 +3470,7 @@ function pageParams() {
     + rangee("Tout effacer", "Les quatre à la fois : on repart d'une progression vierge.",
         `<button class="iconbtn" data-raz="tout">Tout effacer</button>`))}
 
-  <p class="param-pied">Version : <b id="appver">${esc(APPVER || "…")}</b><br><br>
+  <p class="param-pied">Version installée : <b id="appver">${esc(APPVER || "…")}</b><br><br>
     Roub' est né de l'idée originale d'<b>Anis</b> (co-fondateur, docteur en
     mathématiques), conceptualisé et réalisé par <b>Yusuf</b> (co-fondateur,
     interne en médecine), avec les ajustements pédagogiques d'<b>Israa</b>
@@ -3453,8 +3478,9 @@ function pageParams() {
     Avis et contact :
     <a href="mailto:dev.yusuf@pm.me">dev.yusuf@pm.me</a> · Discord
     <b>@ophtalmologie</b>.<br><br>
-    Texte coranique, calligraphie, traduction, récitations, segments mot à mot
-    et tafsir viennent de sources tierces, en usage non commercial : chacune est
+    Texte coranique, calligraphie, traduction, récitations, segments mot à mot,
+    tafsir et planificateur de révisions viennent de sources tierces, en usage
+    non commercial : chacune est
     nommée avec son édition, sa version, sa provenance et ses conditions sur la
     <span class="vref" data-goto-page="sources">page Sources</span>, qui donne aussi la
     bibliographie normalisée et correspond au fichier SOURCES.md du dépôt. Application gratuite et non commerciale,
@@ -3464,7 +3490,8 @@ function pageParams() {
     sources ; une erreur restant toujours possible, merci de signaler tout
     doute via le widget d'avis ou <a href="mailto:dev.yusuf@pm.me">dev.yusuf@pm.me</a>.
     Code sous licence AGPL-3.0, contenu éditorial sous
-    CC BY-NC-SA 4.0 (détails sur le dépôt GitHub). © 2026 Anis &amp; Yusuf.</p>`;
+    CC BY-NC-SA 4.0, bibliothèques redistribuées sous leurs licences propres
+    (détails sur le dépôt GitHub et sur la page Sources). © 2026 Anis &amp; Yusuf.</p>`;
 }
 
 /* ---------------- feedback ---------------- */
@@ -4251,7 +4278,7 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "2.0.0";   // réécrit par tools/release.py
+const BUILD_VERSION = "2.0.1";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {
@@ -4268,9 +4295,13 @@ async function fetchVersion() {
     try {
       const v = await (await fetch("version.json", { cache: "no-store" })).json();
       if (v.version && v.version !== BUILD_VERSION) {
-        APPVER = `${BUILD_VERSION} · mise à jour disponible : ${v.version}`;
+        /* ⚠ Le numéro du SERVEUR ne doit jamais paraître seul : c'est ainsi que
+           l'ancienne version trompait, en affichant la dernière publiée comme si
+           c'était l'installée (signalé deux fois par Yusuf). On l'annonce donc
+           toujours comme une mise à jour, jamais comme un état. */
+        APPVER = `${BUILD_VERSION} · une mise à jour vers ${v.version} est disponible`;
       } else if (v.date) {
-        APPVER = `${BUILD_VERSION} · ${v.date} · à jour`;
+        APPVER = `${BUILD_VERSION} du ${v.date} · à jour`;
       }
     } catch (e) {
       APPVER = BUILD_VERSION + " (vérification des mises à jour impossible)";

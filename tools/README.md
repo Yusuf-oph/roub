@@ -59,6 +59,29 @@ python tools/build_export.py
 | `md2pdf.py <fichier.md>` | met un document de travail au propre en PDF A4 |
 | `md2pdf_ar.py <fichier.md>` | idem, mais pour un document qui CITE DE L'ARABE : passe par HTML + impression Edge, seul moyen d'obtenir des lettres liées et le sens de lecture correct (reportlab ne sait pas le faire) |
 | `translit.py` | moteur de translittération (scientifique + hybride), utilisé par `build_data.py` |
+| `build_khatt.py` | `app/data/khatt.js` : le texte composé pour Digital Khatt, découpé en mots CALÉ sur `arHtml` (sinon l'index de mot décale l'audio et le double-clic) |
+| `build_pages2.py` | `app/data/pages2.js` : la pagination de l'édition colorée QPC v4, lignes prises dans la base de mise en page officielle de QUL |
+| `build_polices_noms.py` | `app/data/noms-sourates.js` : les glyphes des noms de sourates (deux polices du KFGQPC, titre et bandeau orné). À rejouer à chaque juz ajouté |
+| `build_icones.py` | les trois PNG d'icônes PWA, rastérisés depuis le SVG maître par Edge sans interface (rien à installer) |
+| `inspecte_police.py` | dépouille une police (tables, glyphes, palettes) pendant une enquête |
+| `tajwid_kfgqpc.py` | dépouillement COLR/CPAL des polices officielles et croisement avec nos portées |
+| `tajwid_regles.py` | recalcule des règles depuis le texte, **pour CONTRÔLER une hypothèse, jamais pour publier** |
+
+## Bibliothèques vendorisées (`app/vendor/`)
+
+Rien à générer : `fsrs-browser` (le planificateur FSRS-6) est **recopié tel quel**
+depuis jsDelivr, avec les deux textes de licence. Trois pièges, tous payés :
+
+- ce sont **quatre fichiers**, pas deux : la glu ESM importe *statiquement*
+  `snippets/wasm-bindgen-rayon-…/workerHelpers.js`, et sans lui le module ne se
+  charge pas du tout ;
+- `release.py::shell_files` parcourt ce dossier **récursivement**, contrairement au
+  reste : un fichier oublié ferait marcher l'application en ligne et casserait le
+  hors connexion, seulement ;
+- `.gitattributes` exclut `app/vendor/**` de la normalisation des fins de ligne.
+  Sans cette exclusion, le fichier commité ne correspond plus à l'original et
+  toute vérification d'intégrité devient trompeuse. `verifie.py` (section L)
+  compare les empreintes SHA-256 à celles publiées par jsDelivr.
 
 ## Règles de rédaction du contenu (rappels)
 

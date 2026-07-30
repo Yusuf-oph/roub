@@ -429,8 +429,6 @@ summary.juz-title span.juz-ar {
   color: var(--text); white-space: nowrap;
   direction: rtl; unicode-bidi: isolate;
 }
-.juz-compte { margin-left: auto; font-size: var(--fs-200) !important; }
-.juz-compte b { color: var(--accent); }
 summary.juz-title::after {
   content: "▸"; margin-left: 10px; color: var(--muted);
   display: inline-block; transition: transform var(--dur-micro);
@@ -629,9 +627,12 @@ details[open] > summary.juz-title::after { transform: rotate(90deg); }
   font-size: 30px; line-height: 2.05;
   color: var(--text);
 }
-.ar.masked, .tl.masked, .tr.masked { filter: blur(7px); cursor: pointer; transition: filter .15s; }
-.ar.masked:hover, .tl.masked:hover, .tr.masked:hover { filter: blur(5px); }
-.ar.masked.revealed, .tl.masked.revealed, .tr.masked.revealed { filter: none; }
+/* L'arabe et la translittération se masquent, et se dévoilent au clic : c'est un
+   geste de mémorisation, pas un réglage d'affichage. `.tr.masked` n'a en revanche
+   aucun porteur (il n'existe pas de puce « masquer la traduction »). */
+.ar.masked, .tl.masked { filter: blur(7px); cursor: pointer; transition: filter .15s; }
+.ar.masked:hover, .tl.masked:hover { filter: blur(5px); }
+.ar.masked.revealed, .tl.masked.revealed { filter: none; }
 .tl { margin-top: 6px; font-size: var(--fs-400); line-height: 1.7; }
 .tr { margin-top: 6px; color: var(--muted); font-size: var(--fs-300); font-style: italic; }
 
@@ -1064,6 +1065,10 @@ details[open] > summary.juz-title::after { transform: rotate(90deg); }
 .accueil summary { cursor: pointer; color: var(--accent); font-weight: 600; font-size: var(--fs-300); }
 .accueil-corps { font-size: var(--fs-300); line-height: 1.6; color: var(--text); }
 .accueil-corps p { margin: 10px 0; }
+/* la liste des onglets : elle sert à ce que l'œil balaie, donc pas de puce
+   décorative ni d'indentation profonde */
+.accueil-liste { margin: 10px 0; padding-left: 20px; }
+.accueil-liste li { margin: 6px 0; }
 
 /* aide contextuelle « Lequel choisir ? » : elle vit dans un .lab de Paramètres,
    dont la règle « .lab b { display:block } » casserait les phrases */

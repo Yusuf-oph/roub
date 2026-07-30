@@ -1,13 +1,11 @@
 {
-  "version": "2.0.0",
+  "version": "2.0.1",
   "date": "2026-07-30",
   "notes": [
-    "La révision espacée passe à FSRS-6, l'algorithme de planification qu'emploie Anki. Les cartes ne reviennent plus à intervalle simplement croissant : elles reviennent au moment où tu es sur le point de les oublier, calculé sur ton propre historique de révisions",
-    "Deux boutons de notation au lieu de quatre. Tu dis seulement si le verset est venu ou non, ce sur quoi on ne peut pas se tromper. Les quatre restent disponibles dans Paramètres, avec une aide qui explique ce que chacun engage et pourquoi « Difficile » signifie « je l'ai su, avec peine »",
-    "Paramètres gagne trois réglages : le nombre de boutons, le souvenir visé (la part d'oubli que tu acceptes avant qu'une carte revienne) et un bouton qui ajuste la planification sur ton historique. Chacun est expliqué sur place, avec les avertissements de la documentation de FSRS",
-    "Ces trois réglages suivent d'un appareil à l'autre, contrairement au thème ou à la police qui restent propres à chacun : sans cela, un appareil où tu as optimisé et un autre où tu ne l'as pas fait donneraient à la même carte des échéances différentes. Il suffit donc d'optimiser une fois",
-    "La planification des cartes repart de zéro : celle de l'ancien moteur ne se convertit pas dans le nouveau. Tes auto-évaluations de versets, ta série de jours, ton journal et tes statistiques ne sont pas touchés",
-    "Une carte est désormais dite « acquise » quand l'application estime que tu la retiendrais trois semaines, et non plus quand son intervalle atteint trois semaines. Le compte ne bouge donc plus quand tu déplaces le réglage du souvenir visé, mais seulement quand ta mémoire bouge",
-    "À savoir si tu utilises la copie locale : ouvrir app/index.html comme un simple fichier ne permet plus de réviser, le navigateur refusant d'y charger le planificateur. Lance start.bat, ou passe par la version en ligne, et la révision revient. Tout le reste fonctionne dans les deux cas"
+    "La ligne de Paramètres s'intitule maintenant « Version installée », et le numéro de la dernière version publiée n'y apparaît plus que sous la forme d'une mise à jour proposée. On ne peut donc plus croire qu'on est à jour parce qu'on lit le numéro du serveur",
+    "Le bloc de bienvenue de l'accueil est refait : plus court, une ligne par onglet. Le paragraphe sur l'apparence a été retiré, Paramètres le montre mieux que des phrases",
+    "Trois affirmations qui ne disaient plus la vérité sont corrigées : la calligraphie du texte coranique se choisit bel et bien (un paragraphe soutenait le contraire), les couleurs du tajwid s'affichent aussi avec la police de lecture et non seulement avec la calligraphie du mushaf, et la page Sources ne revendique plus la planification des révisions comme notre travail depuis qu'elle vient de FSRS",
+    "UthmanicHafs n'est plus présentée comme « notre » police de lecture : elle est celle du Complexe du Roi Fahd, nous ne l'avons pas dessinée",
+    "Documentation du dépôt remise à jour et captures d'écran refaites, celles du README montrant encore une navigation de plusieurs versions en arrière"
   ]
 }

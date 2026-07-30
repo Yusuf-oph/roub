@@ -23,7 +23,8 @@ create table public.progress (
 alter table public.progress enable row level security;
 
 -- accès anonyme : la sécurité repose sur l'impossibilité de deviner l'id
--- (hash SHA-256 d'un code aléatoire de 60 bits)
+-- (hash SHA-256 d'un code aléatoire de ~59 bits : 12 caractères tirés d'un
+--  alphabet de 31 signes, I/L/O/0/1 exclus pour qu'il se recopie à la main)
 create policy "acces par code" on public.progress
   for all to anon using (true) with check (true);
 
@@ -57,12 +58,36 @@ window.SYNC_CONFIG = {
    `SUPABASE_ANON_KEY` (la clé anon). Le workflow `keepalive.yml` fait un
    ping hebdomadaire.
 
-## Notes
+## Ce qui voyage, et comment ça fusionne
 
-- Fusion côté client, par élément : carte SRS = plus grand nombre de
-  répétitions (à égalité : échéance la plus récente) ; journal = max par
-  jour ; auto-évaluations = horodatage le plus récent.
-- Périmètre : SRS + journal + auto-évaluations. Les réglages restent par
-  appareil, le feedback garde le circuit d'export.
-- Vie privée : la ligne ne contient que des identifiants de cartes et des
-  horodatages. Pas d'IP stockée par l'appli, pas de nom, pas d'e-mail.
+Le serveur n'arbitre rien : c'est un casier clé-valeur. **Toute la fusion se fait
+dans le client** (`mergeRemote()`), et elle doit donc converger sans arbitre.
+La charge utile reste en `v: 1`, un ajout de clé étant purement additif : un
+appareil resté en arrière ignore ce qu'il ne connaît pas et ne réécrit que ses
+propres clés.
+
+| clé | contenu | règle de fusion |
+|---|---|---|
+| `srs` | état FSRS par carte (stabilité, difficulté, intervalle, échéance, répétitions, rechutes) | plus grand nombre de répétitions ; à égalité, échéance la plus tardive |
+| `journal` | total quotidien, ratés, temps de révision, écoute | le plus grand nombre de réponses par jour |
+| `eval` | auto-évaluation par verset | horodatage le plus récent |
+| `vues` | règles de tajwid cochées | union, horodatage le plus récent |
+| `evalLog` | historique des changements d'auto-évaluation | union dédupliquée sur (instant, verset), reborné à 4000 entrées |
+| `revLog` | détail de chaque révision, pour l'optimiseur FSRS | union dédupliquée sur (instant, carte), **sans élagage** ; les index de carte étant locaux à chaque appareil, chaque entrée distante repasse par le dictionnaire qui l'accompagne |
+| `epochs` | horodatage de la dernière remise à zéro, par domaine | la plus récente gagne, et les données antérieures sont écartées |
+| `fsrs` | réglages qui pilotent la planification : nombre de boutons, souvenir visé, 21 poids | le plus récemment changé gagne, **avec deux horodatages distincts** pour que déplacer un curseur sur un appareil n'efface pas les poids calculés sur un autre |
+
+Les époques existent parce qu'une fusion qui garde toujours le maximum ne sait
+pas exprimer une suppression : sans elles, effacer sa progression puis se
+synchroniser la ferait revenir depuis le premier appareil resté en arrière.
+
+**Hors périmètre** : les autres réglages (thème, police, taille, style de
+récitation) restent propres à chaque appareil, et les avis gardent leur circuit
+d'export manuel.
+
+## Vie privée
+
+La ligne ne contient que des identifiants de cartes, des horodatages, des notes
+de 1 à 4 et les réglages de planification. Aucun nom, aucun e-mail, aucun compte,
+aucune adresse IP stockée par l'application. Le code secret lui-même ne quitte
+jamais l'appareil : seul son hash voyage.

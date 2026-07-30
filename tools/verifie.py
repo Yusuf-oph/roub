@@ -685,6 +685,99 @@ def main():
     print("L. fsrs : 3 fichiers présents et retenus par shell_files, "
           "2 licences, SOURCES.md à jour")
 
+    # ---------------- M. cohérence des textes PUBLICS ----------------
+    # ⚠ POURQUOI CE CONTRÔLE EXISTE. L'audit du 30/07 a trouvé CINQ affirmations
+    # FAUSSES dans des textes lus par les utilisateurs, dont une contradiction
+    # interne au bloc d'accueil à trois paragraphes d'écart. Aucune n'aurait été
+    # vue par un test : une phrase périmée ne casse rien, elle ment. Ce qui suit
+    # ne remplace pas la relecture, il attrape la classe de défaut la plus
+    # fréquente : la phrase absolue écrite avant que la chose devienne réglable.
+    #
+    # ⚠ LIMITE ASSUMÉE : on retire les commentaires de app.js avant de chercher,
+    # sinon le contrôle se mordrait la queue (un commentaire qui PROSCRIT une
+    # formule la contient). Le retrait est heuristique : les `://` sont masqués
+    # d'abord pour ne pas prendre une URL pour un commentaire de fin de ligne.
+    def sans_commentaires(src):
+        src = src.replace("://", "\x00\x00\x00")
+        src = re.sub(r"/\*.*?\*/", " ", src, flags=re.S)
+        src = re.sub(r"//[^\n]*", " ", src)
+        return src.replace("\x00\x00\x00", "://")
+
+    app_public = sans_commentaires(open(os.path.join(APP, "app.js"), encoding="utf-8").read())
+    readme = open(os.path.join(ROOT, "README.md"), encoding="utf-8").read()
+    lisezmoi = open(os.path.join(ROOT, "LISEZMOI.txt"), encoding="utf-8").read()
+    PUBLICS = {"app.js": app_public, "README.md": readme, "LISEZMOI.txt": lisezmoi}
+
+    # (a) formules dont on SAIT qu'elles vieillissent mal, avec la date où elles
+    #     se sont révélées fausses : le message doit ENSEIGNER, pas seulement
+    #     refuser.
+    PERIMEES = [
+        ("ne change jamais",
+         "phrase absolue sur ce qui peut devenir réglable ; c'était vrai de la "
+         "calligraphie coranique jusqu'à la 1.19.0, et la contradiction a survécu "
+         "deux versions dans le bloc d'accueil"),
+        ("seuls à porter les couleurs",
+         "faux : le rendu Texte porte aussi les couleurs tajwid, posées par notre "
+         "CSS ; seul Digital Khatt ne les porte pas (relevé par Yusuf le 30/07)"),
+        ("seule à pouvoir porter les couleurs",
+         "même défaut que ci-dessus, à l'infobulle du rendu Mushaf"),
+        ("nous recommandons Anki",
+         "périmé depuis la 2.0.0 : la planification FSRS-6 est intégrée, Anki "
+         "n'est plus qu'une destination d'export"),
+        ("intervalle croissant",
+         "décrit le SM-2 retiré en 2.0.0"),
+        ("moteur simple intégré",
+         "décrit le SM-2 retiré en 2.0.0"),
+        ("moteur de révision espacée sont le travail propre",
+         "faux depuis la 2.0.0 : la planification vient de fsrs-browser, et la "
+         "page Sources promet de correspondre à SOURCES.md"),
+        ("notre police de lecture",
+         "UthmanicHafs est la police du KFGQPC : nous ne l'avons pas dessinée "
+         "(rappelé par Yusuf le 30/07)"),
+    ]
+    for phrase, motif in PERIMEES:
+        for quoi, txt in PUBLICS.items():
+            if phrase.lower() in txt.lower():
+                err(f"texte public : « {phrase} » dans {quoi} — {motif}")
+
+    # (b) les nombres écrits en dur dans la prose publique doivent correspondre au
+    #     réel. On ne scanne QUE README et LISEZMOI, qui sont de la prose de bout
+    #     en bout : dans app.js les mêmes chiffres vivent aussi dans des exemples
+    #     de commentaires, et le jeu n'en vaut pas la chandelle.
+    reel = {
+        "roub'": len(META["rubs"]),
+        "versets": sum(len(R.get("verses") or []) for R in QURAN.values()),
+        "fiches": len(REGLES),
+    }
+    for quoi in ("README.md", "LISEZMOI.txt"):
+        for mot, attendu in reel.items():
+            for n in re.findall(r"(\d+)\s+" + re.escape(mot), PUBLICS[quoi]):
+                if int(n) != attendu:
+                    err(f"texte public : {quoi} annonce {n} {mot}, or il y en a "
+                        f"{attendu} — un chiffre écrit en dur a dérivé")
+
+    # (c) et les chiffres de cartes doivent au moins s'accorder ENTRE EUX : leur
+    #     valeur vraie se déduit du moteur, que ce script ne fait pas tourner,
+    #     mais une divergence entre documents est déjà un défaut.
+    cartes = set()
+    for txt in PUBLICS.values():
+        cartes.update(int(n) for n in re.findall(r"(\d{3,4})\s+cartes", txt))
+    if len(cartes) > 1:
+        err(f"texte public : le nombre de cartes diffère selon le document {sorted(cartes)}")
+
+    # (d) ce qu'on REDISTRIBUE doit être nommé des deux côtés : la page Sources de
+    #     l'appli affirme correspondre à SOURCES.md, ce qui n'a rien d'automatique
+    #     (le 30/07, SOURCES.md était corrigé et la page non).
+    for nom in ("fsrs-browser", "wasm-bindgen-rayon", "Digital Khatt", "QuranEnc"):
+        dans_md = nom.lower() in src_md.lower()
+        dans_app = nom.lower() in app_public.lower()
+        if dans_md != dans_app:
+            err(f"texte public : « {nom} » est nommé dans "
+                f"{'SOURCES.md mais pas dans la page Sources' if dans_md else 'la page Sources mais pas dans SOURCES.md'}")
+    print(f"M. textes publics : {len(PERIMEES)} formules périmées recherchées dans "
+          f"3 documents, chiffres ({', '.join(f'{v} {k}' for k, v in reel.items())}) "
+          f"confrontés au réel")
+
     print()
     if ERR:
         print(f"{len(ERR)} ERREUR(S)")

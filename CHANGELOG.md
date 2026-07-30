@@ -1,5 +1,17 @@
 # Changelog
 
+## 2.0.1 · 2026-07-30
+- La ligne de Paramètres s'intitule **« Version installée »**, et le numéro de la dernière version publiée n'y apparaît plus que sous la forme d'une mise à jour proposée. Le correctif de fond datait de la 1.31.1 ; ce qui restait, c'est qu'une installation plus ancienne affichait le numéro du serveur, et que rien dans le libellé n'empêchait de le prendre pour le sien
+- Bloc de bienvenue de l'accueil refait : une phrase d'introduction et une ligne par onglet au lieu d'un paragraphe compact, et le paragraphe sur l'apparence retiré (Paramètres le montre mieux que des phrases). Mesuré : 2 500 → 1 818 signes
+- **Trois affirmations fausses corrigées dans les textes publics** : le bloc d'accueil annonçait les trois calligraphies puis soutenait trois paragraphes plus loin que « la calligraphie du texte coranique ne change jamais » (vrai avant la 1.19.0, et la même phrase traînait dans le LISEZMOI) ; les couleurs du tajwid étaient données comme portées par la seule calligraphie du mushaf, alors que la police de lecture les porte aussi, posées par l'application ; la page Sources revendiquait encore « le moteur de révision espacée » comme travail propre de Roub'
+- **UthmanicHafs** n'est plus appelée « notre police de lecture » : elle est celle du Complexe du Roi Fahd
+- Le README ne prétend plus que le choix de calligraphie vaut pour les trois présentations : la page imprimée n'en offre qu'une
+- `docs/SYNC.md` décrivait un périmètre de synchronisation de trois clés en concluant que « les réglages restent par appareil » : il donne maintenant les huit clés de la charge utile et leur règle de fusion
+- Captures du README refaites : elles montraient une navigation à cinq entrées sans icônes, donc antérieure à la 1.23.0 et à l'onglet Statistiques
+- `tools/README.md` gagne les six scripts qui n'y figuraient pas et une section sur les bibliothèques vendorisées
+- **Deux contrôles neufs qui refusent une publication**, tous deux éprouvés par injection de fautes : les empreintes SHA-256 des bibliothèques redistribuées doivent correspondre à celles publiées par leur source (une normalisation de fins de ligne les avait déjà fait diverger), et les textes publics sont confrontés à une liste de formules connues pour vieillir mal, à leurs propres chiffres et à `SOURCES.md`
+- Nettoyage : deux règles CSS sans porteur retirées
+
 ## 2.0.0 · 2026-07-30
 - La révision espacée passe à **FSRS-6**, l'algorithme de planification qu'emploie Anki. Les cartes ne reviennent plus à intervalle simplement croissant : elles reviennent au moment où tu es sur le point de les oublier, calculé sur ton propre historique de révisions. Le calcul se fait sur l'appareil, rien n'est envoyé nulle part
 - **Deux boutons de notation au lieu de quatre** : tu dis seulement si le verset est venu ou non, ce sur quoi on ne peut pas se tromper. Les quatre restent disponibles dans Paramètres, avec une aide qui explique ce que chacun engage et pourquoi « Difficile » signifie « je l'ai su, avec peine » et jamais « je l'ai presque su »

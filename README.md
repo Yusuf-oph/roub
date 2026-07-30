@@ -31,10 +31,24 @@ filtres pour ne voir que ce qui reste à travailler ; l'état suit d'un appareil
 l'autre. En mode Mémoriser, chaque sourate courte annonce en plus ses propres
 règles et celles qui y apparaissent pour la première fois.
 
-Également : **révision espacée** intégrée avec export des cartes pour Anki
-(planificateur FSRS) et **synchronisation multi-appareils par code
-anonyme**. PWA installable ; le texte, le tafsir et l'interface fonctionnent
-hors-ligne dès la première visite.
+**Révision espacée par FSRS-6.** Les cartes reviennent au moment où l'on est sur
+le point de les oublier, et non à intervalle fixe : la planification est confiée
+à l'algorithme qu'emploie Anki, dans son implémentation de référence, exécuté sur
+l'appareil. Deux boutons de notation par défaut (venu / pas venu), quatre au
+choix, un réglage de « souvenir visé » et un bouton qui ajuste le modèle sur
+l'historique de celui qui révise. Les cartes s'exportent aussi **pour Anki** si
+l'on préfère réviser là-bas.
+
+**Suivre son avancement.** L'accueil regroupe les roub' **par juz**, chacun nommé
+par ses premiers mots. L'onglet **Statistiques** donne la série de jours, les
+cartes acquises, les versets jugés solides, la régularité sur trente jours, ce
+qui a bougé, l'écoute et l'état du paquet. Paramètres permet de **remettre à zéro
+une partie de sa progression** (cartes, auto-évaluations, tajwid, historique)
+sans toucher au reste.
+
+Également : **synchronisation multi-appareils par code anonyme**. PWA
+installable ; le texte, le tafsir et l'interface fonctionnent hors-ligne dès la
+première visite.
 
 **Apparence.** Trois habillages au choix (Vélin, Ardoise, Colophon), chacun
 en clair et en sombre, avec sa police, que tu peux remplacer sans
@@ -42,12 +56,14 @@ changer d'habillage. À la première visite l'application suit le réglage clair
 ou sombre de ton appareil ; la bascule en haut à droite tranche ensuite, et
 ton choix est retenu. Les animations se règlent aussi (elles suivent par
 défaut la préférence d'accessibilité du système). Tout est dans Paramètres.
-**La calligraphie du texte coranique se choisit** : notre police de lecture,
-**Digital Khatt** (qui reprend le trait du mushaf imprimé tout en restant du
-vrai texte), ou les **dessins de l'édition officielle du KFGQPC**, seuls à
-porter les couleurs tajwid, puisque ces couleurs sont dans la police et non dans
-l'application. Ce choix vaut pour les trois présentations : verset par verset,
-texte continu et page imprimée.
+**La calligraphie du texte coranique se choisit** : **UthmanicHafs**, la police de
+lecture du KFGQPC ; **Digital Khatt**, qui reprend le trait du mushaf imprimé tout
+en restant du vrai texte ; ou les **dessins de l'édition officielle du KFGQPC**, un
+par mot. Les **couleurs du tajwid** s'affichent avec UthmanicHafs, où
+l'application les pose elle-même, et avec les dessins officiels, où elles sont dans
+la police ; Digital Khatt ne les porte pas. Ce choix vaut pour
+le verset par verset et le texte continu ; la page imprimée, dont toute la raison
+d'être est de reproduire le mushaf, n'offre que la calligraphie officielle.
 
 ## Qui sommes-nous
 
@@ -80,9 +96,9 @@ l'export d'avis intégré à l'application, dans Paramètres).
   planificateur est un module que le navigateur refuse de charger depuis un
   simple fichier, la même restriction qui y empêche déjà la synchronisation.
 
-### L'accueil : les 24 roub' et leur difficulté
+### L'accueil : les roub' par juz, avec leur difficulté
 
-![Accueil : les roub' des juz 1, 2 et 'Amma](docs/img/accueil-clair.png)
+![Accueil : les roub' regroupés par juz, chaque juz nommé par ses premiers mots](docs/img/accueil-clair.png)
 
 ### Mémoriser : présentation et calligraphie au choix, tajwid, audio
 
@@ -92,9 +108,9 @@ l'export d'avis intégré à l'application, dans Paramètres).
 
 ![La page imprimée du mushaf, calligraphie officielle colorée](docs/img/pages-mushaf-clair.png)
 
-### Révision espacée intégrée
+### Révision espacée, planifiée par FSRS-6
 
-![Révision espacée, à la façon d'Anki](docs/img/revision-clair.png)
+![Révision espacée : choix des roub' et des types de cartes, session à démarrer](docs/img/revision-clair.png)
 
 ## Sources et licences
 
@@ -115,6 +131,11 @@ onglet **Sources**.
   se mettent en cache au fil de l'écoute. Usage non commercial.
 - Soulignage mot à mot : segments de la Quranic Universal Library
   (qul.tarteel.ai), un jeu par style.
+- Planification des révisions : **FSRS-6** par la bibliothèque `fsrs-browser`
+  (Open Spaced Repetition, BSD-3-Clause, © 2023 Alex Nguyen), qui embarque un
+  fragment de `wasm-bindgen-rayon` (© Google, Apache-2.0) ; les deux textes de
+  licence accompagnent les fichiers dans `app/vendor/`. Les avertissements des
+  réglages reprennent la documentation d'Anki, attribuée et non traduite.
 - Tafsir : « French Translation of Al-Mukhtasar in Interpreting the Noble
   Quran », Tafsir Center for Quranic Studies, V1.0.0, via QuranEnc.com,
   reproduit sans modification (conditions de QuranEnc.com).
