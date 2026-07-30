@@ -1,11 +1,7 @@
 {
-  "version": "2.0.1",
+  "version": "2.0.2",
   "date": "2026-07-30",
   "notes": [
-    "La ligne de Paramètres s'intitule maintenant « Version installée », et le numéro de la dernière version publiée n'y apparaît plus que sous la forme d'une mise à jour proposée. On ne peut donc plus croire qu'on est à jour parce qu'on lit le numéro du serveur",
-    "Le bloc de bienvenue de l'accueil est refait : plus court, une ligne par onglet. Le paragraphe sur l'apparence a été retiré, Paramètres le montre mieux que des phrases",
-    "Trois affirmations qui ne disaient plus la vérité sont corrigées : la calligraphie du texte coranique se choisit bel et bien (un paragraphe soutenait le contraire), les couleurs du tajwid s'affichent aussi avec la police de lecture et non seulement avec la calligraphie du mushaf, et la page Sources ne revendique plus la planification des révisions comme notre travail depuis qu'elle vient de FSRS",
-    "UthmanicHafs n'est plus présentée comme « notre » police de lecture : elle est celle du Complexe du Roi Fahd, nous ne l'avons pas dessinée",
-    "Documentation du dépôt remise à jour et captures d'écran refaites, celles du README montrant encore une navigation de plusieurs versions en arrière"
+    "Correction d'un défaut de la 2.0.1 : une note de développement s'affichait dans la barre d'options de l'onglet Mémoriser, entre les réglages d'affichage et les boutons « Masquer ». Elle n'avait rien à faire là et a disparu"
   ]
 }

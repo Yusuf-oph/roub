@@ -685,6 +685,17 @@ def main():
     print("L. fsrs : 3 fichiers présents et retenus par shell_files, "
           "2 licences, SOURCES.md à jour")
 
+    # ⚠ `node --check` est lancé ICI, et pas seulement à la main dans le workflow :
+    # le 30/07 j'ai cassé la syntaxe de app.js en écrivant la séquence de fermeture
+    # d'un commentaire À L'INTÉRIEUR d'un commentaire, et je ne l'ai vu qu'au coup
+    # d'après. Une barrière qui dépend de la mémoire de celui qui publie n'est pas
+    # une barrière.
+    r_syn = subprocess.run(["node", "--check", os.path.join(APP, "app.js")],
+                           capture_output=True)
+    if r_syn.returncode != 0:
+        err("app.js ne compile pas : "
+            + r_syn.stderr.decode("utf-8", "replace").strip().split("\n")[0])
+
     # ---------------- M. cohérence des textes PUBLICS ----------------
     # ⚠ POURQUOI CE CONTRÔLE EXISTE. L'audit du 30/07 a trouvé CINQ affirmations
     # FAUSSES dans des textes lus par les utilisateurs, dont une contradiction
@@ -739,6 +750,22 @@ def main():
         for quoi, txt in PUBLICS.items():
             if phrase.lower() in txt.lower():
                 err(f"texte public : « {phrase} » dans {quoi} — {motif}")
+
+    # (a bis) UN COMMENTAIRE POSÉ DANS UN GABARIT N'EST PAS UN COMMENTAIRE, C'EST
+    # DU TEXTE. Livré en 2.0.1 et vu par Yusuf dans l'appli : une note de
+    # développement s'affichait dans la barre d'options de Mémoriser, parce qu'un
+    # `/* */` avait été écrit entre deux morceaux d'un `h += \`...\``.
+    # ⚠ Prédicat ÉTROIT et assumé : un commentaire suivi immédiatement d'une BALISE
+    # ouvrante. J'ai d'abord tenté un analyseur maison qui suivait chaînes,
+    # gabarits et `${}` ; il rendait quatre faux positifs et ne voyait pas la vraie
+    # faute, la profondeur d'accolades des expressions le désynchronisant. Celui-ci
+    # est bête, mais il attrape la faute réelle (vérifié contre le app.js de la
+    # 2.0.1) et ne crie sur rien dans le fichier sain.
+    for m in re.finditer(r"/\*.*?\*/", app_src, re.S):
+        if app_src[m.end():m.end() + 200].lstrip().startswith("<"):
+            err(f"texte public : app.js l.{app_src[:m.start()].count(chr(10)) + 1} — "
+                f"commentaire suivi d'une balise, donc probablement DANS un gabarit : "
+                f"il s'afficherait tel quel dans l'application")
 
     # (b) les nombres écrits en dur dans la prose publique doivent correspondre au
     #     réel. On ne scanne QUE README et LISEZMOI, qui sont de la prose de bout

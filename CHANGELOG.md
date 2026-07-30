@@ -1,5 +1,8 @@
 # Changelog
 
+## 2.0.2 · 2026-07-30
+- Correction d'un défaut de la 2.0.1 : une note de développement s'affichait dans la barre d'options de l'onglet Mémoriser, entre les réglages d'affichage et les boutons « Masquer ». Elle n'avait rien à faire là et a disparu
+
 ## 2.0.1 · 2026-07-30
 - La ligne de Paramètres s'intitule **« Version installée »**, et le numéro de la dernière version publiée n'y apparaît plus que sous la forme d'une mise à jour proposée. Le correctif de fond datait de la 1.31.1 ; ce qui restait, c'est qu'une installation plus ancienne affichait le numéro du serveur, et que rien dans le libellé n'empêchait de le prendre pour le sien
 - Bloc de bienvenue de l'accueil refait : une phrase d'introduction et une ligne par onglet au lieu d'un paragraphe compact, et le paragraphe sur l'apparence retiré (Paramètres le montre mieux que des phrases). Mesuré : 2 500 → 1 818 signes

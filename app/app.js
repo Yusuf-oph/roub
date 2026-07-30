@@ -1939,16 +1939,20 @@ function secMemoriser(R) {
       <div class="mo-grp"><span class="mo-lab">Écriture</span>${chipsRendu(pres)}</div>
       <div class="mo-grp"><span class="mo-lab">Affichage</span>${chipCouleurs()}
         <button class="chip ${PARAMS.silentMarks ? "on" : ""}" data-opt="silentMarks" title="les ronds ۟ au-dessus des lettres écrites mais non prononcées">Ronds muets</button>`;
+  /* ⚠ Masquer ≠ ne pas afficher, et la nuance est la raison d'être de ces deux
+     puces : la puce « Translittération » fait disparaître la ligne pour de bon,
+     alors que « Masquer » la floute et la DÉVOILE AU CLIC, ce qui est un geste de
+     mémorisation (je me teste, puis je vérifie). Retiré le 30/07 comme un doublon,
+     rétabli le même jour par Yusuf une fois la nuance dite : ne pas le
+     « simplifier » à nouveau.
+     ⚠⚠ ET CE COMMENTAIRE RESTE ICI, HORS DU GABARIT : posé au milieu du `h += `
+     qui suit, il s'affichait TEL QUEL dans l'appli (livré en 2.0.1, vu par Yusuf).
+     Un commentaire de bloc écrit dans un gabarit n'est pas un commentaire, c'est
+     du texte. */
   if (pres === "versets") {
     h += `
         <button class="chip ${PARAMS.showTl ? "on" : ""}" data-opt="showTl">Translittération</button>
         <button class="chip ${PARAMS.showTr ? "on" : ""}" data-opt="showTr">Traduction</button></div>
-      /* ⚠ Masquer ≠ ne pas afficher, et la nuance est la raison d'être de ces deux
-         puces : la puce « Translittération » ci-dessus la fait disparaître pour de
-         bon, alors que « Masquer » la floute et la DÉVOILE AU CLIC, ce qui est un
-         geste de mémorisation (je me teste, puis je vérifie). Retiré le 30/07
-         comme un doublon, rétabli le même jour par Yusuf une fois la nuance dite :
-         ne pas le « simplifier » à nouveau. */
       <div class="mo-grp"><span class="mo-lab">Masquer</span>
         <button class="chip ${memoState.maskAr ? "on" : ""}" data-mask="maskAr">L'arabe</button>
         <button class="chip ${memoState.maskTl ? "on" : ""}" data-mask="maskTl">La translit.</button></div>`;
@@ -4278,7 +4282,7 @@ async function syncJoin(raw) {
 }
 
 /* ---------------- PWA : service worker + mises à jour ---------------- */
-const BUILD_VERSION = "2.0.1";   // réécrit par tools/release.py
+const BUILD_VERSION = "2.0.2";   // réécrit par tools/release.py
 const SITE_URL = "https://yusuf-oph.github.io/roub/";
 let APPVER = "";
 async function fetchVersion() {
