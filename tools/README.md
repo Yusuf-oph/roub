@@ -109,8 +109,8 @@ répond (sinon on photographie la page d'erreur, et les quatre fichiers sortent
 de taille identique : signal d'alerte), puis, pour chacune :
 
 ```bash
-msedge --headless --disable-gpu --hide-scrollbars --window-size=1280,1100 \
-  --user-data-dir=<profil NEUF> --virtual-time-budget=8000 \
+msedge --headless --disable-gpu --hide-scrollbars --edge-skip-compat-layer-relaunch \
+  --window-size=1280,1100 --user-data-dir=<profil NEUF> --virtual-time-budget=8000 \
   --screenshot=<chemin ABSOLU>.png \
   "http://localhost:8768/app/index.html?theme=light#<route>"
 ```
@@ -128,6 +128,9 @@ Pièges, tous rencontrés :
   le second ne fait rien, sans message, et l'ancienne image reste en place.
   Contrôler la date de chaque fichier après coup.
 - `--headless` seul, **pas** `--headless=new`, qui échoue ici.
+- **`--edge-skip-compat-layer-relaunch` obligatoire depuis Edge 154.0.4258.62** :
+  sans elle, msedge se relance lui-même et rend la main avant d'avoir écrit
+  l'image. Même option dans `build_icones.py` et `md2pdf_ar.py`.
 - Chemin de sortie **absolu** (un chemin relatif donne « Access is denied »).
 - L'écriture est asynchrone : attendre la ligne « bytes written to file ».
 - Profil neuf = bloc d'accueil déplié, comme sur les captures publiées.

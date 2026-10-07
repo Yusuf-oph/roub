@@ -189,7 +189,8 @@ def main():
     tmp = os.path.abspath(dest) + ".html"
     with open(tmp, "w", encoding="utf-8") as f:
         f.write(page)
-    subprocess.run([edge(), "--headless", "--disable-gpu", "--no-pdf-header-footer",
+    subprocess.run([edge(), "--headless", "--disable-gpu", "--edge-skip-compat-layer-relaunch",
+                    "--no-pdf-header-footer",
                     f"--print-to-pdf={os.path.abspath(dest)}",
                     "file:///" + tmp.replace("\\", "/")],
                    check=True, capture_output=True, timeout=180)

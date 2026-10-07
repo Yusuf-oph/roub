@@ -60,6 +60,7 @@ def rendre(svg, sortie, cote, navigateur):
         # second ne fait rien, sans message, en laissant l'ancienne image
         subprocess.run(
             [navigateur, "--headless", "--disable-gpu", "--hide-scrollbars",
+             "--edge-skip-compat-layer-relaunch",
              f"--window-size={cote},{cote}",
              f"--user-data-dir={Path(tmp) / 'profil'}",
              "--virtual-time-budget=4000",
